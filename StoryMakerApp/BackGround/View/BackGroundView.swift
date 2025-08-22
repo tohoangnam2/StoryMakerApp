@@ -8,34 +8,122 @@
 import SwiftUI
 
 struct BackGroundView: View {
+    
+    @ObservedObject var vm = BackGroundViewModel()
+    
+    @Environment(\.dismiss) var dismiss
+
+    //next page
+    
+    @State private var selectedFrame: Frame? = nil
+    @State var isNextPage = false
+    
+    let onPicked: (Frame) -> Void
+
+    
     var body: some View {
         NavigationView{
             ZStack{
-                VStack {
-                    VStack{
-                        HStack{
-                            Image("img_bg_check")
-                                .opacity(0)
-                            Spacer()
-                            Text("Background")
-                                .font(.system(size: 16, weight: .medium, design: .default))
-                            Spacer()
-                            Image("img_bg_check")
-                        }
-                        .padding(.horizontal)
+                VStack{
+                    HStack{
+                        Image("img_bg_check")
+                            .opacity(0)
                         Spacer()
+                        Text("Background")
+                            .font(.system(size: 18, weight: .medium, design: .default))
+                        Spacer()
+                        Button(action: {
+                            if let selected = selectedFrame {
+                                onPicked(selected)
+                                dismiss()
+                            }
+                        }) {
+                            Image("img_bg_check")
+                                .foregroundColor(selectedFrame != nil ? .green : .gray)
+                        }
+                    }
+                    .padding(.horizontal , 16)
+                    VStack {
+                        if let _ = vm.model {
+                            CategoryTagView(vm: vm)
+                                ScrollView {
+                                    LazyVGrid(
+                                        columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
+                                        spacing: 5
+                                    ) {
+                                        ForEach(vm.framesForSelectedCategory()) { frame in
+                                            
+                                                AsyncImage(url: frame.thumbURL) { img in
+                                                    
+                                                    img.resizable()
+                                                        .scaledToFill()
+                                                }
+                                                
+                                                placeholder: {
+                                                    Color.gray.opacity(0.3)
+                                                }
+                                                .frame(width: UIScreen.main.bounds.width/5 - 16,
+                                                       height: UIScreen.main.bounds.width/5-16)
+                                                .clipped()
+                                                .cornerRadius(8)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(selectedFrame?.id == frame.id ? Color.blue : Color.clear, lineWidth: 3)
+                                                )
+                                               
+                                                .onTapGesture {
+                                                    selectedFrame = frame
+                                            }
                         
+                                        }
+                                    }
+                                    .padding(.all, 12)
+                                }
+
+                        } else {
+                            Text("Error")
+                        }
+                    }
+                    .onAppear {
+                        vm.fetch()
                     }
                     
                 }
+                
+//                NavigationLink(
+//                    destination: AddProjectView(frame: selectedFrame),
+//                    isActive: $isNextPage
+//                ){
+//                    EmptyView()
+//                }
+                
             }
+            
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
-
+        
     }
-
+    
+}
+struct CategoryTagView: View {
+    @ObservedObject var vm: BackGroundViewModel
+    
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(vm.model?.config.category ?? [], id: \.id) { category in
+                    Text(category.name)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .foregroundColor(vm.selectedCategory?.id == category.id ? .red : .black)
+                        .onTapGesture {
+                            vm.selectedCategory = category
+                        }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
 }
 
-#Preview {
-    BackGroundView()
-}

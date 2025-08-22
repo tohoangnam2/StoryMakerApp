@@ -8,8 +8,69 @@
 import SwiftUI
 
 struct HomeView: View {
+    
+    @State var mockDataImage: [UIImage] = [
+        UIImage(imageLiteralResourceName: "home_mockdata"),
+        UIImage(imageLiteralResourceName: "home_mockdata"),
+        UIImage(imageLiteralResourceName: "home_mockdata")
+        
+    ]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView{
+            ZStack{
+                VStack(spacing:300){
+                    VStack(spacing: 30){
+                        VStack(spacing: 25){
+                            HStack{
+                                NavigationLink(destination: SplashView()){
+                                    Image("home_icTabbar")
+                                }
+                                Spacer()
+                                Text("Art story".uppercased())
+                                    .font(.system(size: 18, weight: .bold, design: .default))
+                                Spacer()
+                                Image("home_icTabbar")
+                                    .opacity(0)
+                                
+                            }
+                            .padding(.horizontal,20)
+                            Text("Recent Project".uppercased())
+                                .font(.system(size: 18, weight: .bold, design: .default))
+                                .frame(maxWidth: .infinity, alignment: .topLeading)
+                                .padding(.leading,25)
+                        }
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                ForEach(mockDataImage.indices, id: \.self) { index in
+                                    Image(uiImage: mockDataImage[index])
+                                        .resizable()
+                                        .frame(width: 97, height: 207)
+                                        .cornerRadius(8)
+                                }
+                            }
+                            .padding(.horizontal)
+                            Spacer()
+                        }
+                        
+                        
+                    }
+                    VStack(spacing:15){
+                        withAnimation(.spring){
+                            NavigationLink(destination: AddProjectView()) {
+                                Image("home_icBtn")
+                            }
+                        }
+                        Text("Add new Project")
+                            .font(.system(size: 16, weight: .medium, design: .default))
+                    }
+                    .padding(.bottom,20)
+                }
+            }
+        }
+        .navigationBarBackButtonHidden(true)
+
+        
     }
 }
 
