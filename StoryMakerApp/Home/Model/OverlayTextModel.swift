@@ -23,6 +23,7 @@ struct OverlayTextModel: Identifiable {
     
     var isSelected: Bool = false
     var isEditingText: Bool = false
+    var isShowBGText : Bool = false
 }
 
 enum OverlayTextEditEnum {
