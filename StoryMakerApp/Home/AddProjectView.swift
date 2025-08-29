@@ -20,19 +20,16 @@ struct AddProjectView: View {
     //show bàn phím
     @FocusState private var isTextFieldFocused: Bool
     @State private var showTextField: Bool = false
-    //    @State private var overlayText: String = ""
     
     @State var isSelected : Bool = false
     @State var isEditingText = false
     
     //bg text
     
-    
     //edit text
     
     @State var selectedEditText : OverlayTextEditEnum? = nil
-
-
+    
     
     var body: some View {
         NavigationView {
@@ -55,158 +52,408 @@ struct AddProjectView: View {
                                        showTextField: $showTextField,
                                        isTextFieldFocused: $isTextFieldFocused,
                                        isSelected : $isSelected, isEditingText: $isEditingText
-                                        )
+                    )
                     {
                         isShowBackgroundPicker = true
-
+                        
                     }
-
-                    if !isTextFieldFocused  {
-                        if !isSelected {
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    let newOverlay = overlayVM.addOverlay("")
-                                    overlayVM.selectOverlay(newOverlay.id)
-                                    isTextFieldFocused = true
-                                    showTextField = true
-                                    isSelected = true
-                                }) {
-                                    VStack {
-                                        Image("home_tabbartext")
-                                        Text("Add Text")
-                                    }
-                                    .foregroundColor(.black.opacity(0.8))
-                                }
-                                Spacer()
-                                Button(action: { selectedTab = 1; isShowBackgroundPicker = true}) {
-                                    VStack {
-                                        Image("home_tabbarbg")
-                                        Text("Background")
-                                    }
-                                    .foregroundColor(.black.opacity(0.8))
-                                }
-                                Spacer()
-                            }
-                            .padding(.top)
-                            .background(ignoresSafeAreaEdges: .bottom)
-                        } else {
-                            ScrollView(.horizontal){
-                                HStack {
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
-                                            Image("img_edit1_text")
-                                            Text("Edit")
+                    
+                    if let editType = selectedEditText {
+                        VStack(spacing: 0) {
+                            switch editType {
+                            case .fontSize:
+                                VStack{
+                                    HStack {
+                                        Button(action: {}) {
+                                            Image("img_edit1_keyboard")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
+                                        Spacer()
+                                        Text(editType.title)
+                                            .font(.system(size: 16, weight: .medium))
+                                        Spacer()
+                                        Button(action: {
+                                            selectedEditText = nil
+                                        }) {
+                                            Image("img_bg_check")
+                                        }
+                                        .background(.white)
                                     }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
+                                    .padding(.horizontal)
+                                    HStack (spacing: 20) {
+                                        Button(action: {
+                                            selectedEditText = .fontSize
+                                        }) {
+                                            Image("img_edit1_text")
+                                        }
+                                        Button(action: {
+                                            selectedEditText = .fontFamily
+                                        }) {
                                             Image("img_edit1_size")
-                                            Text("Size")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
-                                    }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
+                                        Button(action: {
+                                            selectedEditText = .colorSolid
+                                            
+                                        }) {
                                             Image("img_edit1_color")
-                                            Text("Color")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
-                                    }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
+                                        
+                                        Button(action: {
+                                            selectedEditText = .gradient
+                                        }) {
                                             Image("img_edit1_gradient")
-                                            Text("Gradient")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
-                                    }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
+                                        Button(action: {
+                                            selectedEditText = .stroke
+                                        }) {
                                             Image("img_edit1_stroke")
-                                            Text("Stroke")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
-                                    }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
-                                            Image("img_edit1_text")
-                                            Text("Size")
+                                        Button(action: {
+                                            selectedEditText = .align
+                                        }) {
+                                            Image("img_edit1_align")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
-                                    }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
-                                            Image("img_edit1_text")
-                                            Text("Size")
+                                        Button(action: {
+                                            selectedEditText = .shadow
+                                        }) {
+                                            Image("img_edit1_shadow")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
-                                    }
-                                    Spacer()
-                                    Button(action: {
-
-                                    }) {
-                                        VStack {
-                                            Image("img_edit1_text")
-                                            Text("Size")
+                                        Button(action: {
+                                            selectedEditText = .background
+                                        }) {
+                                            Image("img_edit1_bg")
                                         }
-                                        .foregroundColor(.black.opacity(0.8))
                                     }
-                                    Spacer()
-
+                                    .padding(10)
+                                    .padding(.horizontal,12)
+                                    .background(Color.gray.opacity(0.2).cornerRadius(70))
                                 }
-                                .padding(.top)
-                                .background(ignoresSafeAreaEdges: .bottom)
+                                
+                                
+                            case .fontFamily:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
+                            case .colorSolid:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
+                            case .gradient:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
+                            case .stroke:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
+                            case .align:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
+                            case .background:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
+                            case .shadow:
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
+                                    }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal, 20)
+                                Image(editType.img)
+                                
                             }
                             
+                            
+                            switch editType {
+                            case .fontSize:
+                                TextView(selectedEditText: .fontSize)
+                                    .transition(.move(edge: .bottom))
+                            case .fontFamily:
+                                TextView(selectedEditText: .fontFamily)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case .colorSolid:
+                                TextView(selectedEditText: .colorSolid)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case .gradient:
+                                TextView(selectedEditText: .gradient)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case .stroke:
+                                TextView(selectedEditText: .stroke)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case .align:
+                                TextView(selectedEditText: .align)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case .background:
+                                TextView(selectedEditText: .background)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case .shadow:
+                                TextView(selectedEditText: .shadow)
+                                    .transition(.move(edge: .bottom))
+                                
+                            case nil:
+                                ProgressView()
+                                
+                            }
                         }
                     }
                     else {
-                        HStack {
-                            Button(action: {
+                        
+                        
+                        if !isTextFieldFocused  {
+                            if !isSelected {
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        let newOverlay = overlayVM.addOverlay("")
+                                        overlayVM.selectOverlay(newOverlay.id)
+                                        isTextFieldFocused = true
+                                        showTextField = true
+                                        isSelected = true
+                                    }) {
+                                        VStack {
+                                            Image("home_tabbartext")
+                                            Text("Add Text")
+                                        }
+                                        .foregroundColor(.black.opacity(0.8))
+                                    }
+                                    Spacer()
+                                    Button(action: { selectedTab = 1; isShowBackgroundPicker = true}) {
+                                        VStack {
+                                            Image("home_tabbarbg")
+                                            Text("Background")
+                                        }
+                                        .foregroundColor(.black.opacity(0.8))
+                                    }
+                                    Spacer()
+                                }
+                                .padding(.top)
+                                .background(ignoresSafeAreaEdges: .bottom)
+                            } else {
+                                ScrollView(.horizontal){
+                                    HStack (spacing: 16) {
+                                        Spacer()
+                                        Button(action: {
+                                            selectedEditText = .fontSize
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_text")
+                                                Text("Edit")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_size")
+                                                Text("Size")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_color")
+                                                Text("Color")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_gradient")
+                                                Text("Gradient")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_stroke")
+                                                Text("Stroke")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_text")
+                                                Text("Size")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_text")
+                                                Text("Size")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            
+                                        }) {
+                                            VStack {
+                                                Image("img_edit1_text")
+                                                Text("Size")
+                                            }
+                                            .foregroundColor(.black.opacity(0.8))
+                                        }
+                                        Spacer()
+                                        
+                                    }
+                                    .padding(.top)
+                                    .background(ignoresSafeAreaEdges: .bottom)
+                                }
                                 
-                            }) {
-                                Image("img_textEdit")
-                                    .opacity(0)
                             }
-                            Spacer()
-                            
-                            Text("Text Edit")
-                                .font(.system(size: 16, weight: .medium, design: .default))
-                            Spacer()
-                            Button(action: {
-                                showTextField = false
-                                isTextFieldFocused = false
-                                isSelected = true
-                            }) {
-                                Image("img_bg_check")
-                            }
-                            .background(.white)
                         }
-                        .padding(.horizontal,20)
+                        
+                        else {
+                            HStack {
+                                Button(action: {
+                                }) {
+                                    Image("img_textEdit")
+                                        .opacity(0)
+                                }
+                                Spacer()
+                                
+                                Text("Text Edit")
+                                    .font(.system(size: 16, weight: .medium, design: .default))
+                                Spacer()
+                                Button(action: {
+                                    showTextField = false
+                                    isTextFieldFocused = false
+                                    isSelected = true
+                                    
+                                }) {
+                                    Image("img_bg_check")
+                                }
+                                .background(.white)
+                            }
+                            .padding(.horizontal,20)
+                        }
+                        
                     }
-  
                 }
             }
         }
@@ -227,6 +474,13 @@ struct AddProjectView: View {
     }
 }
 
+enum EditMode {
+    case none
+    case moving
+    case rotating
+    case scaling
+}
+
 struct AddBackgroundsView: View {
     
     @ObservedObject var overlayVM: OverlayTextViewModel
@@ -242,7 +496,7 @@ struct AddBackgroundsView: View {
     @State private var isShowImage = false
     
     //xoay
-    var angle: Angle = Angle(degrees: 0)
+    var angle: Angle = .zero
     var currentAngle : Angle = Angle(degrees: 0)
     var isRotating: Bool = false
     
@@ -259,7 +513,15 @@ struct AddBackgroundsView: View {
     @Binding var isEditingText : Bool
     
     @State var isShowBGText: Bool = false
+    
+    @State var isCheck : Bool = false
+    
+    @State private var currentMode: EditMode = .none
+    @State private var rotBase: Double = 0
+    @State private var rotInProgress = false
+    
 
+    
     let onAddTap: () -> Void
     
     
@@ -272,12 +534,14 @@ struct AddBackgroundsView: View {
                             .scaledToFill()
                             .frame(maxWidth: .infinity,maxHeight: .infinity)
                         
-                            //img
+                        //img
                             .onTapGesture {
                                 showTextField = false
-                                overlayVM.setEditingSelectedOverlay(true)
+                                overlayVM.setEditingSelectedOverlay(false)
+                                overlayVM.deselectAll()
                                 if !isEditingText {
                                     isSelected = false
+                                    
                                 }
                             }
                             .overlay(
@@ -293,151 +557,180 @@ struct AddBackgroundsView: View {
                                                 .focused($isTextFieldFocused)
                                                 .onSubmit {
                                                     showTextField = false
-//                                                    overlay.isEditingText = false
                                                 }
                                         }
-
+                                        
                                         else  {
-                                            
-                                            Button(action: {
-//                                                overlayVM.selectOverlay(overlay.id)
-                                                
-//                                                isSelected.toggle()
-//                                                overlay.isEditingText = true
-                                                overlayVM.setEditingSelectedOverlay(false)
-                                                if !overlay.isEditingText {
-                                                    isSelected = true
-//                                                    showTextField = true
-                                                    isTextFieldFocused = true
-                                                }
-                                                print(overlay.id)
-
-                                            }){
+                                            ZStack{
+                                                VStack{
+                                                    Spacer()
                                                 Text(overlay.text)
-                                                    .font(.system(size: 40, weight: .bold))
+                                                    .font(.system(size: 28, weight: .bold))
                                                     .foregroundColor(.white)
                                                     .shadow(radius: 2)
                                                     .padding()
-                                                    .onTapGesture(count: 2, perform: {
+                                                    .onTapGesture(perform: {
+                                                        overlayVM.setEditingSelectedOverlay(false)
                                                         overlayVM.selectOverlay(overlay.id)
+                                                        if !overlay.isEditingText {
+                                                            isSelected = true
+                                                            isTextFieldFocused = true
+                                                            
+                                                        }
+                                                        print(overlay.id)
+                                                    })
+                                                    .onTapGesture(count: 2, perform: {
+                                                        
                                                         showTextField = true
                                                         isTextFieldFocused = true
                                                     })
-
-                                            }
-                                            .background(
-                                                Group{
-                                                    if !overlay.isEditingText {
-                                                        Rectangle()
-                                                            .stroke(style: StrokeStyle(lineWidth: 2))
-                                                            .foregroundColor(Color.black.opacity(0.6))
-                                                    }
-                                                }
-                                            )
-                                            .background(
-                                                Group{
-                                                    if !overlay.isEditingText {
-                                                GeometryReader { textGeo in
-                                                    ZStack {
-                                                        Image("img_edit_x")
-                                                            .position(x: 0, y: 0)
-                                                            .onTapGesture {
-                                                                overlayVM.removeOverlay(overlay.id)
-                                                            }
-                                                        
-                                                        Image("img_edit_copy")
-                                                            .position(x: textGeo.size.width, y: 0)
-                                                            if 
-                                                            .onTapGesture {
-                                                                    overlayVM.copyOverlay(overlay)
-                                                                for item in overlayVM.overlays {
-                                                                    print(item.id)
+                                                
+                                                
+                                                    .background(
+                                                        Group{
+                                                            if !overlay.isEditingText {
+                                                                GeometryReader {textGeo in
+                                                                    ZStack {
+                                                                        Rectangle()
+                                                                            .stroke(style: StrokeStyle(lineWidth: 2))
+                                                                            .foregroundColor(Color.black.opacity(0.6))
+                                                                        Image("img_edit_x")
+                                                                            .padding(10)
+                                                                        
+                                                                            .position(x: 0, y: 0)
+                                                                            .onTapGesture {
+                                                                                overlayVM.removeOverlay(overlay.id)
+                                                                            }
+                                                                        
+                                                                        Image("img_edit_copy")
+                                                                            .padding(10)
+                                                                        
+                                                                            .position(x: textGeo.size.width, y: 0)
+                                                                            .onTapGesture {
+                                                                                overlayVM.selectOverlay(overlay.id)
+                                                                                overlayVM.copyOverlay(overlay)
+                                                                                for item in overlayVM.overlays {
+                                                                                    print(item.id)
+                                                                                }
+                                                                            }
+                                                                        
+                                                                        Image("img_edit_xoay")
+                                                                            .padding(10)
+                                                                            .position(x: 0, y: textGeo.size.height)
+                                                                        
+                                                                        Image("img_edit_zoom")
+                                                                            .padding(10)
+                                                                            .position(x: textGeo.size.width, y: textGeo.size.height)
+                                                                            .gesture(
+                                                                                MagnificationGesture()
+                                                                                    .onChanged { value in
+                                                                                        if currentMode == .none {
+                                                                                            currentMode = .scaling
+                                                                                        }
+                                                                                        if currentMode == .scaling {
+                                                                                            overlay.currentZoom = value - 1
+                                                                                        }
+                                                                                    }
+                                                                                    .onEnded { _ in
+                                                                                        overlay.scaleZoom += overlay.currentZoom
+                                                                                        overlay.currentZoom = 0
+                                                                                        currentMode = .none
+                                                                                    }
+                                                                            )
+                                                                    }
                                                                 }
                                                             }
-                                                        
-                                                        Image("img_edit_xoay")
-                                                            .position(x: 0, y: textGeo.size.height)
-                                                            .onTapGesture {
-                                                                overlay.isRotating.toggle()
-                                                                print("onXoay")
-                                                            }
-                                                        Image("img_edit_zoom")
-                                                            .position(x: textGeo.size.width, y: textGeo.size.height)
-                                                            .onTapGesture {
-                                                                overlay.isZoom.toggle()
-                                                                print("onZoom")
-                                                            }
-                                                    }
-                                                }
-                                                    }
-                                                }
-                                            )
-                                            .fixedSize()
-//                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                            .offset(overlay.offset)
-                                            .gesture(
-                                                DragGesture()
-                                                    .onChanged { value in
-                                                        withAnimation (.easeInOut) {
-                                                            overlay.offset = CGSize(
-                                                                width: overlay.endset.width + value.translation.width,
-                                                                height: overlay.endset.height + value.translation.height
-                                                            )
-                                                        }
-
-                                                       
-                                                    }
-                                                    .onEnded({ value in
-                                                        withAnimation (.easeInOut) {
-                                                            overlay.endset = overlay.offset
-                                                        }
-                                                    })
-                                            )
-                                        //text
-
-                                        //xoay -zoom
-                                            .rotationEffect(overlay.angle)
-                                            .scaleEffect( 1 + overlay.currentZoom )
-                                            .gesture(
-                                                RotationGesture()
-                                                    .onChanged { value in
-                                                        withAnimation (.easeInOut) {
-                                                            
-                                                            overlay.angle = overlay.currentAngle + value
-                                                        }
-                                                    }
-                                                    .onEnded { value in
-                                                        withAnimation(.easeInOut) {
-                                                            overlay.currentAngle = value
                                                         }
                                                         
+                                                    )
+                                                    .fixedSize()
+                                                    .offset(overlay.offset)
+                                                    .gesture(
+                                                        DragGesture(coordinateSpace: .named("canvas"))
+                                                            .onChanged { value in
+                                                                if currentMode == .none {
+                                                                    currentMode = .moving
+                                                                }
+                                                                if currentMode == .moving {
+                                                                    overlay.offset = CGSize(
+                                                                        width: overlay.endset.width + value.translation.width,
+                                                                        height: overlay.endset.height + value.translation.height
+                                                                    )
+                                                                }
+                                                            }
+                                                            .onEnded { _ in
+                                                                if currentMode == .moving {
+                                                                    overlay.endset = overlay.offset
+                                                                }
+                                                                currentMode = .none
+                                                            }
+                                                    )
+                                                    .rotationEffect(overlay.angle)
+                                                    .scaleEffect( 1 + overlay.currentZoom + overlay.scaleZoom )
+                                                    Spacer()
+
+                                                    Button(action: {}) {
+                                                        Text("Xoay")
+                                                            .font(.title)
+                                                            .foregroundColor(.white)
+                                                            .padding(40)
+                                                            .background(Color.blue.cornerRadius(10))
                                                     }
+                                                    .gesture(
+                                                        DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                                                             .onChanged { value in
+                                                                 // Lấy tâm của nút để xoay quanh
+                                                                 let center = CGPoint(x: 40, y: 40) // nút có padding(40) nên tâm khoảng (40,40)
+                                                                 
+                                                                 // Góc hiện tại và góc ban đầu
+                                                                 let current = atan2(value.location.y - center.y,
+                                                                                     value.location.x - center.x)
+                                                                 let start = atan2(value.startLocation.y - center.y,
+                                                                                   value.startLocation.x - center.x)
+
+                                                                 let delta = current - start
+                                                                 overlay.angle = Angle(radians: overlay.currentAngle.radians + delta)
+                                                             }
+                                                             .onEnded { _ in
+                                                                 overlay.currentAngle = overlay.angle
+                                                                 overlay.angle = Angle(degrees: overlay.angle.degrees.truncatingRemainder(dividingBy: 360))
+                                                             }
+                                                    )
+                                                    Spacer()
+                                                }
+
                                                 
-                                                    .simultaneously(with:
-                                                                        MagnificationGesture()
-                                                        .onChanged {value in
-                                                            withAnimation (.easeInOut) {
-                                                                
-                                                                overlay.currentZoom = 1 - value
-                                                            }
-                                                            
-                                                        }
-                                                        .onEnded { value in
-                                                            withAnimation(.easeInOut) {
-                                                                overlay.scaleZoom += overlay.currentZoom
-                                                            }
-                                                            
-                                                        }
-                                                )
                                                 
-                                            )
-                                        
-//                                            .frame(width: 100  , height: 100)
-//                                            .background(.red
-//                                            )
+                                                
+                                                
+                                                //text
+                                                
+                                                //                                            //xoay -zoom
+                                                //                                            .rotationEffect(overlay.angle)
+                                                
+                                                //
+                                                //                                                    .simultaneously(with:
+                                                //                                                        MagnificationGesture()
+                                                //                                                            .onChanged {value in
+                                                //                                                                withAnimation (.easeInOut) {
+                                                //                                                                    overlay.currentZoom = value - 1
+                                                //                                                                }
+                                                //
+                                                //                                                            }
+                                                //                                                            .onEnded { value in
+                                                //                                                                withAnimation(.easeInOut) {
+                                                //                                                                    overlay.scaleZoom += overlay.currentZoom
+                                                //                                                                    overlay.currentZoom = 0
+                                                //                                                                }
+                                                //
+                                                //                                                            }
+                                                //                                               )
+                                                //                                            )
+                                            }
                                             
-                                        }
-                                    }
+                                        }}
+                                    .coordinateSpace(name: "canvas")
+
                                 }
                             )
                     } placeholder: {
