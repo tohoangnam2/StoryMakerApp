@@ -21,11 +21,17 @@ struct OverlayTextModel: Identifiable {
     var text: String
     var offset: CGSize = .zero
     var endset: CGSize = .zero
-    var angle: Angle  = .zero
-    var currentAngle: Angle = Angle(degrees: 0)
-    var currentZoom: CGFloat = 0
-    var scaleZoom: CGFloat = 0
-    var isRotating: Bool = false
+    
+    var angle: CGFloat = 0           // Góc xoay của Text
+    var topLeft: CGPoint = .zero
+    var topRight: CGPoint = .zero
+    var bottomLeft: CGPoint = .zero
+    var bottomRight: CGPoint = .zero
+    var textSize: CGSize = .zero     // Kích thước Text + padding
+    
+ 
+    
+    
     var isZoom: Bool = false
     
     var isSelected: Bool = false
@@ -35,6 +41,37 @@ struct OverlayTextModel: Identifiable {
     var startDragAngle: CGFloat? = nil
     var startZoomDistance: CGFloat? = nil
     var activeGesture: OverlayGestureType = .none
+    
+   
+    var startLocation: CGPoint = .zero
+    
+    
+    
+    
+
+    var startAngleToCenter: CGFloat? = nil
+    var startRadius: CGFloat? = nil
+    
+    //lastdance
+
+
+
+
+
+
+
+
+
+
+    //zoom
+    
+    var startDistance: CGFloat = 0
+    var initialZoom: CGFloat = 1
+    var currentZoom: CGFloat = 1
+    var displayZoom: CGFloat = 1
+    
+    
+
 }
 
 enum OverlayTextEditEnum {

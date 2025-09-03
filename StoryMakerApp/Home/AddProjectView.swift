@@ -500,10 +500,13 @@ struct AddBackgroundsView: View {
     var currentAngle : Angle = Angle(degrees: 0)
     var isRotating: Bool = false
     
+
+    
     //zoom
-    var currentZoom : CGFloat = 0
-    var scaleZoom : CGFloat = 0
-    var isZoom: Bool = false
+        @State private var startDistance: CGFloat = 0
+      @State private var initialZoom: CGFloat = 1
+      @State private var currentZoom: CGFloat = 1   // Zoom cuối cùng
+      @State private var displayZoom: CGFloat = 1   // Zoom đang hiển thị khi kéo
     
     //offset
     var offset : CGSize = .zero
@@ -519,6 +522,11 @@ struct AddBackgroundsView: View {
     @State private var currentMode: EditMode = .none
     @State private var rotBase: Double = 0
     @State private var rotInProgress = false
+    
+    
+    //new rotate
+    @State private var rotation: Angle = .degrees(0)
+    @State private var lastAngle: Angle = .degrees(0)
     
 
     
@@ -561,172 +569,135 @@ struct AddBackgroundsView: View {
                                         }
                                         
                                         else  {
-                                            ZStack{
-                                                VStack{
-                                                    Spacer()
-                                                Text(overlay.text)
-                                                    .font(.system(size: 28, weight: .bold))
-                                                    .foregroundColor(.white)
-                                                    .shadow(radius: 2)
-                                                    .padding()
-                                                    .onTapGesture(perform: {
-                                                        overlayVM.setEditingSelectedOverlay(false)
-                                                        overlayVM.selectOverlay(overlay.id)
-                                                        if !overlay.isEditingText {
-                                                            isSelected = true
-                                                            isTextFieldFocused = true
-                                                            
-                                                        }
-                                                        print(overlay.id)
-                                                    })
-                                                    .onTapGesture(count: 2, perform: {
-                                                        
-                                                        showTextField = true
-                                                        isTextFieldFocused = true
-                                                    })
-                                                
-                                                
-                                                    .background(
-                                                        Group{
-                                                            if !overlay.isEditingText {
-                                                                GeometryReader {textGeo in
-                                                                    ZStack {
-                                                                        Rectangle()
-                                                                            .stroke(style: StrokeStyle(lineWidth: 2))
-                                                                            .foregroundColor(Color.black.opacity(0.6))
-                                                                        Image("img_edit_x")
-                                                                            .padding(10)
-                                                                        
-                                                                            .position(x: 0, y: 0)
-                                                                            .onTapGesture {
-                                                                                overlayVM.removeOverlay(overlay.id)
-                                                                            }
-                                                                        
-                                                                        Image("img_edit_copy")
-                                                                            .padding(10)
-                                                                        
-                                                                            .position(x: textGeo.size.width, y: 0)
-                                                                            .onTapGesture {
-                                                                                overlayVM.selectOverlay(overlay.id)
-                                                                                overlayVM.copyOverlay(overlay)
-                                                                                for item in overlayVM.overlays {
-                                                                                    print(item.id)
-                                                                                }
-                                                                            }
-                                                                        
-                                                                        Image("img_edit_xoay")
-                                                                            .padding(10)
-                                                                            .position(x: 0, y: textGeo.size.height)
-                                                                        
-                                                                        Image("img_edit_zoom")
-                                                                            .padding(10)
-                                                                            .position(x: textGeo.size.width, y: textGeo.size.height)
-                                                                            .gesture(
-                                                                                MagnificationGesture()
-                                                                                    .onChanged { value in
-                                                                                        if currentMode == .none {
-                                                                                            currentMode = .scaling
-                                                                                        }
-                                                                                        if currentMode == .scaling {
-                                                                                            overlay.currentZoom = value - 1
-                                                                                        }
-                                                                                    }
-                                                                                    .onEnded { _ in
-                                                                                        overlay.scaleZoom += overlay.currentZoom
-                                                                                        overlay.currentZoom = 0
-                                                                                        currentMode = .none
-                                                                                    }
-                                                                            )
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        
-                                                    )
-                                                    .fixedSize()
-                                                    .offset(overlay.offset)
-                                                    .gesture(
-                                                        DragGesture(coordinateSpace: .named("canvas"))
-                                                            .onChanged { value in
-                                                                if currentMode == .none {
-                                                                    currentMode = .moving
-                                                                }
-                                                                if currentMode == .moving {
-                                                                    overlay.offset = CGSize(
-                                                                        width: overlay.endset.width + value.translation.width,
-                                                                        height: overlay.endset.height + value.translation.height
-                                                                    )
-                                                                }
-                                                            }
-                                                            .onEnded { _ in
-                                                                if currentMode == .moving {
-                                                                    overlay.endset = overlay.offset
-                                                                }
-                                                                currentMode = .none
-                                                            }
-                                                    )
-                                                    .rotationEffect(overlay.angle)
-                                                    .scaleEffect( 1 + overlay.currentZoom + overlay.scaleZoom )
-                                                    Spacer()
-
+                                                ZStack{
                                                     Button(action: {}) {
-                                                        Text("Xoay")
-                                                            .font(.title)
+                                                        Text(overlay.text)
+                                                            .font(.system(size: 22, weight: .bold))
                                                             .foregroundColor(.white)
-                                                            .padding(40)
-                                                            .background(Color.blue.cornerRadius(10))
+                                                            .shadow(radius: 2)
+                                                            .padding(.horizontal)
+//                                                            .position(
+//                                                                x: overlay.iconCenter.x + overlay.radius * cos(overlay.angle),
+//                                                                y: overlay.iconCenter.y + overlay.radius * sin(overlay.angle)
+//                                                            )
+                                                            .onTapGesture(perform: {
+                                                                overlayVM.setEditingSelectedOverlay(false)
+                                                                overlayVM.selectOverlay(overlay.id)
+                                                                if !overlay.isEditingText {
+                                                                    isSelected = true
+                                                                    isTextFieldFocused = true
+                                                                }
+                                                                print(overlay.id)
+                                                            })
+                                                            .onTapGesture(count: 2, perform: {
+                                                                showTextField = true
+                                                                isTextFieldFocused = true
+                                                            })
+                                                            .gesture(
+                                                                DragGesture(coordinateSpace: .named("canvas"))
+                                                                    .onChanged { value in
+                                                                        if currentMode == .none {
+                                                                            currentMode = .moving
+                                                                        }
+                                                                        if currentMode == .moving {
+                                                                            overlay.offset = CGSize(
+                                                                                width: overlay.endset.width + value.translation.width,
+                                                                                height: overlay.endset.height + value.translation.height
+                                                                            )
+                                                                        }
+                                                                    }
+                                                                    .onEnded { _ in
+                                                                        if currentMode == .moving {
+                                                                            overlay.endset = overlay.offset
+                                                                        }
+                                                                        currentMode = .none
+                                                                    }
+                                                            )
                                                     }
-                                                    .gesture(
-                                                        DragGesture(minimumDistance: 0, coordinateSpace: .local)
-                                                             .onChanged { value in
-                                                                 // Lấy tâm của nút để xoay quanh
-                                                                 let center = CGPoint(x: 40, y: 40) // nút có padding(40) nên tâm khoảng (40,40)
-                                                                 
-                                                                 // Góc hiện tại và góc ban đầu
-                                                                 let current = atan2(value.location.y - center.y,
-                                                                                     value.location.x - center.x)
-                                                                 let start = atan2(value.startLocation.y - center.y,
-                                                                                   value.startLocation.x - center.x)
-
-                                                                 let delta = current - start
-                                                                 overlay.angle = Angle(radians: overlay.currentAngle.radians + delta)
-                                                             }
-                                                             .onEnded { _ in
-                                                                 overlay.currentAngle = overlay.angle
-                                                                 overlay.angle = Angle(degrees: overlay.angle.degrees.truncatingRemainder(dividingBy: 360))
-                                                             }
-                                                    )
-                                                    Spacer()
+                                                    .padding()
+                                                    .overlay {
+                                                        if !overlay.isEditingText {
+                                                            GeometryReader {textGeo in
+                                                                ZStack {
+                                                                    Rectangle()
+                                                                        .stroke(style: StrokeStyle(lineWidth: 2))
+                                                                        .foregroundColor(Color.black.opacity(0.6))
+                                                                    Image("img_edit_x")
+                                                                        .padding(10)
+                                                                    
+                                                                        .position(x: 0, y: 0)
+                                                                        .onTapGesture {
+                                                                            overlayVM.removeOverlay(overlay.id)
+                                                                        }
+                                                                    
+                                                                    Image("img_edit_copy")
+                                                                        .padding(10)
+                                                                        .position(x: textGeo.size.width, y: 0)
+                                                                        .onTapGesture {
+                                                                            overlayVM.selectOverlay(overlay.id)
+                                                                            overlayVM.copyOverlay(overlay)
+                                                                            for item in overlayVM.overlays {
+                                                                                print(item.id)
+                                                                            }
+                                                                        }
+                                                                    
+                                                                    // Icon xoay
+                                                                    Image("img_edit_xoay")
+                                                                        .frame(width: 30, height: 30)
+                                                                        .padding(30)
+                                                                        .contentShape(Rectangle())
+                                                                        .position(x: 0, y: textGeo.size.height) // góc dưới trái
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                    Image("img_edit_zoom")
+                                                                        .padding(10)
+                                                                        .position(x: textGeo.size.width, y: textGeo.size.height)
+                                                                        .gesture(
+                                                                            DragGesture()
+                                                                                .onChanged { value in
+                                                                                    // Tính tâm theo global coordinate để không bị ảnh hưởng scale
+                                                                                    let center = CGPoint(
+                                                                                        x: textGeo.frame(in: .global).midX,
+                                                                                        y: textGeo.frame(in: .global).midY
+                                                                                    )
+                                                                                    
+                                                                                    if overlay.startDistance == 0 {
+                                                                                        overlay.startDistance = hypot(
+                                                                                            value.startLocation.x - center.x,
+                                                                                            value.startLocation.y - center.y
+                                                                                        )
+                                                                                        overlay.initialZoom = overlay.currentZoom
+                                                                                    }
+                                                                                    
+                                                                                    let currentDistance = hypot(
+                                                                                        value.location.x - center.x,
+                                                                                        value.location.y - center.y
+                                                                                    )
+                                                                                    
+                                                                                    // Tỉ lệ zoom giới hạn 0.2x - 5x
+                                                                                    let scaleRatio = max(0.2, min(overlay.startDistance / currentDistance, 5))
+                                                                                    
+                                                                                    // Cập nhật zoom hiển thị tạm
+                                                                                    overlay.displayZoom = overlay.initialZoom * scaleRatio
+                                                                                }
+                                                                                .onEnded { _ in
+                                                                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
+                                                                                        overlay.currentZoom = overlay.displayZoom
+                                                                                    }
+                                                                                    overlay.startDistance = 0
+                                                                                }
+                                                                        )
+                                                                }
+                                                                
+                                                            }
+                                                        }
+                                                    }
+                                                    .offset(overlay.offset)
+                                                    .scaleEffect(overlay.displayZoom)
                                                 }
-
-                                                
-                                                
-                                                
-                                                
-                                                //text
-                                                
-                                                //                                            //xoay -zoom
-                                                //                                            .rotationEffect(overlay.angle)
-                                                
-                                                //
-                                                //                                                    .simultaneously(with:
-                                                //                                                        MagnificationGesture()
-                                                //                                                            .onChanged {value in
-                                                //                                                                withAnimation (.easeInOut) {
-                                                //                                                                    overlay.currentZoom = value - 1
-                                                //                                                                }
-                                                //
-                                                //                                                            }
-                                                //                                                            .onEnded { value in
-                                                //                                                                withAnimation(.easeInOut) {
-                                                //                                                                    overlay.scaleZoom += overlay.currentZoom
-                                                //                                                                    overlay.currentZoom = 0
-                                                //                                                                }
-                                                //
-                                                //                                                            }
-                                                //                                               )
-                                                //                                            )
-                                            }
+                                            
                                             
                                         }}
                                     .coordinateSpace(name: "canvas")
@@ -751,8 +722,11 @@ struct AddBackgroundsView: View {
         }
         .navigationBarBackButtonHidden(true)
     }
-}
-
-#Preview {
-    AddProjectView()
+    // Hàm tính góc giữa 2 điểm (giúp tính toán góc xoay)
+    func angleBetween(start: CGPoint, current: CGPoint) -> Angle {
+        let deltaX = current.x - start.x
+        let deltaY = current.y - start.y
+        let radians = atan2(deltaY, deltaX)
+        return Angle(radians: radians)
+    }
 }

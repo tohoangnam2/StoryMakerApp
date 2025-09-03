@@ -58,9 +58,8 @@ class OverlayTextViewModel: ObservableObject {
             offset: .zero,
             endset: .zero,
             angle: .zero,
-            currentAngle: .zero,
-            currentZoom: 0,
-            scaleZoom: 1
+            currentZoom: 1,
+            displayZoom: 1
         )
         overlays.append(newOverlay)
         return newOverlay
