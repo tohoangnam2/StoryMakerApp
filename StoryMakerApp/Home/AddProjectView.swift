@@ -24,6 +24,8 @@ struct AddProjectView: View {
     @State var isSelected : Bool = false
     @State var isEditingText = false
     
+    @State var isClick : Bool = false
+    
     //bg text
     
     //edit text
@@ -60,211 +62,82 @@ struct AddProjectView: View {
                     
                     if let editType = selectedEditText {
                         VStack(spacing: 0) {
-                            switch editType {
-                            case .fontSize:
-                                VStack{
-                                    HStack {
-                                        Button(action: {}) {
-                                            Image("img_edit1_keyboard")
-                                        }
-                                        Spacer()
-                                        Text(editType.title)
-                                            .font(.system(size: 16, weight: .medium))
-                                        Spacer()
-                                        Button(action: {
-                                            selectedEditText = nil
-                                        }) {
-                                            Image("img_bg_check")
-                                        }
-                                        .background(.white)
+                            VStack{
+                                HStack {
+                                    Button(action: {}) {
+                                        Image("img_edit1_keyboard")
                                     }
-                                    .padding(.horizontal)
-                                    HStack (spacing: 20) {
-                                        Button(action: {
-                                            selectedEditText = .fontSize
-                                        }) {
-                                            Image("img_edit1_text")
-                                        }
-                                        Button(action: {
-                                            selectedEditText = .fontFamily
-                                        }) {
-                                            Image("img_edit1_size")
-                                        }
-                                        Button(action: {
-                                            selectedEditText = .colorSolid
-                                            
-                                        }) {
-                                            Image("img_edit1_color")
-                                        }
+                                    Spacer()
+                                    Text(editType.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                    Spacer()
+                                    Button(action: {
+                                        selectedEditText = nil
+                                    }) {
+                                        Image("img_bg_check")
+                                    }
+                                    .background(.white)
+                                }
+                                .padding(.horizontal)
+                                HStack (spacing: 20) {
+                                    Button(action: {
+                                        selectedEditText = .fontSize
+                                    }) {
+                                        Image("img_edit1_text")
+                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+
+                                    }
+                                    Button(action: {
+                                        selectedEditText = .fontFamily
+
+                                    }) {
+                                        Image("img_edit1_size")
+                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+
+                                    }
+                                    Button(action: {
+                                        selectedEditText = .colorSolid
                                         
-                                        Button(action: {
-                                            selectedEditText = .gradient
-                                        }) {
-                                            Image("img_edit1_gradient")
-                                        }
-                                        Button(action: {
-                                            selectedEditText = .stroke
-                                        }) {
-                                            Image("img_edit1_stroke")
-                                        }
-                                        Button(action: {
-                                            selectedEditText = .align
-                                        }) {
-                                            Image("img_edit1_align")
-                                        }
-                                        Button(action: {
-                                            selectedEditText = .shadow
-                                        }) {
-                                            Image("img_edit1_shadow")
-                                        }
-                                        Button(action: {
-                                            selectedEditText = .background
-                                        }) {
-                                            Image("img_edit1_bg")
-                                        }
-                                    }
-                                    .padding(10)
-                                    .padding(.horizontal,12)
-                                    .background(Color.gray.opacity(0.2).cornerRadius(70))
-                                }
-                                
-                                
-                            case .fontFamily:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
-                                    Button(action: {
-                                        selectedEditText = nil
                                     }) {
-                                        Image("img_bg_check")
+                                        Image("img_edit1_color")
+                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+
                                     }
-                                    .background(.white)
-                                }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
-                            case .colorSolid:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
+                                    
                                     Button(action: {
-                                        selectedEditText = nil
+                                        selectedEditText = .gradient
                                     }) {
-                                        Image("img_bg_check")
+                                        Image("img_edit1_gradient")
+                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+
                                     }
-                                    .background(.white)
-                                }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
-                            case .gradient:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
                                     Button(action: {
-                                        selectedEditText = nil
+                                        selectedEditText = .stroke
                                     }) {
-                                        Image("img_bg_check")
+                                        Image("img_edit1_stroke")
                                     }
-                                    .background(.white)
-                                }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
-                            case .stroke:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
                                     Button(action: {
-                                        selectedEditText = nil
+                                        selectedEditText = .align
                                     }) {
-                                        Image("img_bg_check")
+                                        Image("img_edit1_align")
                                     }
-                                    .background(.white)
-                                }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
-                            case .align:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
                                     Button(action: {
-                                        selectedEditText = nil
+                                        selectedEditText = .shadow
                                     }) {
-                                        Image("img_bg_check")
+                                        Image("img_edit1_shadow")
                                     }
-                                    .background(.white)
-                                }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
-                            case .background:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
                                     Button(action: {
-                                        selectedEditText = nil
+                                        selectedEditText = .background
                                     }) {
-                                        Image("img_bg_check")
+                                        Image("img_edit1_bg")
                                     }
-                                    .background(.white)
                                 }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
-                            case .shadow:
-                                HStack {
-                                    Button(action: {}) {
-                                        Image("img_edit1_keyboard")
-                                    }
-                                    Spacer()
-                                    Text(editType.title)
-                                        .font(.system(size: 16, weight: .medium))
-                                    Spacer()
-                                    Button(action: {
-                                        selectedEditText = nil
-                                    }) {
-                                        Image("img_bg_check")
-                                    }
-                                    .background(.white)
-                                }
-                                .padding(.horizontal, 20)
-                                Image(editType.img)
-                                
+                                .padding(10)
+                                .padding(.horizontal,12)
+                                .background(Color.gray.opacity(0.2).cornerRadius(70))
                             }
                             
-                            
+                    
                             switch editType {
                             case .fontSize:
                                 TextView(selectedEditText: .fontSize)
@@ -503,7 +376,7 @@ struct AddBackgroundsView: View {
 
     
     //zoom
-        @State private var startDistance: CGFloat = 0
+    @State private var startDistance: CGFloat = 0
       @State private var initialZoom: CGFloat = 1
       @State private var currentZoom: CGFloat = 1   // Zoom cuối cùng
       @State private var displayZoom: CGFloat = 1   // Zoom đang hiển thị khi kéo
@@ -570,16 +443,11 @@ struct AddBackgroundsView: View {
                                         
                                         else  {
                                                 ZStack{
-                                                    Button(action: {}) {
                                                         Text(overlay.text)
                                                             .font(.system(size: 22, weight: .bold))
                                                             .foregroundColor(.white)
                                                             .shadow(radius: 2)
                                                             .padding(.horizontal)
-//                                                            .position(
-//                                                                x: overlay.iconCenter.x + overlay.radius * cos(overlay.angle),
-//                                                                y: overlay.iconCenter.y + overlay.radius * sin(overlay.angle)
-//                                                            )
                                                             .onTapGesture(perform: {
                                                                 overlayVM.setEditingSelectedOverlay(false)
                                                                 overlayVM.selectOverlay(overlay.id)
@@ -613,89 +481,98 @@ struct AddBackgroundsView: View {
                                                                         currentMode = .none
                                                                     }
                                                             )
-                                                    }
-                                                    .padding()
-                                                    .overlay {
-                                                        if !overlay.isEditingText {
-                                                            GeometryReader {textGeo in
-                                                                ZStack {
-                                                                    Rectangle()
-                                                                        .stroke(style: StrokeStyle(lineWidth: 2))
-                                                                        .foregroundColor(Color.black.opacity(0.6))
-                                                                    Image("img_edit_x")
-                                                                        .padding(10)
-                                                                    
-                                                                        .position(x: 0, y: 0)
-                                                                        .onTapGesture {
-                                                                            overlayVM.removeOverlay(overlay.id)
-                                                                        }
-                                                                    
-                                                                    Image("img_edit_copy")
-                                                                        .padding(10)
-                                                                        .position(x: textGeo.size.width, y: 0)
-                                                                        .onTapGesture {
-                                                                            overlayVM.selectOverlay(overlay.id)
-                                                                            overlayVM.copyOverlay(overlay)
-                                                                            for item in overlayVM.overlays {
-                                                                                print(item.id)
+                                                    
+                                                        .padding()
+                                                        .overlay {
+                                                            if !overlay.isEditingText {
+                                                                GeometryReader {textGeo in
+                                                                    ZStack {
+                                                                        Rectangle()
+                                                                            .stroke(style: StrokeStyle(lineWidth: 2))
+                                                                            .foregroundColor(Color.black.opacity(0.6))
+                                                                        Image("img_edit_x")
+                                                                            .padding(10)
+                                                                        
+                                                                            .position(x: 0, y: 0)
+                                                                            .onTapGesture {
+                                                                                overlayVM.removeOverlay(overlay.id)
                                                                             }
-                                                                        }
-                                                                    
-                                                                    // Icon xoay
-                                                                    Image("img_edit_xoay")
-                                                                        .frame(width: 30, height: 30)
-                                                                        .padding(30)
-                                                                        .contentShape(Rectangle())
-                                                                        .position(x: 0, y: textGeo.size.height) // góc dưới trái
-                                                                    
-                                                                    
-                                                                    
-                                                                    
-                                                                    Image("img_edit_zoom")
-                                                                        .padding(10)
-                                                                        .position(x: textGeo.size.width, y: textGeo.size.height)
-                                                                        .gesture(
-                                                                            DragGesture()
-                                                                                .onChanged { value in
-                                                                                    // Tính tâm theo global coordinate để không bị ảnh hưởng scale
-                                                                                    let center = CGPoint(
-                                                                                        x: textGeo.frame(in: .global).midX,
-                                                                                        y: textGeo.frame(in: .global).midY
-                                                                                    )
-                                                                                    
-                                                                                    if overlay.startDistance == 0 {
-                                                                                        overlay.startDistance = hypot(
-                                                                                            value.startLocation.x - center.x,
-                                                                                            value.startLocation.y - center.y
-                                                                                        )
-                                                                                        overlay.initialZoom = overlay.currentZoom
-                                                                                    }
-                                                                                    
-                                                                                    let currentDistance = hypot(
-                                                                                        value.location.x - center.x,
-                                                                                        value.location.y - center.y
-                                                                                    )
-                                                                                    
-                                                                                    // Tỉ lệ zoom giới hạn 0.2x - 5x
-                                                                                    let scaleRatio = max(0.2, min(overlay.startDistance / currentDistance, 5))
-                                                                                    
-                                                                                    // Cập nhật zoom hiển thị tạm
-                                                                                    overlay.displayZoom = overlay.initialZoom * scaleRatio
+                                                                        
+                                                                        Image("img_edit_copy")
+                                                                            .padding(10)
+                                                                            .position(x: textGeo.size.width, y: 0)
+                                                                            .onTapGesture {
+                                                                                overlayVM.selectOverlay(overlay.id)
+                                                                                overlayVM.copyOverlay(overlay)
+                                                                                for item in overlayVM.overlays {
+                                                                                    print(item.id)
                                                                                 }
-                                                                                .onEnded { _ in
-                                                                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
-                                                                                        overlay.currentZoom = overlay.displayZoom
+                                                                            }
+                                                                        
+                                                                        Image("img_edit_xoay")
+                                                                            .frame(width: 30, height: 30)
+                                                                            .padding(30) 
+                                                                            .contentShape(Rectangle())
+                                                                            .position(x: 0, y: textGeo.size.height)
+                                                                            .gesture(
+                                                                                DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                                                                                    .onChanged { value in
+                                                                                        let frame = textGeo.frame(in: .global)
+                                                                                        let center = CGPoint(x: frame.midX, y: frame.midY)
+                                                                                        
+                                                                                        if overlay.startLocation == nil {
+                                                                                            overlay.startLocation = value.startLocation
+                                                                                            overlay.startAngle = overlay.currentRotation
+                                                                                        }
+                                                                                        
+                                                                                        let startVector = CGVector(dx: (overlay.startLocation?.x ?? 0) - center.x,
+                                                                                                                   dy: (overlay.startLocation?.y ?? 0) - center.y)
+                                                                                        
+                                                                                        let currentVector = CGVector(dx: value.location.x - center.x,
+                                                                                                                     dy: value.location.y - center.y)
+                                                                                        
+                                                                                        let angleChange = atan2(currentVector.dy, currentVector.dx) - atan2(startVector.dy, startVector.dx)
+                                                                                        overlay.currentRotation = overlay.startAngle + Angle(radians: Double(angleChange))
                                                                                     }
-                                                                                    overlay.startDistance = 0
-                                                                                }
-                                                                        )
+                                                                                
+                                                                            )
+                                                                       
+
+                                                                        Image("img_edit_zoom")
+                                                                            .padding(10)
+                                                                            .position(x: textGeo.size.width, y: textGeo.size.height)
+                                                                            .gesture(
+                                                                                DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                                                                                    .onChanged { value in
+                                                                                        let frame = textGeo.frame(in: .global)
+                                                                                        let center = CGPoint(x: frame.midX, y: frame.midY)
+                                                                                        
+                                                                                        let currentDistance = hypot(value.location.x - center.x,
+                                                                                                                    value.location.y - center.y)
+                                                                                        
+                                                                                        if overlay.startDistance == 0 {
+                                                                                            overlay.startDistance = currentDistance
+                                                                                            overlay.startScale = overlay.currentScale
+                                                                                        }
+                                                                                        
+                                                                                        if overlay.startDistance != 0 {
+                                                                                            let scaleFactor = currentDistance / overlay.startDistance
+                                                                                            overlay.currentScale = max(0.2, min(overlay.startScale * scaleFactor, 5.0)) // giới hạn 0.2x - 5x
+                                                                                        }
+                                                                                    }
+                                                                                    .onEnded { _ in
+                                                                                        overlay.startDistance = 0
+                                                                                    }
+                                                                            )
+                                                                    }
+                                                                   
+                                                                    
                                                                 }
-                                                                
                                                             }
                                                         }
-                                                    }
-                                                    .offset(overlay.offset)
-                                                    .scaleEffect(overlay.displayZoom)
+                                                        .rotationEffect(overlay.currentRotation, anchor: .center) // Áp dụng góc xoay
+                                                        .offset(overlay.offset)
+                                                        .scaleEffect(overlay.currentScale)
                                                 }
                                             
                                             

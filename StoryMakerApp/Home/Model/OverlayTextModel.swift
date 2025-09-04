@@ -22,17 +22,38 @@ struct OverlayTextModel: Identifiable {
     var offset: CGSize = .zero
     var endset: CGSize = .zero
     
-    var angle: CGFloat = 0           // Góc xoay của Text
+    //rotate
+    
+    // 1. Biến trạng thái để lưu góc xoay
+    var currentRotation: Angle = .degrees(0)
+    
+    // Biến tạm để lưu góc ban đầu khi bắt đầu kéo
+    var startAngle: Angle = .degrees(0)
+    
+    // Biến tạm để lưu vị trí ban đầu của ngón tay
+    var startLocation: CGPoint?
+    
+    // 2. Biến trạng thái để lưu zoom
+    var currentScale: CGFloat = 1.0
+    
+    // Biến tạm để lưu scale ban đầu
+    var startScale: CGFloat = 1.0
+    
+    // Biến tạm để lưu khoảng cách ban đầu từ tâm khi zoom
+    var startDistance: CGFloat = 0.0
+       
     var topLeft: CGPoint = .zero
     var topRight: CGPoint = .zero
     var bottomLeft: CGPoint = .zero
     var bottomRight: CGPoint = .zero
-    var textSize: CGSize = .zero     // Kích thước Text + padding
+    var textSize: CGSize = .zero
     
  
     
     
     var isZoom: Bool = false
+    
+ 
     
     var isSelected: Bool = false
     var isEditingText: Bool = false
@@ -43,7 +64,6 @@ struct OverlayTextModel: Identifiable {
     var activeGesture: OverlayGestureType = .none
     
    
-    var startLocation: CGPoint = .zero
     
     
     
@@ -51,21 +71,8 @@ struct OverlayTextModel: Identifiable {
 
     var startAngleToCenter: CGFloat? = nil
     var startRadius: CGFloat? = nil
-    
-    //lastdance
-
-
-
-
-
-
-
-
-
-
     //zoom
     
-    var startDistance: CGFloat = 0
     var initialZoom: CGFloat = 1
     var currentZoom: CGFloat = 1
     var displayZoom: CGFloat = 1

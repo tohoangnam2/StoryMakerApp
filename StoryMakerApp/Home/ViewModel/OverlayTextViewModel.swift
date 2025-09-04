@@ -11,7 +11,7 @@ import Foundation
 class OverlayTextViewModel: ObservableObject {
     @Published var overlays: [OverlayTextModel] = []
     @Published var selectedOverlayID: UUID? = nil
-    
+    // Thêm biến này vào class Overlay của bạn
     
 
     
@@ -57,7 +57,7 @@ class OverlayTextViewModel: ObservableObject {
             text: text,
             offset: .zero,
             endset: .zero,
-            angle: .zero,
+            
             currentZoom: 1,
             displayZoom: 1
         )
