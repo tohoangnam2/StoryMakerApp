@@ -47,14 +47,7 @@ struct OverlayTextModel: Identifiable {
     var bottomLeft: CGPoint = .zero
     var bottomRight: CGPoint = .zero
     var textSize: CGSize = .zero
-    
- 
-    
-    
     var isZoom: Bool = false
-    
- 
-    
     var isSelected: Bool = false
     var isEditingText: Bool = false
     var isShowBGText : Bool = false
@@ -62,12 +55,6 @@ struct OverlayTextModel: Identifiable {
     var startDragAngle: CGFloat? = nil
     var startZoomDistance: CGFloat? = nil
     var activeGesture: OverlayGestureType = .none
-    
-   
-    
-    
-    
-    
 
     var startAngleToCenter: CGFloat? = nil
     var startRadius: CGFloat? = nil
@@ -77,11 +64,25 @@ struct OverlayTextModel: Identifiable {
     var currentZoom: CGFloat = 1
     var displayZoom: CGFloat = 1
     
+    // MARK: Edit Text
+    //font size
+    var value : Double
     
-
+    static let solidColors: [String] = [
+            "#FFFFFF", "#000000",
+            "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
+            "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
+            "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
+            "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
+            "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
+            "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
+            "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
+            "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
+            "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
+    
 }
 
-enum OverlayTextEditEnum {
+enum OverlayTextEditEnum : Equatable , CaseIterable {
     case fontSize
     case fontFamily
     case colorSolid
@@ -90,6 +91,7 @@ enum OverlayTextEditEnum {
     case align
     case background
     case shadow
+    case none
     
     var title: String {
         switch self {
@@ -108,6 +110,8 @@ enum OverlayTextEditEnum {
         case .background:
             return "Background"
         case .shadow:
+            return "ShaDow"
+        case .none:
             return "ShaDow"
         }
     }
@@ -130,12 +134,78 @@ enum OverlayTextEditEnum {
             return "img_edit1_bg"
         case .shadow:
             return "img_edit1_shadow"
+        case .none:
+            return "img_edit1_shadow"
+
         }
     }
+
     
     
     
 }
+enum FontFmailyEnum : String , CaseIterable {
+    case ff1
+    case ff2
+    case ff3
+    case ff4
+    case ff5
+    case ff6
+    case ff7
+    case ff8
+    case ff9
+    case ff10
+    case ff11
+    case ff12
+    
+    var img: String {
+        switch self {
+        case .ff1:
+            return "ff1"
+        case .ff2:
+            return "ff2"
+        case .ff3:
+            return "ff3"
+        case .ff4:
+            return "ff4"
+        case .ff5:
+            return "ff5"
+
+        case .ff6:
+            return "ff6"
+        case .ff7:
+            return "ff7"
+        case .ff8:
+            return "ff8"
+        case .ff9:
+            return "ff9"
+        case .ff10:
+            return "ff10"
+        case .ff11:
+            return "ff11"
+        case .ff12:
+            return "ff12"
+       
+
+        }
+    }
+}
+
+enum AlignEnum : String , CaseIterable {
+    case left
+    case center
+    case right
+    case none
+}
+
+enum AlignCaseEnum : String , CaseIterable {
+    case up
+    case cap
+    case low
+    case none
+}
+
+
 
 
 

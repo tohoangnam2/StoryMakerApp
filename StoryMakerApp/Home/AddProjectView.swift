@@ -30,7 +30,9 @@ struct AddProjectView: View {
     
     //edit text
     
-    @State var selectedEditText : OverlayTextEditEnum? = nil
+    @State var selectedEditText : OverlayTextEditEnum = .none
+    @State var selectedFontFamily : FontFmailyEnum? = nil
+
     
     
     var body: some View {
@@ -60,7 +62,7 @@ struct AddProjectView: View {
                         
                     }
                     
-                    if let editType = selectedEditText {
+                    if  selectedEditText != .none {
                         VStack(spacing: 0) {
                             VStack{
                                 HStack {
@@ -68,11 +70,11 @@ struct AddProjectView: View {
                                         Image("img_edit1_keyboard")
                                     }
                                     Spacer()
-                                    Text(editType.title)
+                                    Text(selectedEditText.title)
                                         .font(.system(size: 16, weight: .medium))
                                     Spacer()
                                     Button(action: {
-                                        selectedEditText = nil
+                                        selectedEditText = .none
                                     }) {
                                         Image("img_bg_check")
                                     }
@@ -84,7 +86,7 @@ struct AddProjectView: View {
                                         selectedEditText = .fontSize
                                     }) {
                                         Image("img_edit1_text")
-                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+                                            .foregroundColor(selectedEditText == .fontSize ? .red : .black)
 
                                     }
                                     Button(action: {
@@ -93,6 +95,7 @@ struct AddProjectView: View {
                                     }) {
                                         Image("img_edit1_size")
                                             .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+                                        
 
                                     }
                                     Button(action: {
@@ -100,7 +103,7 @@ struct AddProjectView: View {
                                         
                                     }) {
                                         Image("img_edit1_color")
-                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+                                            .foregroundColor(selectedEditText == .colorSolid ? .red : .black)
 
                                     }
                                     
@@ -108,77 +111,74 @@ struct AddProjectView: View {
                                         selectedEditText = .gradient
                                     }) {
                                         Image("img_edit1_gradient")
-                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
+                                            .foregroundColor(selectedEditText == .gradient ? .red : .black)
 
                                     }
                                     Button(action: {
                                         selectedEditText = .stroke
                                     }) {
                                         Image("img_edit1_stroke")
+                                            .foregroundColor(selectedEditText == .stroke ? .red : .black)
+
                                     }
                                     Button(action: {
                                         selectedEditText = .align
                                     }) {
                                         Image("img_edit1_align")
+                                            .foregroundColor(selectedEditText == .align ? .red : .black)
+
                                     }
                                     Button(action: {
                                         selectedEditText = .shadow
                                     }) {
                                         Image("img_edit1_shadow")
+                                            .foregroundColor(selectedEditText == .shadow ? .red : .black)
+
                                     }
                                     Button(action: {
                                         selectedEditText = .background
                                     }) {
                                         Image("img_edit1_bg")
+                                            .foregroundColor(selectedEditText == .background ? .red : .black)
+
                                     }
                                 }
                                 .padding(10)
                                 .padding(.horizontal,12)
                                 .background(Color.gray.opacity(0.2).cornerRadius(70))
                             }
-                            
-                    
-                            switch editType {
+                            switch selectedEditText {
                             case .fontSize:
                                 TextView(selectedEditText: .fontSize)
-                                    .transition(.move(edge: .bottom))
                             case .fontFamily:
                                 TextView(selectedEditText: .fontFamily)
-                                    .transition(.move(edge: .bottom))
                                 
                             case .colorSolid:
                                 TextView(selectedEditText: .colorSolid)
-                                    .transition(.move(edge: .bottom))
                                 
                             case .gradient:
                                 TextView(selectedEditText: .gradient)
-                                    .transition(.move(edge: .bottom))
                                 
                             case .stroke:
                                 TextView(selectedEditText: .stroke)
-                                    .transition(.move(edge: .bottom))
                                 
                             case .align:
                                 TextView(selectedEditText: .align)
-                                    .transition(.move(edge: .bottom))
-                                
-                            case .background:
-                                TextView(selectedEditText: .background)
-                                    .transition(.move(edge: .bottom))
-                                
+                            
                             case .shadow:
                                 TextView(selectedEditText: .shadow)
-                                    .transition(.move(edge: .bottom))
+                            case .background:
+                                TextView(selectedEditText: .background)
                                 
-                            case nil:
-                                ProgressView()
+                          
+                                
+                            case .none:
+                                SplashView()
                                 
                             }
                         }
                     }
                     else {
-                        
-                        
                         if !isTextFieldFocused  {
                             if !isSelected {
                                 HStack {
@@ -223,7 +223,8 @@ struct AddProjectView: View {
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .fontFamily
+
                                         }) {
                                             VStack {
                                                 Image("img_edit1_size")
@@ -233,7 +234,8 @@ struct AddProjectView: View {
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .colorSolid
+
                                         }) {
                                             VStack {
                                                 Image("img_edit1_color")
@@ -243,7 +245,8 @@ struct AddProjectView: View {
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .gradient
+
                                         }) {
                                             VStack {
                                                 Image("img_edit1_gradient")
@@ -253,7 +256,8 @@ struct AddProjectView: View {
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .stroke
+
                                         }) {
                                             VStack {
                                                 Image("img_edit1_stroke")
@@ -263,31 +267,34 @@ struct AddProjectView: View {
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .align
+
                                         }) {
                                             VStack {
-                                                Image("img_edit1_text")
-                                                Text("Size")
+                                                Image("img_edit1_align")
+                                                Text("Align")
                                             }
                                             .foregroundColor(.black.opacity(0.8))
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .shadow
+
                                         }) {
                                             VStack {
-                                                Image("img_edit1_text")
-                                                Text("Size")
+                                                Image("img_edit1_shadow")
+                                                Text("Shadow")
                                             }
                                             .foregroundColor(.black.opacity(0.8))
                                         }
                                         Spacer()
                                         Button(action: {
-                                            
+                                            selectedEditText = .background
+
                                         }) {
                                             VStack {
-                                                Image("img_edit1_text")
-                                                Text("Size")
+                                                Image("img_edit1_bg")
+                                                Text("BackGround")
                                             }
                                             .foregroundColor(.black.opacity(0.8))
                                         }
@@ -300,7 +307,6 @@ struct AddProjectView: View {
                                 
                             }
                         }
-                        
                         else {
                             HStack {
                                 Button(action: {

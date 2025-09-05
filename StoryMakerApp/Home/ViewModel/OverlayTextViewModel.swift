@@ -59,7 +59,7 @@ class OverlayTextViewModel: ObservableObject {
             endset: .zero,
             
             currentZoom: 1,
-            displayZoom: 1
+            displayZoom: 1, value: 0
         )
         overlays.append(newOverlay)
         return newOverlay

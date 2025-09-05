@@ -90,12 +90,7 @@ struct BackGroundView: View {
                     
                 }
                 
-//                NavigationLink(
-//                    destination: AddProjectView(frame: selectedFrame),
-//                    isActive: $isNextPage
-//                ){
-//                    EmptyView()
-//                }
+
                 
             }
             
