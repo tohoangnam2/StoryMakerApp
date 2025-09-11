@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 
 class BackGroundViewModel: ObservableObject {
+    
+
     @Published var model: BackGroundModel? = nil
     @Published var selectedCategory: Category? = nil
     

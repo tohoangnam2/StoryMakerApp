@@ -8,6 +8,69 @@
 import Foundation
 import SwiftUI
 
+class BackgroundModel: Identifiable, ObservableObject {
+    let id = UUID()
+    let url: URL
+    @Published var opacity: Double
+    @Published var filter: FilterType
+    var editEnum : BackGroundEditEditEnum = .filter
+    
+    init(url: URL, opacity: Double = 1.0, filter: FilterType = .normal) {
+        self.url = url
+        self.opacity = opacity
+        self.filter = filter
+    }
+}
+enum BackGroundEditEditEnum : CaseIterable {
+    case filter
+    case brightness
+    case none
+    
+    var title : String {
+        switch self {
+        case .filter:
+            return "Filter"
+        case .brightness:
+            return "Brightness"
+        case .none:
+            return ""
+        }
+    }
+}
+
+
+enum FilterType: String, CaseIterable {
+    case normal, light, red, cyal, vintage, hot, old
+}
+
+struct CategoryResponse: Codable {
+    let error: Int
+    let data: [CategoryBG]
+}
+
+struct CategoryBG: Identifiable, Codable {
+    let id: String
+    let value: String   // tên category hiển thị
+}
+struct BackgroundResponse: Codable {
+    let error: Int
+    let category: String
+    let data: [String]   // danh sách URL ảnh
+}
+
+struct BackgroundItem: Identifiable {
+    let id = UUID()
+    let image: String
+}
+
+
+
+
+
+
+
+//background open
+
 struct BackGroundModel: Codable {
     let config: Config
     let data: [Frame]
@@ -39,6 +102,9 @@ struct Frame: Codable, Identifiable {
          return URL(string: "https://api.fleet-tech.net" + background)
      }
 }
+
+
+
 
 
 

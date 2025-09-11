@@ -32,9 +32,11 @@ struct AddProjectView: View {
     
     @State var selectedEditText : OverlayTextEditEnum = .none
     @State var selectedFontFamily : FontFmailyEnum? = nil
+    
+    
+    @State var showBackgroundEditor : Bool = false
+    @State private var editEnum: BackGroundEditEditEnum = .filter
 
-    
-    
     var body: some View {
         NavigationView {
             ZStack{
@@ -61,10 +63,15 @@ struct AddProjectView: View {
                         isShowBackgroundPicker = true
                         
                     }
-                    
+                    onTapOutside: {
+                        resetEditState()
+                    }
+                    onOpenBackgroundEditor: {
+                          showBackgroundEditor = true
+                      }
                     if  selectedEditText != .none {
                         VStack(spacing: 0) {
-                            VStack{
+                            VStack {
                                 HStack {
                                     Button(action: {}) {
                                         Image("img_edit1_keyboard")
@@ -81,101 +88,47 @@ struct AddProjectView: View {
                                     .background(.white)
                                 }
                                 .padding(.horizontal)
-                                HStack (spacing: 20) {
-                                    Button(action: {
-                                        selectedEditText = .fontSize
-                                    }) {
-                                        Image("img_edit1_text")
-                                            .foregroundColor(selectedEditText == .fontSize ? .red : .black)
-
-                                    }
-                                    Button(action: {
-                                        selectedEditText = .fontFamily
-
-                                    }) {
-                                        Image("img_edit1_size")
-                                            .foregroundColor(selectedEditText == .fontFamily ? .red : .black)
-                                        
-
-                                    }
-                                    Button(action: {
-                                        selectedEditText = .colorSolid
-                                        
-                                    }) {
-                                        Image("img_edit1_color")
-                                            .foregroundColor(selectedEditText == .colorSolid ? .red : .black)
-
-                                    }
-                                    
-                                    Button(action: {
-                                        selectedEditText = .gradient
-                                    }) {
-                                        Image("img_edit1_gradient")
-                                            .foregroundColor(selectedEditText == .gradient ? .red : .black)
-
-                                    }
-                                    Button(action: {
-                                        selectedEditText = .stroke
-                                    }) {
-                                        Image("img_edit1_stroke")
-                                            .foregroundColor(selectedEditText == .stroke ? .red : .black)
-
-                                    }
-                                    Button(action: {
-                                        selectedEditText = .align
-                                    }) {
-                                        Image("img_edit1_align")
-                                            .foregroundColor(selectedEditText == .align ? .red : .black)
-
-                                    }
-                                    Button(action: {
-                                        selectedEditText = .shadow
-                                    }) {
-                                        Image("img_edit1_shadow")
-                                            .foregroundColor(selectedEditText == .shadow ? .red : .black)
-
-                                    }
-                                    Button(action: {
-                                        selectedEditText = .background
-                                    }) {
-                                        Image("img_edit1_bg")
-                                            .foregroundColor(selectedEditText == .background ? .red : .black)
-
-                                    }
+                                HStack(spacing: 20) {
+                                    iconButton("img_edit1_text", .fontSize)
+                                    iconButton("img_edit1_size", .fontFamily)
+                                    iconButton("img_edit1_color", .colorSolid)
+                                    iconButton("img_edit1_gradient", .gradient)
+                                    iconButton("img_edit1_stroke", .stroke)
+                                    iconButton("img_edit1_align", .align)
+                                    iconButton("img_edit1_shadow", .shadow)
+                                    iconButton("img_edit1_bg", .background)
                                 }
                                 .padding(10)
-                                .padding(.horizontal,12)
+                                .padding(.horizontal, 12)
                                 .background(Color.gray.opacity(0.2).cornerRadius(70))
+
                             }
-                            switch selectedEditText {
-                            case .fontSize:
-                                TextView(selectedEditText: .fontSize)
-                            case .fontFamily:
-                                TextView(selectedEditText: .fontFamily)
-                                
-                            case .colorSolid:
-                                TextView(selectedEditText: .colorSolid)
-                                
-                            case .gradient:
-                                TextView(selectedEditText: .gradient)
-                                
-                            case .stroke:
-                                TextView(selectedEditText: .stroke)
-                                
-                            case .align:
-                                TextView(selectedEditText: .align)
-                            
-                            case .shadow:
-                                TextView(selectedEditText: .shadow)
-                            case .background:
-                                TextView(selectedEditText: .background)
-                                
-                          
-                                
-                            case .none:
-                                SplashView()
-                                
+
+                            ZStack {
+                                switch selectedEditText {
+                                case .fontSize:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .fontSize)
+                                case .fontFamily:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .fontFamily)
+                                case .colorSolid:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .colorSolid)
+                                case .gradient:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .gradient)
+                                case .stroke:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .stroke)
+                                case .align:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .align)
+                                case .shadow:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .shadow)
+                                case .background:
+                                    TextView(overlayVM: overlayVM, selectedEditText: .background)
+                                case .none:
+                                    EmptyView()
+                                }
                             }
+                            .id(selectedEditText) // giúp SwiftUI animate mượt
+                            .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                            .animation(.easeInOut(duration: 0.35), value: selectedEditText)
                         }
                     }
                     else {
@@ -184,6 +137,7 @@ struct AddProjectView: View {
                                 HStack {
                                     Spacer()
                                     Button(action: {
+                                        guard frame != nil else { return }
                                         let newOverlay = overlayVM.addOverlay("")
                                         overlayVM.selectOverlay(newOverlay.id)
                                         isTextFieldFocused = true
@@ -299,7 +253,6 @@ struct AddProjectView: View {
                                             .foregroundColor(.black.opacity(0.8))
                                         }
                                         Spacer()
-                                        
                                     }
                                     .padding(.top)
                                     .background(ignoresSafeAreaEdges: .bottom)
@@ -340,8 +293,15 @@ struct AddProjectView: View {
             BackGroundView { picked in
                 self.frame = picked
             }
-            
         }
+        .sheet(isPresented: $showBackgroundEditor) {
+            if #available(iOS 16.0, *) {
+                BackgroundEditorView()
+                    .presentationDetents([.height(290)])
+            } else {
+                // Fallback on earlier versions
+            }        }
+        
         .onChange(of: frame?.id) { _ in
             if selectedTab == 1 {
                 overlayVM.overlays.removeAll()
@@ -350,6 +310,26 @@ struct AddProjectView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+    }
+    
+    //func
+    func resetEditState() {
+        selectedEditText = .none
+        showTextField = false
+        isTextFieldFocused = false
+        isSelected = false
+        overlayVM.deselectAll()
+    }
+    
+    // Helper để tạo nút icon
+
+    @ViewBuilder
+    private func iconButton(_ imageName: String, _ type: OverlayTextEditEnum) -> some View {
+        Image(imageName)
+            .foregroundColor(selectedEditText == type ? .red : .black)
+            .onTapGesture {
+                selectedEditText = type
+            }
     }
 }
 
@@ -363,6 +343,10 @@ enum EditMode {
 struct AddBackgroundsView: View {
     
     @ObservedObject var overlayVM: OverlayTextViewModel
+    
+    @StateObject private var bgoverrlayVM = BackGroundViewModel()
+
+    
     
     let frame: Frame?
     
@@ -383,9 +367,9 @@ struct AddBackgroundsView: View {
     
     //zoom
     @State private var startDistance: CGFloat = 0
-      @State private var initialZoom: CGFloat = 1
-      @State private var currentZoom: CGFloat = 1   // Zoom cuối cùng
-      @State private var displayZoom: CGFloat = 1   // Zoom đang hiển thị khi kéo
+    @State private var initialZoom: CGFloat = 1
+    @State private var currentZoom: CGFloat = 1   // Zoom cuối cùng
+    @State private var displayZoom: CGFloat = 1   // Zoom đang hiển thị khi kéo
     
     //offset
     var offset : CGSize = .zero
@@ -401,15 +385,17 @@ struct AddBackgroundsView: View {
     @State private var currentMode: EditMode = .none
     @State private var rotBase: Double = 0
     @State private var rotInProgress = false
-    
-    
     //new rotate
     @State private var rotation: Angle = .degrees(0)
     @State private var lastAngle: Angle = .degrees(0)
+    let onAddTap: () -> Void
     
+    let onTapOutside: () -> Void
+    
+    let onOpenBackgroundEditor: () -> Void
+
 
     
-    let onAddTap: () -> Void
     
     
     var body: some View {
@@ -420,15 +406,15 @@ struct AddBackgroundsView: View {
                         img.resizable()
                             .scaledToFill()
                             .frame(maxWidth: .infinity,maxHeight: .infinity)
-                        
+                            
+//                            .overlay(Color.black.opacity(0.3))
                         //img
                             .onTapGesture {
-                                showTextField = false
-                                overlayVM.setEditingSelectedOverlay(false)
-                                overlayVM.deselectAll()
-                                if !isEditingText {
-                                    isSelected = false
-                                    
+                                if showTextField == false && isTextFieldFocused == false && isSelected == false{
+                                    onOpenBackgroundEditor()
+                                } else {
+                                    onTapOutside()
+
                                 }
                             }
                             .overlay(
@@ -447,13 +433,53 @@ struct AddBackgroundsView: View {
                                                 }
                                         }
                                         
-                                        else  {
+                                        else if !overlay.text.isEmpty  {
                                                 ZStack{
-                                                        Text(overlay.text)
-                                                            .font(.system(size: 22, weight: .bold))
-                                                            .foregroundColor(.white)
-                                                            .shadow(radius: 2)
+                                                    //case
+                                                        Text({
+                                                                switch overlay.selectedAlignCase {
+                                                                case .up: return overlay.text.uppercased()
+                                                                case .cap: return overlay.text.capitalized
+                                                                case .low: return overlay.text.lowercased()
+                                                                case .none: return overlay.text
+                                                                }
+                                                            }())
+                                                            .font(.custom(overlay.selectedFontFamily.fontFamily, size: overlay.fontSize))
+                                                            .kerning(overlay.letterSpacing)
+                                                            .lineSpacing(overlay.lineHeight)
+                                                            .rotation3DEffect(
+                                                                   .degrees(overlay.cuver * 10), // slider điều khiển
+                                                                   axis: (x: 0, y: 2, z: 0)
+                                                            )
+                                                   //align
+                                                            .frame(maxWidth: UIScreen.main.bounds.width/1.5, alignment: {
+                                                                switch overlay.selectedAlign {
+                                                                case .left: return .leading
+                                                                case .center: return .center
+                                                                case .right: return .trailing
+                                                                case .none: return .center
+                                                                }
+                                                            }())
+                                                            .contentShape(Rectangle())
+                                                    //solid
+                                                            .if(!overlay.userGradient) { view in
+                                                                 view.foregroundColor(overlay.colorSolid.opacity(overlay.valueOpacity))
+                                                             }
+                                                    //gradient
+                                                             .if(overlay.userGradient) { view in
+                                                                 view.foregroundStyle(overlay.colorGradient.opacity(overlay.valueOpacity))
+                                                             }
+                                                             .padding(overlay.paddingBG)
+                                                             .shadow(
+                                                                     color: overlay.shawDowColor.opacity(overlay.opacitySD),
+                                                                     //độ mở
+                                                                     radius: overlay.blurSD,
+                                                                     x: overlay.offSetXSD,
+                                                                     y: overlay.offSetYSD
+                                                                 )
+
                                                             .padding(.horizontal)
+                                                    
                                                             .onTapGesture(perform: {
                                                                 overlayVM.setEditingSelectedOverlay(false)
                                                                 overlayVM.selectOverlay(overlay.id)
@@ -470,118 +496,174 @@ struct AddBackgroundsView: View {
                                                             .gesture(
                                                                 DragGesture(coordinateSpace: .named("canvas"))
                                                                     .onChanged { value in
-                                                                        if currentMode == .none {
-                                                                            currentMode = .moving
-                                                                        }
-                                                                        if currentMode == .moving {
-                                                                            overlay.offset = CGSize(
-                                                                                width: overlay.endset.width + value.translation.width,
-                                                                                height: overlay.endset.height + value.translation.height
-                                                                            )
-                                                                        }
+                                                                        overlay.offset = CGSize(
+                                                                            width: overlay.endset.width + value.translation.width,
+                                                                            height: overlay.endset.height + value.translation.height
+                                                                        )
                                                                     }
                                                                     .onEnded { _ in
-                                                                        if currentMode == .moving {
-                                                                            overlay.endset = overlay.offset
-                                                                        }
-                                                                        currentMode = .none
+                                                                        overlay.endset = overlay.offset
                                                                     }
                                                             )
-                                                    
-                                                        .padding()
-                                                        .overlay {
-                                                            if !overlay.isEditingText {
-                                                                GeometryReader {textGeo in
-                                                                    ZStack {
-                                                                        Rectangle()
-                                                                            .stroke(style: StrokeStyle(lineWidth: 2))
-                                                                            .foregroundColor(Color.black.opacity(0.6))
-                                                                        Image("img_edit_x")
-                                                                            .padding(10)
-                                                                        
-                                                                            .position(x: 0, y: 0)
-                                                                            .onTapGesture {
-                                                                                overlayVM.removeOverlay(overlay.id)
-                                                                            }
-                                                                        
-                                                                        Image("img_edit_copy")
-                                                                            .padding(10)
-                                                                            .position(x: textGeo.size.width, y: 0)
-                                                                            .onTapGesture {
-                                                                                overlayVM.selectOverlay(overlay.id)
-                                                                                overlayVM.copyOverlay(overlay)
-                                                                                for item in overlayVM.overlays {
-                                                                                    print(item.id)
-                                                                                }
-                                                                            }
-                                                                        
-                                                                        Image("img_edit_xoay")
-                                                                            .frame(width: 30, height: 30)
-                                                                            .padding(30) 
-                                                                            .contentShape(Rectangle())
-                                                                            .position(x: 0, y: textGeo.size.height)
-                                                                            .gesture(
-                                                                                DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                                                                                    .onChanged { value in
-                                                                                        let frame = textGeo.frame(in: .global)
-                                                                                        let center = CGPoint(x: frame.midX, y: frame.midY)
-                                                                                        
-                                                                                        if overlay.startLocation == nil {
-                                                                                            overlay.startLocation = value.startLocation
-                                                                                            overlay.startAngle = overlay.currentRotation
-                                                                                        }
-                                                                                        
-                                                                                        let startVector = CGVector(dx: (overlay.startLocation?.x ?? 0) - center.x,
-                                                                                                                   dy: (overlay.startLocation?.y ?? 0) - center.y)
-                                                                                        
-                                                                                        let currentVector = CGVector(dx: value.location.x - center.x,
-                                                                                                                     dy: value.location.y - center.y)
-                                                                                        
-                                                                                        let angleChange = atan2(currentVector.dy, currentVector.dx) - atan2(startVector.dy, startVector.dx)
-                                                                                        overlay.currentRotation = overlay.startAngle + Angle(radians: Double(angleChange))
-                                                                                    }
+                                                            .padding()
+                                                            
+                                                            .background(
+                                                                Group{
+                                                                        GeometryReader {textGeo in
+                                                                            ZStack {
+                                                                                overlay.bgColor
+                                                                                    .opacity(overlay.opacityBG)
+                                                                                    .cornerRadius(overlay.cornerRadiusBG)
+                                                                                    .frame(width: textGeo.size.width, height: textGeo.size.height)
+                                                                                    .allowsHitTesting(false)
                                                                                 
-                                                                            )
-                                                                       
-
-                                                                        Image("img_edit_zoom")
-                                                                            .padding(10)
-                                                                            .position(x: textGeo.size.width, y: textGeo.size.height)
-                                                                            .gesture(
-                                                                                DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                                                                                    .onChanged { value in
-                                                                                        let frame = textGeo.frame(in: .global)
-                                                                                        let center = CGPoint(x: frame.midX, y: frame.midY)
-                                                                                        
-                                                                                        let currentDistance = hypot(value.location.x - center.x,
-                                                                                                                    value.location.y - center.y)
-                                                                                        
-                                                                                        if overlay.startDistance == 0 {
-                                                                                            overlay.startDistance = currentDistance
-                                                                                            overlay.startScale = overlay.currentScale
+                                                                                if !overlay.isEditingText {
+                                                                                    
+                                                                                    Rectangle()
+                                                                                        .stroke(style: StrokeStyle(lineWidth: 2 / overlay.currentScale))
+                                                                                        .foregroundColor(Color.black.opacity(0.6))
+                                                                                    Image("img_edit_x")
+                                                                                        .resizable()
+                                                                                        .scaledToFit()
+                                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                                        .padding(10 / overlay.currentScale)
+                                                                                        .contentShape(Rectangle())
+                                                                                    
+                                                                                        .position(x: 0, y: 0)
+                                                                                        .onTapGesture {
+                                                                                            overlayVM.removeOverlay(overlay.id)
                                                                                         }
-                                                                                        
-                                                                                        if overlay.startDistance != 0 {
-                                                                                            let scaleFactor = currentDistance / overlay.startDistance
-                                                                                            overlay.currentScale = max(0.2, min(overlay.startScale * scaleFactor, 5.0)) // giới hạn 0.2x - 5x
+                                                                                    
+                                                                                    Image("img_edit_copy")
+                                                                                        .resizable()
+                                                                                        .scaledToFit()
+                                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                                        .padding(10 / overlay.currentScale)
+                                                                                        .contentShape(Rectangle())
+                                                                                        .position(x: textGeo.size.width, y: 0)
+                                                                                        .onTapGesture {
+                                                                                            overlayVM.selectOverlay(overlay.id)
+                                                                                            overlayVM.copyOverlay(overlay)
+                                                                                            for item in overlayVM.overlays {
+                                                                                                print(item.id)
+                                                                                            }
                                                                                         }
-                                                                                    }
-                                                                                    .onEnded { _ in
-                                                                                        overlay.startDistance = 0
-                                                                                    }
-                                                                            )
-                                                                    }
-                                                                   
+                                                                                    
+                                                                                    Image("img_edit_xoay")
+                                                                                        .resizable()
+                                                                                        .scaledToFit()
+                                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                                        .padding(10 / overlay.currentScale)
+                                                                                        .contentShape(Rectangle())
+                                                                                        .position(x: 0, y: textGeo.size.height)
+                                                                                        .gesture(
+                                                                                            DragGesture(minimumDistance: 10, coordinateSpace: .named("canvas"))
+                                                                                                .onChanged { value in
+                                                                                                    let center = CGPoint(x: textGeo.frame(in: .named("canvas")).midX,
+                                                                                                                         y: textGeo.frame(in: .named("canvas")).midY)
+                                                                                                    
+                                                                                                    if overlay.startLocation == nil {
+                                                                                                        let dx = value.startLocation.x - center.x
+                                                                                                        let dy = value.startLocation.y - center.y
+                                                                                                        overlay.startLocation = CGPoint(x: dx, y: dy)
+                                                                                                        overlay.startAngle = overlay.currentRotation
+                                                                                                    }
+                                                                                                    
+                                                                                                    let currentVector = CGVector(dx: value.location.x - center.x,
+                                                                                                                                 dy: value.location.y - center.y)
+                                                                                                    let startVector = CGVector(dx: overlay.startLocation!.x,
+                                                                                                                               dy: overlay.startLocation!.y)
+                                                                                                    let angleChange = atan2(currentVector.dy, currentVector.dx) - atan2(startVector.dy, startVector.dx)
+                                                                                                    overlay.currentRotation = overlay.startAngle + Angle(radians: Double(angleChange))
+                                                                                                }
+                                                                                                .onEnded { _ in
+                                                                                                    overlay.startLocation = nil
+                                                                                                }
+                                                                                        )
+                                                                                    
+                                                                                    Image("img_edit_zoom")
+                                                                                        .resizable()
+                                                                                        .scaledToFit()
+                                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                                        .padding(10 / overlay.currentScale)
+                                                                                        .contentShape(Rectangle())
+                                                                                        .position(x: textGeo.size.width, y: textGeo.size.height)
+                                                                                        .gesture(
+                                                                                            DragGesture(minimumDistance: 0, coordinateSpace: .named("canvas"))
+                                                                                                .onChanged { value in
+                                                                                                    if overlay.startDistance == 0 {
+                                                                                                        // Dùng size thay vì frame để tránh lỗi khi move
+                                                                                                        let frameSize = textGeo.size
+                                                                                                        
+                                                                                                        overlay.startCenter = CGPoint(
+                                                                                                            x: (frameSize.width / 2) + overlay.endset.width,
+                                                                                                            y: (frameSize.height / 2) + overlay.endset.height
+                                                                                                        )
+                                                                                                        
+                                                                                                        overlay.startDistance = hypot(
+                                                                                                            value.location.x - overlay.startCenter.x,
+                                                                                                            value.location.y - overlay.startCenter.y
+                                                                                                        )
+                                                                                                        overlay.startScale = overlay.currentScale
+                                                                                                        
+                                                                                                        overlay.startAngleToCenter = atan2(
+                                                                                                            value.location.y - overlay.startCenter.y,
+                                                                                                            value.location.x - overlay.startCenter.x
+                                                                                                        )
+                                                                                                    }
+                                                                                                    
+                                                                                                    let currentAngle = atan2(
+                                                                                                        value.location.y - overlay.startCenter.y,
+                                                                                                        value.location.x - overlay.startCenter.x
+                                                                                                    )
+                                                                                                    
+                                                                                                    if let startAngle = overlay.startAngleToCenter {
+                                                                                                        let angleDiff = abs((currentAngle - startAngle).truncatingRemainder(dividingBy: .pi * 2))
+                                                                                                        if angleDiff > (.pi / 4) { // ±45°
+                                                                                                            return
+                                                                                                        }
+                                                                                                    }
+                                                                                                    
+                                                                                                    let currentDistance = hypot(
+                                                                                                        value.location.x - overlay.startCenter.x,
+                                                                                                        value.location.y - overlay.startCenter.y
+                                                                                                    )
+                                                                                                    let scaleFactor = currentDistance / overlay.startDistance
+                                                                                                    
+                                                                                                    let minScale: CGFloat = 0.5
+                                                                                                    let maxScale: CGFloat = 3.0
+                                                                                                    
+                                                                                                    var newScale = overlay.startScale * scaleFactor
+                                                                                                    
+                                                                                                    if newScale < minScale {
+                                                                                                        newScale = minScale
+                                                                                                    } else if newScale > maxScale {
+                                                                                                        newScale = maxScale
+                                                                                                    }
+                                                                                                    
+                                                                                                    overlay.currentScale = newScale
+                                                                                                }
+                                                                                                .onEnded { _ in
+                                                                                                    overlay.startDistance = 0
+                                                                                                    overlay.startScale = overlay.currentScale
+                                                                                                    overlay.startAngleToCenter = nil
+                                                                                                }
+                                                                                        )
+                                                                                    
+                                                                                }
+                                                                                
+                                                                                
+                                                                            }
+                                                                        }
                                                                     
                                                                 }
-                                                            }
-                                                        }
-                                                        .rotationEffect(overlay.currentRotation, anchor: .center) // Áp dụng góc xoay
-                                                        .offset(overlay.offset)
-                                                        .scaleEffect(overlay.currentScale)
+                                                            )
+                                                    //move+ rotate + zoom
+                                                            .rotationEffect(overlay.currentRotation, anchor: .center)
+                                                            .offset(x: overlay.offset.width / overlay.currentScale,
+                                                                y: overlay.offset.height / overlay.currentScale)
+                                                            .scaleEffect(overlay.currentScale)
                                                 }
-                                            
-                                            
                                         }}
                                     .coordinateSpace(name: "canvas")
 
@@ -613,3 +695,77 @@ struct AddBackgroundsView: View {
         return Angle(radians: radians)
     }
 }
+
+
+
+
+// MARK: EXTENSION
+
+extension View {
+    @ViewBuilder
+    func `if`<Content: View>(
+        _ condition: Bool,
+        transform: (Self) -> Content
+    ) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+}
+
+
+//align
+
+extension Text {
+    func applyAlign(_ align: AlignEnum) -> some View {
+        switch align {
+        case .left:
+            return self.frame(maxWidth: .infinity, alignment: .leading)
+        case .center:
+            return self.frame(maxWidth: .infinity, alignment: .center)
+        case .right:
+            return self.frame(maxWidth: .infinity, alignment: .trailing)
+        case .none:
+            return self.frame(maxWidth: .infinity, alignment: .center)
+
+        }
+    }
+    
+    func applyCase(_ textCase: AlignCaseEnum) -> Text {
+        switch textCase {
+        case .up:
+            return Text(self.string.uppercased())
+        case .cap:
+            return Text(self.string.capitalized)
+        case .low:
+            return Text(self.string.lowercased())
+        case .none:
+            return Text(self.string.lowercased())
+
+        }
+    }
+    
+    // Helper property để lấy String từ Text
+    private var string: String {
+        let mirror = Mirror(reflecting: self)
+        for child in mirror.children {
+            if let storage = child.value as? String {
+                return storage
+            }
+        }
+        return ""
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

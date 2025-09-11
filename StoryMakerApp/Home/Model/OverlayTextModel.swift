@@ -41,7 +41,7 @@ struct OverlayTextModel: Identifiable {
     
     // Biến tạm để lưu khoảng cách ban đầu từ tâm khi zoom
     var startDistance: CGFloat = 0.0
-       
+    
     var topLeft: CGPoint = .zero
     var topRight: CGPoint = .zero
     var bottomLeft: CGPoint = .zero
@@ -55,7 +55,7 @@ struct OverlayTextModel: Identifiable {
     var startDragAngle: CGFloat? = nil
     var startZoomDistance: CGFloat? = nil
     var activeGesture: OverlayGestureType = .none
-
+    
     var startAngleToCenter: CGFloat? = nil
     var startRadius: CGFloat? = nil
     //zoom
@@ -68,17 +68,67 @@ struct OverlayTextModel: Identifiable {
     //font size
     var value : Double
     
-    static let solidColors: [String] = [
-            "#FFFFFF", "#000000",
-            "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
-            "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
-            "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
-            "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
-            "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
-            "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
-            "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
-            "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
-            "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
+    // Font
+    var fontSize: Double = 30
+    var lineHeight: Double = 30
+    var letterSpacing: Double = 0
+    
+    // Font family
+    var selectedFontFamily: FontFmailyEnum = .ff7
+    
+    
+    // Align
+    var selectedAlign: AlignEnum = .none
+    var selectedAlignCase: AlignCaseEnum = .none
+    var cuver : Double = 2
+    
+    // Color solid
+    var colorSolid: Color = .white
+    var valueOpacity : Double = 1
+    
+    //color gradient
+    var colorGradient: LinearGradient = LinearGradient(
+        gradient: Gradient(colors: [Color.white, Color.white]),
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    var userGradient: Bool = false
+    
+    // Stroke
+    var strokeWidth: Double = 15
+    var hasStroke: Bool = false
+
+    
+    // Background
+    var paddingBG: Double = 10
+    var cornerRadiusBG: Double = 10
+    var opacityBG: Double = 0
+    var bgColor: Color = .white
+    
+    // Shadow
+    var offSetXSD: Double = 0
+    var offSetYSD: Double = 0
+    var blurSD: Double = 1
+    var opacitySD: Double = 1
+    var shawDowColor: Color = .white
+    
+    var baseScale: CGFloat = 1.0 // scale gốc lúc thêm overlay
+    var startOffset: CGSize = .zero
+    
+    var startPoint: CGPoint = .zero
+    var originalScale: CGFloat = 1.0
+    var startCenter: CGPoint = .zero
+    
+    
+    //picker color
+    var showColorPicker = false
+    var selectedColor: Color = .red
+    
+    
+    //bg edit
+    
+
+    
     
 }
 
@@ -136,10 +186,10 @@ enum OverlayTextEditEnum : Equatable , CaseIterable {
             return "img_edit1_shadow"
         case .none:
             return "img_edit1_shadow"
-
+            
         }
     }
-
+    
     
     
     
@@ -170,7 +220,7 @@ enum FontFmailyEnum : String , CaseIterable {
             return "ff4"
         case .ff5:
             return "ff5"
-
+            
         case .ff6:
             return "ff6"
         case .ff7:
@@ -185,9 +235,44 @@ enum FontFmailyEnum : String , CaseIterable {
             return "ff11"
         case .ff12:
             return "ff12"
-       
-
+            
+            
         }
+    }
+    
+    var titleFF: String {
+        switch self {
+        case .ff1: return "Fancy"
+        case .ff2: return "Playful"
+        case .ff3: return "Cute"
+        case .ff4: return "MV Boli"
+        case .ff5: return "Vintage"
+        case .ff6: return "Pixel"
+        case .ff7: return "Loud"
+        case .ff8: return "Happy"
+        case .ff9: return "Childlike"
+        case .ff10: return "Stencil"
+        case .ff11: return "Shaded"
+        case .ff12: return "Marker"
+        }
+    }
+    
+    var fontFamily: String {
+        switch self {
+        case .ff1: return "MonsieurLaDoulaise-Regular"
+        case .ff2: return "Barriecito-Regular"
+        case .ff3: return "Pacifico-Regular"
+        case .ff4: return "Kapakana-VariableFont_wght"
+        case .ff5: return "PPNeueMachina-Regular"
+        case .ff6: return "AllertaStencil-Regular"
+        case .ff7: return "Arbutus-Regular"
+        case .ff8: return "Kablammo-Regular-VariableFont_MORF"
+        case .ff9: return "Eater-Regular"
+        case .ff10: return "Inspiration-Regular"
+        case .ff11: return "FontdinerSwanky-Regular"
+        case .ff12: return "RubikIso-Regular"
+        }
+        
     }
 }
 

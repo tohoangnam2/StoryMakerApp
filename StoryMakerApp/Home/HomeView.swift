@@ -24,13 +24,13 @@ struct HomeView: View {
                         VStack(spacing: 25){
                             HStack{
                                 NavigationLink(destination: SplashView()){
-                                    Image("home_icTabbar")
+                                    Image("home_ictabbar")
                                 }
                                 Spacer()
                                 Text("Art story".uppercased())
                                     .font(.system(size: 18, weight: .bold, design: .default))
                                 Spacer()
-                                Image("home_icTabbar")
+                                Image("home_ictabbar")
                                     .opacity(0)
                                 
                             }

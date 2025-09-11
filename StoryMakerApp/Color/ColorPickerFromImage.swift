@@ -7,31 +7,29 @@
 
 import SwiftUI
 
-struct ShadowColorPickerView: View {
-    @State private var shadowColor: Color = .black
-    @State private var colors: Color = .black
-    
+struct ColorPickerFromImage: View {
+    @Binding var overlay: OverlayTextModel
+
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Aaa")
-                .foregroundColor(colors
-                )
-                .padding(30)
-                .background()
-                .frame(width: 200, height: 100)
-                .shadow(
-                    color: shadowColor.opacity(0.5), // dùng màu picker
-                    radius: 10,
-                    x: 5,
-                    y: 5
-                )
-            
-            ColorPicker("Colors", selection: $colors)
-                .padding()
+        ZStack {
+            Image("cs1")
+                .resizable()
+                .frame(width: 40, height: 40)
+//                .colorMultiply(overlay.colorSolid)
+                .allowsHitTesting(false) // ảnh không chặn sự kiện tap
+
+            ColorPicker("Colors", selection: $overlay.colorSolid)
+                .labelsHidden()
+                .opacity(0.02)
+                .frame(width: 40, height: 40)
         }
+
+
+
+
     }
 }
 
-#Preview {
-    ShadowColorPickerView()
-}
+
+
+

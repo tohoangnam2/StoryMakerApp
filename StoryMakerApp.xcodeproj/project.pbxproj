@@ -6,14 +6,89 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
+		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
+		546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */; };
+		546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */; };
+		546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */; };
+		546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */; };
+		546968B12E6E8C2E00BD2B77 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689B2E6E8C2E00BD2B77 /* HomeView.swift */; };
+		546968B22E6E8C2E00BD2B77 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689D2E6E8C2E00BD2B77 /* OnboardingView.swift */; };
+		546968B32E6E8C2E00BD2B77 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689F2E6E8C2E00BD2B77 /* SplashView.swift */; };
+		546968B42E6E8C2E00BD2B77 /* SubcriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968A12E6E8C2E00BD2B77 /* SubcriptionView.swift */; };
+		546968B52E6E8C2E00BD2B77 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968A32E6E8C2E00BD2B77 /* TextView.swift */; };
+		546968B62E6E8C2E00BD2B77 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968A62E6E8C2E00BD2B77 /* ContentView.swift */; };
+		546968B72E6E8C2E00BD2B77 /* StoryMakerAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968A82E6E8C2E00BD2B77 /* StoryMakerAppApp.swift */; };
+		546968B82E6E8C2E00BD2B77 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968A92E6E8C2E00BD2B77 /* Test.swift */; };
+		546968B92E6E8C2E00BD2B77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 546968A52E6E8C2E00BD2B77 /* Assets.xcassets */; };
+		546968BC2E6E8C6D00BD2B77 /* PPNeueMachina-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 546968BB2E6E8C6D00BD2B77 /* PPNeueMachina-Regular.otf */; };
+		546968BF2E6E8DB600BD2B77 /* MonsieurLaDoulaise-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968BE2E6E8DB600BD2B77 /* MonsieurLaDoulaise-Regular.ttf */; };
+		546968C12E6E960900BD2B77 /* Barriecito-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968C02E6E960900BD2B77 /* Barriecito-Regular.ttf */; };
+		546968C32E6E96B700BD2B77 /* Pacifico-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968C22E6E96B700BD2B77 /* Pacifico-Regular.ttf */; };
+		546968C52E6E96F500BD2B77 /* Kapakana-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968C42E6E96F500BD2B77 /* Kapakana-VariableFont_wght.ttf */; };
+		546968C72E6E975400BD2B77 /* AllertaStencil-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968C62E6E975400BD2B77 /* AllertaStencil-Regular.ttf */; };
+		546968C92E6E97A700BD2B77 /* Arbutus-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968C82E6E97A700BD2B77 /* Arbutus-Regular.ttf */; };
+		546968CB2E6E97D200BD2B77 /* Kablammo-Regular-VariableFont_MORF.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968CA2E6E97D200BD2B77 /* Kablammo-Regular-VariableFont_MORF.ttf */; };
+		546968CD2E6E980400BD2B77 /* Butcherman-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968CC2E6E980400BD2B77 /* Butcherman-Regular.ttf */; };
+		546968CF2E6E982B00BD2B77 /* Eater-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968CE2E6E982B00BD2B77 /* Eater-Regular.ttf */; };
+		546968D12E6E984C00BD2B77 /* Inspiration-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968D02E6E984C00BD2B77 /* Inspiration-Regular.ttf */; };
+		546968D32E6E987300BD2B77 /* FontdinerSwanky-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968D22E6E987300BD2B77 /* FontdinerSwanky-Regular.ttf */; };
+		546968D52E6E988E00BD2B77 /* RubikIso-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */; };
+		546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */; };
+		546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
+		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
+		546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundViewModel.swift; sourceTree = "<group>"; };
+		546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextModel.swift; sourceTree = "<group>"; };
+		546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextViewModel.swift; sourceTree = "<group>"; };
+		5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
+		5469689B2E6E8C2E00BD2B77 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		5469689D2E6E8C2E00BD2B77 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		5469689F2E6E8C2E00BD2B77 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		546968A12E6E8C2E00BD2B77 /* SubcriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcriptionView.swift; sourceTree = "<group>"; };
+		546968A32E6E8C2E00BD2B77 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
+		546968A52E6E8C2E00BD2B77 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		546968A62E6E8C2E00BD2B77 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		546968A72E6E8C2E00BD2B77 /* StoryMakerApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StoryMakerApp.entitlements; sourceTree = "<group>"; };
+		546968A82E6E8C2E00BD2B77 /* StoryMakerAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMakerAppApp.swift; sourceTree = "<group>"; };
+		546968A92E6E8C2E00BD2B77 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
+		546968BB2E6E8C6D00BD2B77 /* PPNeueMachina-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PPNeueMachina-Regular.otf"; sourceTree = "<group>"; };
+		546968BD2E6E8CA600BD2B77 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		546968BE2E6E8DB600BD2B77 /* MonsieurLaDoulaise-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MonsieurLaDoulaise-Regular.ttf"; sourceTree = "<group>"; };
+		546968C02E6E960900BD2B77 /* Barriecito-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barriecito-Regular.ttf"; sourceTree = "<group>"; };
+		546968C22E6E96B700BD2B77 /* Pacifico-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pacifico-Regular.ttf"; sourceTree = "<group>"; };
+		546968C42E6E96F500BD2B77 /* Kapakana-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Kapakana-VariableFont_wght.ttf"; sourceTree = "<group>"; };
+		546968C62E6E975400BD2B77 /* AllertaStencil-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AllertaStencil-Regular.ttf"; sourceTree = "<group>"; };
+		546968C82E6E97A700BD2B77 /* Arbutus-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arbutus-Regular.ttf"; sourceTree = "<group>"; };
+		546968CA2E6E97D200BD2B77 /* Kablammo-Regular-VariableFont_MORF.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Kablammo-Regular-VariableFont_MORF.ttf"; sourceTree = "<group>"; };
+		546968CC2E6E980400BD2B77 /* Butcherman-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Butcherman-Regular.ttf"; sourceTree = "<group>"; };
+		546968CE2E6E982B00BD2B77 /* Eater-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Eater-Regular.ttf"; sourceTree = "<group>"; };
+		546968D02E6E984C00BD2B77 /* Inspiration-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inspiration-Regular.ttf"; sourceTree = "<group>"; };
+		546968D22E6E987300BD2B77 /* FontdinerSwanky-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FontdinerSwanky-Regular.ttf"; sourceTree = "<group>"; };
+		546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RubikIso-Regular.ttf"; sourceTree = "<group>"; };
+		546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorView.swift; sourceTree = "<group>"; };
+		546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorViewModel.swift; sourceTree = "<group>"; };
 		BB94D9EE2E541CBD008F66EA /* StoryMakerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMakerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		BB94D9F02E541CBD008F66EA /* StoryMakerApp */ = {
+		546968D62E702F9800BD2B77 /* Color */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = StoryMakerApp;
+			path = Color;
+			sourceTree = "<group>";
+		};
+		546968E42E71760A00BD2B77 /* BackgroundEditmodel */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BackgroundEditmodel;
+			sourceTree = "<group>";
+		};
+		546968E52E717EC200BD2B77 /* Filter */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Filter;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -29,10 +104,148 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		546968902E6E8C2E00BD2B77 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				546968E42E71760A00BD2B77 /* BackgroundEditmodel */,
+				5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		546968922E6E8C2E00BD2B77 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */,
+				546968912E6E8C2E00BD2B77 /* BackGroundView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		546968942E6E8C2E00BD2B77 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */,
+				546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		546968952E6E8C2E00BD2B77 /* BackGround */ = {
+			isa = PBXGroup;
+			children = (
+				546968902E6E8C2E00BD2B77 /* Model */,
+				546968922E6E8C2E00BD2B77 /* View */,
+				546968942E6E8C2E00BD2B77 /* ViewModels */,
+			);
+			path = BackGround;
+			sourceTree = "<group>";
+		};
+		546968972E6E8C2E00BD2B77 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		546968992E6E8C2E00BD2B77 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		5469689C2E6E8C2E00BD2B77 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				546968972E6E8C2E00BD2B77 /* Model */,
+				546968992E6E8C2E00BD2B77 /* ViewModel */,
+				5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */,
+				5469689B2E6E8C2E00BD2B77 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		5469689E2E6E8C2E00BD2B77 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				5469689D2E6E8C2E00BD2B77 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		546968A02E6E8C2E00BD2B77 /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				5469689F2E6E8C2E00BD2B77 /* SplashView.swift */,
+			);
+			path = Splash;
+			sourceTree = "<group>";
+		};
+		546968A22E6E8C2E00BD2B77 /* Subcription */ = {
+			isa = PBXGroup;
+			children = (
+				546968A12E6E8C2E00BD2B77 /* SubcriptionView.swift */,
+			);
+			path = Subcription;
+			sourceTree = "<group>";
+		};
+		546968A42E6E8C2E00BD2B77 /* Text */ = {
+			isa = PBXGroup;
+			children = (
+				546968A32E6E8C2E00BD2B77 /* TextView.swift */,
+			);
+			path = Text;
+			sourceTree = "<group>";
+		};
+		546968AA2E6E8C2E00BD2B77 /* StoryMakerApp */ = {
+			isa = PBXGroup;
+			children = (
+				546968E52E717EC200BD2B77 /* Filter */,
+				546968D62E702F9800BD2B77 /* Color */,
+				546968BD2E6E8CA600BD2B77 /* Info.plist */,
+				546968BA2E6E8C3700BD2B77 /* FontFamily */,
+				546968952E6E8C2E00BD2B77 /* BackGround */,
+				5469689C2E6E8C2E00BD2B77 /* Home */,
+				5469689E2E6E8C2E00BD2B77 /* Onboarding */,
+				546968A02E6E8C2E00BD2B77 /* Splash */,
+				546968A22E6E8C2E00BD2B77 /* Subcription */,
+				546968A42E6E8C2E00BD2B77 /* Text */,
+				546968A52E6E8C2E00BD2B77 /* Assets.xcassets */,
+				546968A62E6E8C2E00BD2B77 /* ContentView.swift */,
+				546968A72E6E8C2E00BD2B77 /* StoryMakerApp.entitlements */,
+				546968A82E6E8C2E00BD2B77 /* StoryMakerAppApp.swift */,
+				546968A92E6E8C2E00BD2B77 /* Test.swift */,
+			);
+			path = StoryMakerApp;
+			sourceTree = "<group>";
+		};
+		546968BA2E6E8C3700BD2B77 /* FontFamily */ = {
+			isa = PBXGroup;
+			children = (
+				546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */,
+				546968D22E6E987300BD2B77 /* FontdinerSwanky-Regular.ttf */,
+				546968D02E6E984C00BD2B77 /* Inspiration-Regular.ttf */,
+				546968CE2E6E982B00BD2B77 /* Eater-Regular.ttf */,
+				546968CC2E6E980400BD2B77 /* Butcherman-Regular.ttf */,
+				546968CA2E6E97D200BD2B77 /* Kablammo-Regular-VariableFont_MORF.ttf */,
+				546968C82E6E97A700BD2B77 /* Arbutus-Regular.ttf */,
+				546968C62E6E975400BD2B77 /* AllertaStencil-Regular.ttf */,
+				546968C42E6E96F500BD2B77 /* Kapakana-VariableFont_wght.ttf */,
+				546968C22E6E96B700BD2B77 /* Pacifico-Regular.ttf */,
+				546968C02E6E960900BD2B77 /* Barriecito-Regular.ttf */,
+				546968BE2E6E8DB600BD2B77 /* MonsieurLaDoulaise-Regular.ttf */,
+				546968BB2E6E8C6D00BD2B77 /* PPNeueMachina-Regular.otf */,
+			);
+			path = FontFamily;
+			sourceTree = "<group>";
+		};
 		BB94D9E52E541CBD008F66EA = {
 			isa = PBXGroup;
 			children = (
-				BB94D9F02E541CBD008F66EA /* StoryMakerApp */,
+				546968AA2E6E8C2E00BD2B77 /* StoryMakerApp */,
 				BB94D9EF2E541CBD008F66EA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +274,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				BB94D9F02E541CBD008F66EA /* StoryMakerApp */,
+				546968D62E702F9800BD2B77 /* Color */,
+				546968E42E71760A00BD2B77 /* BackgroundEditmodel */,
+				546968E52E717EC200BD2B77 /* Filter */,
 			);
 			name = StoryMakerApp;
 			packageProductDependencies = (
@@ -109,6 +324,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				546968B92E6E8C2E00BD2B77 /* Assets.xcassets in Resources */,
+				546968CB2E6E97D200BD2B77 /* Kablammo-Regular-VariableFont_MORF.ttf in Resources */,
+				546968CF2E6E982B00BD2B77 /* Eater-Regular.ttf in Resources */,
+				546968C72E6E975400BD2B77 /* AllertaStencil-Regular.ttf in Resources */,
+				546968C12E6E960900BD2B77 /* Barriecito-Regular.ttf in Resources */,
+				546968D32E6E987300BD2B77 /* FontdinerSwanky-Regular.ttf in Resources */,
+				546968BF2E6E8DB600BD2B77 /* MonsieurLaDoulaise-Regular.ttf in Resources */,
+				546968D52E6E988E00BD2B77 /* RubikIso-Regular.ttf in Resources */,
+				546968D12E6E984C00BD2B77 /* Inspiration-Regular.ttf in Resources */,
+				546968C92E6E97A700BD2B77 /* Arbutus-Regular.ttf in Resources */,
+				546968BC2E6E8C6D00BD2B77 /* PPNeueMachina-Regular.otf in Resources */,
+				546968C32E6E96B700BD2B77 /* Pacifico-Regular.ttf in Resources */,
+				546968CD2E6E980400BD2B77 /* Butcherman-Regular.ttf in Resources */,
+				546968C52E6E96F500BD2B77 /* Kapakana-VariableFont_wght.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +348,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */,
+				546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */,
+				546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */,
+				546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */,
+				546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */,
+				546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */,
+				546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */,
+				546968B12E6E8C2E00BD2B77 /* HomeView.swift in Sources */,
+				546968B22E6E8C2E00BD2B77 /* OnboardingView.swift in Sources */,
+				546968B32E6E8C2E00BD2B77 /* SplashView.swift in Sources */,
+				546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */,
+				546968B42E6E8C2E00BD2B77 /* SubcriptionView.swift in Sources */,
+				546968B52E6E8C2E00BD2B77 /* TextView.swift in Sources */,
+				546968B62E6E8C2E00BD2B77 /* ContentView.swift in Sources */,
+				546968B72E6E8C2E00BD2B77 /* StoryMakerAppApp.swift in Sources */,
+				546968B82E6E8C2E00BD2B77 /* Test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +498,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StoryMakerApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -292,6 +539,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StoryMakerApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

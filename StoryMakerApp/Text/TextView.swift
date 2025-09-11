@@ -9,16 +9,12 @@ import SwiftUI
 
 struct TextView: View {
     
-    @State var selectedEditText: OverlayTextEditEnum
-//    @Binding var selectedFontFamily : FontFmailyEnum
-    @State var selectedFontFamily : FontFmailyEnum? = nil
-    
-    @State var selectedAlign : AlignEnum = .none
-    
-    @State var selectedAlignCase : AlignCaseEnum = .none
+    @ObservedObject var overlayVM: OverlayTextViewModel
+
+    var selectedEditText: OverlayTextEditEnum
     
     static let solidColors: [String] = [
-            "#FFFFFF", "#000000",
+             "#000000",
             "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
             "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
             "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
@@ -29,167 +25,247 @@ struct TextView: View {
             "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
             "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
     
-    static let gradientColors: [String] = [
+    static let gradientColors: [[String]] = [
           
+            ["#234E52", "#285E61"],
+            ["#2C7A7B", "#319795"],
+            ["#38B2AC", "#4FD1C5"],
+            ["#81E6D9", "#B2F5EA"],
+            ["#E6FFFA", "#2A4365"],
+            ["#2C5282", "#2B6CB0"],
+            ["#4299E1", "#63B3ED"],
+            ["#90CDF4", "#BEE3F8"],
+            ["#EBF8FF", "#3C366B"],
+            ["#434190", "#4C51BF"],
+            ["#5A67D8", "#667EEA"],
+            ["#7F9CF5", "#A3BFFA"],
+            ["#C3DAFE", "#EBF4FF"],
+            ["#44337A", "#553C9A"],
+            ["#6B46C1", "#805AD5"],
+            ["#9F7AEA", "#B794F4"],
+            ["#D6BCFA", "#E9D8FD"],
+            ["#FAF5FF", "#702459"],
+            ["#97266D", "#B83280"],
+            ["#D53F8C", "#ED64A6"],
+            ["#F687B3", "#FBB6CE"],
+            ]
+    
+    static let bgColors: [String] = [
+             "#000000",
+            "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
+            "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
+            "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
+            "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
             "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
             "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
             "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
             "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
             "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
+    
 
-
-    
-    
-    //fontsize
-    @State var fontSize: Double = 32
-    @State var lineHeight: Double = 32
-    @State var letterSpacing: Double = 32
-    
-    //color solid
-    @State var colorSolid: Double = 0.5
-    
-    //stroke
-    @State var strokeWidth: Double = 15
-    
     var body: some View {
         VStack{
-            switch selectedEditText {
-            case .fontSize:
-                VStack{
-                    VStack(spacing: 2) {
-                        CustomSliderRow(title: "Font size", value: $fontSize, sliderColor: .gray,thumbColor: .red)
-                        CustomSliderRow(title: "Line height", value: $lineHeight, sliderColor: .gray,thumbColor: .red)
-                        CustomSliderRow(title: "Letter Spacing", value: $letterSpacing, sliderColor: .gray,thumbColor: .red)
+            if let overlay = $overlayVM.overlays.first(where: { $0.id == overlayVM.selectedOverlayID }) {
+                
+                switch selectedEditText {
+                case .fontSize:
+                    VStack{
+                        VStack(spacing: 2) {
+                            CustomSliderRow(title: "Font size", value: overlay.fontSize, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: "Line height", value: overlay.lineHeight, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                            CustomSliderRowLetter(title: "Letter Spacing", value: overlay.letterSpacing, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        }
+                        .padding()
                     }
-                    .padding()
-                }
-            case .fontFamily:
-                VStack{
+                case .fontFamily:
+                    VStack{
                         LazyVGrid(
                             columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 3),
                             spacing: 5
                         ) {
                             ForEach(FontFmailyEnum.allCases, id: \.self) { font in
-                                Image(font.img) 
-//                                    .frame(
-//                                        width: UIScreen.main.bounds.width / 3 - 16,
-//                                        height: (UIScreen.main.bounds.width / 3 - 16) * 0.5
-//                                    )
+                                Text(font.titleFF)
+                                    .font(.custom(font.fontFamily, size: 16))
+                                    .frame(width: 114, height: 40)
                                     .frame(maxWidth: .infinity)
-                                     .aspectRatio(4/3, contentMode: .fit)
+                                    .aspectRatio(4/3, contentMode: .fit)
+                                    .background(
+                                        font == overlay.selectedFontFamily.wrappedValue ? Color.white : Color.gray.opacity(0.3)
+                                    )
                                     .clipped()
                                     .cornerRadius(8)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
                                             .stroke(
-                                                font == selectedFontFamily ? Color.red : Color.clear,
+                                                font == overlay.selectedFontFamily.wrappedValue ? Color.red : Color.clear,
                                                 lineWidth: 3
                                             )
                                     )
                                     .onTapGesture {
-                                        selectedFontFamily = font
+                                        overlay.selectedFontFamily.wrappedValue = font
                                     }
                             }
                         }
                         .frame(height: 200)
-                }
-                
-
-            case .colorSolid:
-                VStack{
-                    CustomSliderRowColor(title: "Opacity", valueOpacity:$colorSolid, sliderColor: .gray,thumbColor: .red)
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(TextView.solidColors, id: \.self) { color in
-                                Circle()
-                                    .frame(width: 40, height: 40)
-                                    .foregroundColor(Color(color))
-                                    .onTapGesture {
-                                    }
-                            }
-                        }
                     }
-                }
-                .padding(.top, 12)
-            
-            case .gradient:
-                VStack {
-                    CustomSliderRowColor(title: "Opacity", valueOpacity: $colorSolid, sliderColor: .gray, thumbColor: .red)
                     
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(0..<TextView.gradientColors.count, id: \.self) { _ in
-                                let first = TextView.gradientColors.randomElement() ?? "#FFFFFF"
-                                let second = TextView.gradientColors.randomElement() ?? "#000000"
-                                
-                                Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [Color(first), Color(second)]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .frame(width: 40, height: 40)
-                                    .onTapGesture {
-                                    }
-                            }
-                        }
-                    }
-                }
-
-                .padding(.top, 12)
-            case .stroke:
-                VStack {
-                    CustomSliderRowStroke(title: "Stroke Width", value: $strokeWidth, sliderColor: .gray, thumbColor: .red)
-                    CustomSliderRowColor(title: "Opacity", valueOpacity: $colorSolid, sliderColor: .gray, thumbColor: .red)
                     
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(TextView.solidColors, id: \.self) { color in
-                                Circle()
-                                    .foregroundColor(Color(color))
-                                    .frame(width: 40, height: 40)
-                                    .onTapGesture {
-                                    }
+                case .colorSolid:
+                    VStack{
+                        CustomSliderRowColor(title: "Opacity", valueOpacity:overlay.valueOpacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(TextView.solidColors, id: \.self) { color in
+                                    Circle()
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(Color(color))
+                                        .onTapGesture {
+                                            overlay.colorSolid.wrappedValue = Color(color)
+                                            overlay.userGradient.wrappedValue = false
+
+                                        }
+                                }
                             }
+                            .padding(.horizontal)
+                            
                         }
                     }
-                }
-
-                .padding(.top, 12)
-            case .align:
-                VStack{
-                    CustomAlign(title: "Align", selectedAlign: $selectedAlign)
-                    CustomAlignCase(title: "Case", selectedAlignCase: $selectedAlignCase)
-                    CustomSliderRowColor(title: "Opacity", valueOpacity: $colorSolid, sliderColor: .gray, thumbColor: .red)
-                }
                     .padding(.top, 12)
+                    
+                case .gradient:
+                    VStack {
+                        CustomSliderRowColor(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(0..<TextView.gradientColors.count, id: \.self) { gradientIndex in
+                                    let first = Color(TextView.gradientColors[gradientIndex][0])
+                                    let second = Color(TextView.gradientColors[gradientIndex][1])
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [first, second]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .frame(width: 40, height: 40)
+                                        .onTapGesture {
+                                            overlay.colorGradient.wrappedValue = LinearGradient(
+                                                gradient: Gradient(colors: [first, second]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                            overlay.userGradient.wrappedValue = true
 
-                
-            case .background:
-                Text("7 Family Picker")
-            case .shadow:
-                Text("8 Family Picker")
-            case nil:
-                ProgressView()
-            case .none:
-                Text("8 Family Picker")
+                                        }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top, 12)
+                case .stroke:
+                    VStack {
+                        CustomSliderRowStroke(title: "Stroke Width", value: overlay.strokeWidth, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRowColor(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ColorPickerFromImage(overlay: overlay)
 
+                                ForEach(TextView.solidColors, id: \.self) { color in
+                                    Circle()
+                                        .foregroundColor(Color(color))
+                                        .frame(width: 40, height: 40)
+                                        .onTapGesture {
+                                            overlay.colorSolid.wrappedValue = Color(color)
+                                        }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top, 12)
+                case .align:
+                    VStack{
+                        CustomAlign(title: "Align", selectedAlign: overlay.selectedAlign)
+                        CustomAlignCase(title: "Case", selectedAlignCase: overlay.selectedAlignCase)
+                        CustomSliderBackGround(title: "Cuver", valueBG: overlay.cuver, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                    }
+                    .padding(.top, 12)
+                case .background:
+                    VStack{
+                        CustomSliderBackGround(title: "Padding", valueBG: overlay.paddingBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderBackGround(title: "Corner", valueBG: overlay.cornerRadiusBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderRowBgOpacity(title: "Opacity", valueOpacity:overlay.opacityBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        
+                        ScrollView(.horizontal) {
+                            HStack {
+                                Image("cs1")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                ForEach(TextView.solidColors, id: \.self) { color in
+                                    Circle()
+                                        .foregroundColor(Color(color))
+                                        .frame(width: 40, height: 40)
+                                        .onTapGesture {
+                                            overlay.bgColor.wrappedValue = Color(color)
+                                        }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        
+                    }
+                    .padding(.top, 12)
+                case .shadow:
+                    VStack{
+                        CustomSliderShadow(title: "X", valueBG: overlay.offSetXSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderShadow(title: "Y", valueBG: overlay.offSetYSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderShaDowBlur(title: "Blur", valueBG:overlay.blurSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderRowColor(title: "Opacity", valueOpacity:overlay.opacitySD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        
+                        
+                        ScrollView(.horizontal) {
+                            HStack {
+                                Image("cs1")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                ForEach(TextView.solidColors, id: \.self) { color in
+                                    Circle()
+                                        .foregroundColor(Color(color))
+                                        .frame(width: 40, height: 40)
+                                        .onTapGesture {
+                                            overlay.shawDowColor.wrappedValue = Color(color)
+
+                                        }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        
+                    }
+                    .padding(.top, 12)
+                case nil:
+                    ProgressView()
+                case .none:
+                    Text("8 Family Picker")
+                }
             }
-
+//            else{
+//                Text("Không có overlay nào được chọn")
+//            }
         }
     }
 }
 
 //customSlider
 
-
 struct CustomSliderRow: View {
     let title: String
     @Binding var value: Double
-    var minValue: Double = 0
-    var maxValue: Double = 60
+    var minValue: Double = 15
+    var maxValue: Double = 80
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
@@ -201,19 +277,41 @@ struct CustomSliderRow: View {
                 .frame(width: 200, alignment: .leading)
             
             HStack {
-                Slider(value: $value, in: minValue...maxValue)
-                    .tint(sliderColor) // track fill
-                    .frame(height: 20)
-                    .overlay(
-                        GeometryReader { geo in
-                            let percent = (value - minValue) / (maxValue - minValue)
-                            Circle()
-                                .fill(thumbColor)
-                                .frame(width: 20, height: 20)
-                                .offset(x: CGFloat(percent) * (geo.size.width - 20))
-                        }
-                    )
-                
+                CustomSlider(value: $value,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                .frame(height: 25)
+
+                Text("\(Int(value))")
+            }
+        }
+    }
+}
+struct CustomSliderRowLetter: View {
+    let title: String
+    @Binding var value: Double
+    var minValue: Double = 0
+    var maxValue: Double = 20
+    var sliderColor: Color = .red
+    var thumbColor: Color = .red
+    var trackHeight: CGFloat = 3
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 12))
+                .frame(width: 200, alignment: .leading)
+            
+            HStack {
+                CustomSlider(value: $value,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                .frame(height: 25)
+
                 Text("\(Int(value))")
             }
         }
@@ -223,6 +321,37 @@ struct CustomSliderRow: View {
 //customsilder color solid
 
 struct CustomSliderRowColor: View {
+    let title: String
+    @Binding var valueOpacity: Double
+    var minValue: Double = 0.1
+    var maxValue: Double = 1.0
+    var sliderColor: Color = .red
+    var thumbColor: Color = .red
+    var trackHeight: CGFloat = 3
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 12))
+            HStack {
+                CustomUISlider(
+                                valueOpacity: $valueOpacity,
+                                minValue: 0.1,
+                                maxValue: 1.0,
+                                trackColor: .gray,
+                                thumbColor: .red // màu thumb
+                 )
+                            .frame(height: 25)
+                
+                Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+
+
+struct CustomSliderRowBgOpacity: View {
     let title: String
     @Binding var valueOpacity: Double
     var minValue: Double = 0
@@ -236,25 +365,24 @@ struct CustomSliderRowColor: View {
             Text(title)
                 .font(.system(size: 12))
             HStack {
-                Slider(value: $valueOpacity, in: minValue...maxValue)
-                    .tint(sliderColor)
-                    .frame(height: 20)
-                    .overlay(
-                        GeometryReader { geo in
-                            let percent = (valueOpacity - minValue) / (maxValue - minValue)
-                            Circle()
-                                .fill(thumbColor)
-                                .frame(width: 20, height: 20)
-                                .offset(x: CGFloat(percent) * (geo.size.width - 20))
-                        }
-                    )
+                CustomUISlider(
+                                valueOpacity: $valueOpacity,
+                                minValue: 0.1,
+                                maxValue: 1.0,
+                                trackColor: .gray,
+                                thumbColor: .red // màu thumb
+                            )
+                            .frame(height: 25)
                 
-                Text(String(format: "%.1f", valueOpacity))
+                Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
             }
         }
         .padding(.horizontal)
     }
 }
+
+
+
 
 //customslider stroke
 
@@ -273,19 +401,13 @@ struct CustomSliderRowStroke: View {
             Text(title)
                 .font(.system(size: 12))
             HStack {
-                Slider(value: $value, in: minValue...maxValue)
-                    .tint(sliderColor)
-                    .frame(height: 20)
-                    .overlay(
-                        GeometryReader { geo in
-                            let percent = (value - minValue) / (maxValue - minValue)
-                            Circle()
-                                .fill(thumbColor)
-                                .frame(width: 20, height: 20)
-                                .offset(x: CGFloat(percent) * (geo.size.width - 20))
-                        }
-                    )
-                
+                CustomSlider(value: $value,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                .frame(height: 25)
+
                 Text("\(Int(value))")
             }
         }
@@ -294,7 +416,6 @@ struct CustomSliderRowStroke: View {
 }
 
 //customAlign
-
 
 struct CustomAlign: View {
     var title: String
@@ -381,8 +502,177 @@ struct CustomAlignCase: View {
     }
 }
 
+//background
+
+struct CustomSliderShadow: View {
+    let title: String
+    @Binding var valueBG: Double
+    var minValue: Double = -200
+    var maxValue: Double = 200
+    var sliderColor: Color = .red
+    var thumbColor: Color = .red
+    var trackHeight: CGFloat = 3
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 12))
+                .frame(width: 200, alignment: .leading)
+            
+            HStack {
+                CustomSlider(value: $valueBG,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                .frame(height: 25)
+
+                Text("\(Int(valueBG))")
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+
+struct CustomSliderBackGround: View {
+    let title: String
+    @Binding var valueBG: Double
+    var minValue: Double = 0
+    var maxValue: Double = 100
+    var sliderColor: Color = .red
+    var thumbColor: Color = .red
+    var trackHeight: CGFloat = 3
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 12))
+                .frame(width: 200, alignment: .leading)
+            
+            HStack {
+                CustomSlider(value: $valueBG,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                .frame(height: 25)
+
+                Text("\(Int(valueBG))")
+            }
+        }
+        .padding(.horizontal)
+    }
+}
 
 
+
+struct CustomSliderShaDowBlur: View {
+    let title: String
+    @Binding var valueBG: Double
+    var minValue: Double = 0
+    var maxValue: Double = 10
+    var sliderColor: Color = .red
+    var thumbColor: Color = .red
+    var trackHeight: CGFloat = 3
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 12))
+                .frame(width: 200, alignment: .leading)
+            
+            HStack {
+                CustomSlider(value: $valueBG,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                    .frame(height: 25)
+                Text("\(Int(valueBG))")
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+
+//MARK: CUSTOMSLIDER
+struct CustomSlider: UIViewRepresentable {
+    @Binding var value: Double
+    var minValue: Double
+    var maxValue: Double
+    var trackColor: UIColor
+    var thumbColor: UIColor
+    
+    func makeUIView(context: Context) -> UISlider {
+        let slider = UISlider(frame: .zero)
+        slider.minimumValue = Float(minValue)
+        slider.maximumValue = Float(maxValue)
+        slider.minimumTrackTintColor = trackColor
+        slider.maximumTrackTintColor = .lightGray
+        slider.thumbTintColor = thumbColor
+        slider.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged(_:)), for: .valueChanged)
+        return slider
+    }
+    
+    func updateUIView(_ uiView: UISlider, context: Context) {
+        uiView.value = Float(value)
+        uiView.thumbTintColor = thumbColor // cập nhật màu thumb khi đổi
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject {
+        var parent: CustomSlider
+        init(_ parent: CustomSlider) { self.parent = parent }
+        
+        @objc func valueChanged(_ sender: UISlider) {
+            parent.value = Double(sender.value)
+        }
+    }
+}
+
+//slider X10
+
+struct CustomUISlider: UIViewRepresentable {
+    @Binding var valueOpacity: Double  // 0.1 → 1.0
+    var minValue: Double = 0.1
+    var maxValue: Double = 1.0
+    var trackColor: UIColor = .red
+    var thumbColor: UIColor = .blue
+    
+    func makeUIView(context: Context) -> UISlider {
+        let slider = UISlider()
+        slider.minimumValue = Float(minValue * 10)  // 1 → 10
+        slider.maximumValue = Float(maxValue * 10)
+        slider.minimumTrackTintColor = trackColor
+        slider.maximumTrackTintColor = .lightGray
+        slider.thumbTintColor = thumbColor
+        slider.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged(_:)), for: .valueChanged)
+        return slider
+    }
+    
+    func updateUIView(_ uiView: UISlider, context: Context) {
+        uiView.value = Float(valueOpacity * 10) // binding ngược lại
+        uiView.thumbTintColor = thumbColor
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject {
+        var parent: CustomUISlider
+        init(_ parent: CustomUISlider) {
+            self.parent = parent
+        }
+        
+        @objc func valueChanged(_ sender: UISlider) {
+            parent.valueOpacity = Double(sender.value) / 10  // scale ngược lại
+        }
+    }
+}
 
 
 

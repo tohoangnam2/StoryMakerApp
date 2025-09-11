@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>PPNeueMachina-Regular.otf</string>
+		<string>MonsieurLaDoulaise-Regular.ttf</string>
+		<string>Barriecito-Regular.ttf</string>
+		<string>Pacifico-Regular.ttf</string>
+		<string>Kapakana-VariableFont_wght.ttf</string>
+		<string>AllertaStencil-Regular.ttf</string>
+		<string>Arbutus-Regular.ttf</string>
+		<string>Kablammo-Regular-VariableFont_MORF.ttf</string>
+		<string>Butcherman-Regular.ttf</string>
+		<string>Eater-Regular.ttf</string>
+		<string>Inspiration-Regular.ttf</string>
+		<string>FontdinerSwanky-Regular.ttf</string>
+		<string>RubikIso-Regular.ttf</string>
+	</array>
+</dict>
+</plist>

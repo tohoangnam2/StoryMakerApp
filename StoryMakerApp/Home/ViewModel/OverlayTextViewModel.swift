@@ -11,6 +11,10 @@ import Foundation
 class OverlayTextViewModel: ObservableObject {
     @Published var overlays: [OverlayTextModel] = []
     @Published var selectedOverlayID: UUID? = nil
+    
+    var isAnyOverlayEditing: Bool {
+        overlays.contains { $0.isEditingText }
+    }
     // Thêm biến này vào class Overlay của bạn
     
 
@@ -36,6 +40,7 @@ class OverlayTextViewModel: ObservableObject {
         newOverlay.offset.width += 30
         newOverlay.offset.height += 30
         overlays.append(newOverlay)
+        selectOverlay(newOverlay.id)
             
     }
     
@@ -51,6 +56,7 @@ class OverlayTextViewModel: ObservableObject {
         selectedOverlayID = id
         setEditingSelectedOverlay(false)
     }
+    
     func addOverlay(_ text: String) -> OverlayTextModel {
         let newOverlay = OverlayTextModel(
             id: UUID(),
