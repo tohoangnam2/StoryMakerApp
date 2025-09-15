@@ -11,15 +11,21 @@ struct AddProjectView: View {
     
     @StateObject private var overlayVM = OverlayTextViewModel()
     
+    @EnvironmentObject var vm: BackgroundEditorViewModel
+
+    
     
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int? = nil
-    @State private var isShowBackgroundPicker = false
+    @State  var isShowBackgroundPicker = false
+    @State  var showBackgroundEdit = false
+
+    
     @State private var frame: Frame?
     
     //show bàn phím
     @FocusState private var isTextFieldFocused: Bool
-    @State private var showTextField: Bool = false
+    @State  var showTextField: Bool = false
     
     @State var isSelected : Bool = false
     @State var isEditingText = false
@@ -34,8 +40,8 @@ struct AddProjectView: View {
     @State var selectedFontFamily : FontFmailyEnum? = nil
     
     
-    @State var showBackgroundEditor : Bool = false
     @State private var editEnum: BackGroundEditEditEnum = .filter
+    
 
     var body: some View {
         NavigationView {
@@ -53,22 +59,23 @@ struct AddProjectView: View {
                     .padding(.horizontal)
                     Spacer()
                     
-                    AddBackgroundsView(overlayVM: overlayVM,
-                                       frame: frame,
-                                       showTextField: $showTextField,
-                                       isTextFieldFocused: $isTextFieldFocused,
-                                       isSelected : $isSelected, isEditingText: $isEditingText
+                    AddBackgroundsView(
+                        overlayVM: overlayVM,
+                        frame: frame,
+                        showTextField: $showTextField,
+                        isTextFieldFocused: $isTextFieldFocused,
+                        isSelected: $isSelected,
+                        isEditingText: $isEditingText,
+                        onAddTap: { isShowBackgroundPicker = true },
+                        onTapOutside: { resetEditState() },
+                        onOpenBackgroundEditor: { showBackgroundEdit = true }, isShowBackgroundPicker: $isShowBackgroundPicker,
+                        showBackgroundEdit: $showBackgroundEdit, // cuối cùng
+                        vm: _vm // truyền EnvironmentObject
                     )
-                    {
-                        isShowBackgroundPicker = true
-                        
-                    }
-                    onTapOutside: {
-                        resetEditState()
-                    }
-                    onOpenBackgroundEditor: {
-                          showBackgroundEditor = true
-                      }
+
+
+
+
                     if  selectedEditText != .none {
                         VStack(spacing: 0) {
                             VStack {
@@ -108,20 +115,36 @@ struct AddProjectView: View {
                                 switch selectedEditText {
                                 case .fontSize:
                                     TextView(overlayVM: overlayVM, selectedEditText: .fontSize)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .fontFamily:
                                     TextView(overlayVM: overlayVM, selectedEditText: .fontFamily)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .colorSolid:
                                     TextView(overlayVM: overlayVM, selectedEditText: .colorSolid)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .gradient:
                                     TextView(overlayVM: overlayVM, selectedEditText: .gradient)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .stroke:
                                     TextView(overlayVM: overlayVM, selectedEditText: .stroke)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .align:
                                     TextView(overlayVM: overlayVM, selectedEditText: .align)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .shadow:
                                     TextView(overlayVM: overlayVM, selectedEditText: .shadow)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .background:
                                     TextView(overlayVM: overlayVM, selectedEditText: .background)
+                                        .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+
                                 case .none:
                                     EmptyView()
                                 }
@@ -151,7 +174,14 @@ struct AddProjectView: View {
                                         .foregroundColor(.black.opacity(0.8))
                                     }
                                     Spacer()
-                                    Button(action: { selectedTab = 1; isShowBackgroundPicker = true}) {
+                                    Button(action: {
+//                                        selectedTab = 1
+//                                        isShowBackgroundPicker = true
+                                            isShowBackgroundPicker = true
+
+                                   
+                                   
+                                    }) {
                                         VStack {
                                             Image("home_tabbarbg")
                                             Text("Background")
@@ -244,7 +274,7 @@ struct AddProjectView: View {
                                         Spacer()
                                         Button(action: {
                                             selectedEditText = .background
-
+                                            
                                         }) {
                                             VStack {
                                                 Image("img_edit1_bg")
@@ -290,17 +320,34 @@ struct AddProjectView: View {
             }
         }
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
-            BackGroundView { picked in
+            BackGroundView(isShowBackgroundPicker: $isShowBackgroundPicker) { picked in
                 self.frame = picked
+                
+                  if vm.currentFrameID != picked.backgroundID {
+                      vm.currentFrameID = picked.backgroundID
+
+                      overlayVM.overlays.removeAll()
+                      overlayVM.addOverlay("")
+                      vm.finalImage = nil
+                      vm.opacity = 1.0
+                      vm.selectedFilterImage = nil
+                      vm.selectedFilter = nil
+                      vm.previewImages.removeAll()
+
+                      if let url = picked.backgroundURL,
+                         let data = try? Data(contentsOf: url),
+                         let uiImage = UIImage(data: data) {
+                          vm.baseImage = uiImage
+                      }
+                  }
             }
         }
-        .sheet(isPresented: $showBackgroundEditor) {
+        .sheet(isPresented: $showBackgroundEdit) {
             if #available(iOS 16.0, *) {
-                BackgroundEditorView()
+                BackgroundEditorView(overlayVM: overlayVM, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit)
                     .presentationDetents([.height(290)])
-            } else {
-                // Fallback on earlier versions
-            }        }
+            } else {}
+        }
         
         .onChange(of: frame?.id) { _ in
             if selectedTab == 1 {
@@ -353,46 +400,54 @@ struct AddBackgroundsView: View {
     @Binding var showTextField: Bool
     //    @Binding var overlayText: String
     @FocusState.Binding var isTextFieldFocused: Bool
-    
-    @State private var isShow = false
-    
-    @State private var isShowImage = false
+//    
+//    @State private var isShow = false
+//    
+//    @State private var isShowImage = false
     
     //xoay
-    var angle: Angle = .zero
-    var currentAngle : Angle = Angle(degrees: 0)
-    var isRotating: Bool = false
+//    var angle: Angle = .zero
+//    var currentAngle : Angle = Angle(degrees: 0)
+//    var isRotating: Bool = false
     
-
-    
-    //zoom
-    @State private var startDistance: CGFloat = 0
-    @State private var initialZoom: CGFloat = 1
-    @State private var currentZoom: CGFloat = 1   // Zoom cuối cùng
-    @State private var displayZoom: CGFloat = 1   // Zoom đang hiển thị khi kéo
-    
-    //offset
-    var offset : CGSize = .zero
-    var endset : CGSize = .zero
+//
+//    
+//    //zoom
+//    @State private var startDistance: CGFloat = 0
+//    @State private var initialZoom: CGFloat = 1
+//    @State private var currentZoom: CGFloat = 1   // Zoom cuối cùng
+//    @State private var displayZoom: CGFloat = 1   // Zoom đang hiển thị khi kéo
+//    
+//    //offset
+//    var offset : CGSize = .zero
+//    var endset : CGSize = .zero
     
     @Binding var isSelected : Bool
     @Binding var isEditingText : Bool
     
-    @State var isShowBGText: Bool = false
-    
-    @State var isCheck : Bool = false
-    
-    @State private var currentMode: EditMode = .none
-    @State private var rotBase: Double = 0
-    @State private var rotInProgress = false
-    //new rotate
-    @State private var rotation: Angle = .degrees(0)
-    @State private var lastAngle: Angle = .degrees(0)
+//    @State var isShowBGText: Bool = false
+//    
+//    @State var isCheck : Bool = false
+//    
+//    @State private var currentMode: EditMode = .none
+//    @State private var rotBase: Double = 0
+//    @State private var rotInProgress = false
+//    //new rotate
+//    @State private var rotation: Angle = .degrees(0)
+//    @State private var lastAngle: Angle = .degrees(0)
     let onAddTap: () -> Void
     
     let onTapOutside: () -> Void
     
     let onOpenBackgroundEditor: () -> Void
+    
+
+    @Binding var isShowBackgroundPicker: Bool
+    @Binding var showBackgroundEdit: Bool
+
+    
+    @EnvironmentObject var vm: BackgroundEditorViewModel
+
 
 
     
@@ -406,17 +461,48 @@ struct AddBackgroundsView: View {
                         img.resizable()
                             .scaledToFill()
                             .frame(maxWidth: .infinity,maxHeight: .infinity)
-                            
-//                            .overlay(Color.black.opacity(0.3))
-                        //img
-                            .onTapGesture {
-                                if showTextField == false && isTextFieldFocused == false && isSelected == false{
-                                    onOpenBackgroundEditor()
-                                } else {
-                                    onTapOutside()
+                            .contentShape(Rectangle()) // xác định vùng nhận tap
+
+                            .onAppear {
+                                vm.prepareAllPreviews()
+                                if let url = frame.backgroundURL,
+                                   let data = try? Data(contentsOf: url),
+                                   let uiImage = UIImage(data: data) {
+                                    vm.baseImage = uiImage
+                                    vm.defaultPreview = uiImage // ảnh frame gốc làm preview mặc định
 
                                 }
                             }
+                            .overlay(
+                                Group {
+                                    if let filtered = vm.finalImage {
+                                        Image(uiImage: filtered)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .opacity(vm.opacity)
+                                            .brightness(vm.lightness)   // điều chỉnh sáng tối
+                                            .saturation(vm.saturation) // điều chỉnh độ bão hòa
+                                            .blur(radius: vm.blur)
+                                            .shadow(radius: vm.blur)
+
+                                           
+                                    }
+                                }
+                            )
+                        //img
+
+                            .onTapGesture {
+                                guard frame != nil else { return }
+//                                guard showBackgroundPicker else { return }
+                                if showTextField == false && isTextFieldFocused == false && isSelected == false{
+
+                                    onOpenBackgroundEditor()
+                                } else {
+                                    
+                                    onTapOutside()
+                                }
+                            }
+
                             .overlay(
                                 //Group không ảnh hưởng layout, chỉ gom nhiều view trong điều kiện.
                                 Group {
@@ -669,6 +755,8 @@ struct AddBackgroundsView: View {
 
                                 }
                             )
+                        
+
                     } placeholder: {
                         ProgressView()
                     }}
@@ -694,6 +782,10 @@ struct AddBackgroundsView: View {
         let radians = atan2(deltaY, deltaX)
         return Angle(radians: radians)
     }
+    
+    
+
+
 }
 
 
@@ -762,6 +854,44 @@ extension Text {
 
 
 
+
+//auto size
+
+
+// MARK: - Wrapper UIViewController
+struct AutoSizingSheet<Content: View>: UIViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    let content: Content
+    
+    init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
+        self._isPresented = isPresented
+        self.content = content()
+    }
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        return UIViewController()
+    }
+    
+    func updateUIViewController(_ vc: UIViewController, context: Context) {
+        if isPresented {
+            let hosting = UIHostingController(rootView: content)
+            hosting.view.backgroundColor = .clear
+            
+            // Wrap trong UINavigationController để dùng .preferredContentSize
+            let nav = UINavigationController(rootViewController: hosting)
+            nav.modalPresentationStyle = .formSheet
+            
+            // Tính height theo nội dung SwiftUI
+            hosting.view.layoutIfNeeded()
+            let targetSize = hosting.sizeThatFits(in: UIScreen.main.bounds.size)
+            hosting.preferredContentSize = targetSize
+            
+            vc.present(nav, animated: true)
+        } else {
+            vc.presentedViewController?.dismiss(animated: true)
+        }
+    }
+}
 
 
 

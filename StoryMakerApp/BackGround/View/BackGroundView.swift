@@ -18,6 +18,9 @@ struct BackGroundView: View {
     @State private var selectedFrame: Frame? = nil
     @State var isNextPage = false
     
+    @Binding var isShowBackgroundPicker : Bool
+
+    
     let onPicked: (Frame) -> Void
 
     
@@ -33,10 +36,9 @@ struct BackGroundView: View {
                             .font(.system(size: 18, weight: .medium, design: .default))
                         Spacer()
                         Button(action: {
-                            if let selected = selectedFrame {
-                                onPicked(selected)
+                            onPicked(selectedFrame!)
+                            
                                 dismiss()
-                            }
                         }) {
                             Image("img_bg_check")
                                 .foregroundColor(selectedFrame != nil ? .green : .gray)

@@ -91,6 +91,11 @@
 			path = Filter;
 			sourceTree = "<group>";
 		};
+		546968EC2E73D2D000BD2B77 /* Extensions */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +139,7 @@
 		546968952E6E8C2E00BD2B77 /* BackGround */ = {
 			isa = PBXGroup;
 			children = (
+				546968E52E717EC200BD2B77 /* Filter */,
 				546968902E6E8C2E00BD2B77 /* Model */,
 				546968922E6E8C2E00BD2B77 /* View */,
 				546968942E6E8C2E00BD2B77 /* ViewModels */,
@@ -203,7 +209,7 @@
 		546968AA2E6E8C2E00BD2B77 /* StoryMakerApp */ = {
 			isa = PBXGroup;
 			children = (
-				546968E52E717EC200BD2B77 /* Filter */,
+				546968EC2E73D2D000BD2B77 /* Extensions */,
 				546968D62E702F9800BD2B77 /* Color */,
 				546968BD2E6E8CA600BD2B77 /* Info.plist */,
 				546968BA2E6E8C3700BD2B77 /* FontFamily */,
@@ -277,6 +283,7 @@
 				546968D62E702F9800BD2B77 /* Color */,
 				546968E42E71760A00BD2B77 /* BackgroundEditmodel */,
 				546968E52E717EC200BD2B77 /* Filter */,
+				546968EC2E73D2D000BD2B77 /* Extensions */,
 			);
 			name = StoryMakerApp;
 			packageProductDependencies = (

@@ -48,7 +48,7 @@ struct CategoryResponse: Codable {
     let data: [CategoryBG]
 }
 
-struct CategoryBG: Identifiable, Codable {
+struct CategoryBG: Identifiable, Codable ,Equatable {
     let id: String
     let value: String   // tên category hiển thị
 }
@@ -59,8 +59,18 @@ struct BackgroundResponse: Codable {
 }
 
 struct BackgroundItem: Identifiable {
-    let id = UUID()
+    let id: UUID
     let image: String
+    var isDefault: Bool = false
+    var baseImage: UIImage? = nil
+    
+    // Custom initializer
+    init(id: UUID = UUID(), image: String, isDefault: Bool = false, baseImage: UIImage? = nil) {
+        self.id = id
+        self.image = image
+        self.isDefault = isDefault
+        self.baseImage = baseImage
+    }
 }
 
 
@@ -80,19 +90,25 @@ struct Config: Codable {
     let category: [Category]
 }
 
-struct Category: Codable {
+struct Category: Codable ,Equatable{
     let id: String
     let name: String
 }
 
 
 struct Frame: Codable, Identifiable {
-    let id = UUID() 
+    let id = UUID()
     let category: String
     let thumb: String
     let background: String
     let feature: Int
     let updated: Double
+    
+    //fake id bg
+    var backgroundID: String {
+        return background.hash.description
+    }
+
     
     var thumbURL: URL? {
          return URL(string: "https://api.fleet-tech.net" + thumb)

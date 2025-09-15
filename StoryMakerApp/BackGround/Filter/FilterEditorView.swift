@@ -25,54 +25,81 @@ struct FilterEditorView: View {
                                 }
                         }
                     }
-                    .padding(.horizontal,12)
-                }
-                ScrollView(.horizontal){
-                    HStack {
-                        let allBackgrounds = [vm.defaultBackgroundItem].compactMap { $0 } + vm.backgrounds
-
-                        ForEach(allBackgrounds) { bg in
-                            ZStack {
-                                if bg.isDefault, let base = bg.baseImage {
-                                    Image(uiImage: base)
-                                        .resizable()
-                                        .scaledToFill()
-                                } else if let filtered = vm.previewImages[bg.image] {
-                                    Image(uiImage: filtered)
-                                        .resizable()
-                                        .scaledToFill()
-                                } else {
-                                    ProgressView()                                }
-                            }
-                            .frame(width: 50, height: 50)
-                            .clipped()
-                            .onAppear {
-
-                            }
-                            .onTapGesture {
-                                if bg.isDefault {
-                                    vm.finalImage = bg.baseImage
-                                    vm.selectedFilter = nil
-                                } else {
-                                    vm.selectedFilter = bg.image
-                                    if let base = vm.baseImage {
-                                        vm.loadSelectedFilter(baseImage: base) { filtered in
-                                            vm.finalImage = filtered
-                                        }
-                                    }
-                                }
-                            }
-                            
-                        }
-                    }
                     .padding()
                 }
-                
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(vm.allBackgrounds) { bg in
+                                ZStack {
+                                    if bg.isDefault, let base = bg.baseImage {
+                                        Image(uiImage: base)
+                                            .resizable()
+                                            .scaledToFill()
+                                    } else if let filtered = vm.previewImages[bg.image] {
+                                        Image(uiImage: filtered)
+                                            .resizable()
+                                            .scaledToFill()
+                                    } else {
+                                        ProgressView()
+                                    }
+                                }
+                                .frame(width: 50, height: 50)
+                                .clipped()
+                                .id(bg.id)
+                                .onTapGesture {
+                                    if bg.isDefault {
+                                        vm.finalImage = bg.baseImage
+                                        vm.selectedFilter = nil
+                                    } else {
+                                        vm.selectedFilter = bg.image
+                                        if let base = vm.baseImage {
+                                            vm.loadSelectedFilter(baseImage: base) { filtered in
+                                                vm.finalImage = filtered
+                                            }
+                                        }
+                                    }
+                                    // Lưu vị trí filter đã chọn cho category hiện tại
+                                    if let categoryID = vm.selectedCategory?.id {
+                                        vm.lastSelectedFilterPosition[categoryID] = bg.id
+                                    }
+
+                                    withAnimation {
+                                        proxy.scrollTo(bg.id, anchor: .center)
+                                    }
+                                }
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 2)
+                                        .stroke(
+                                            (bg.isDefault && vm.selectedFilter == nil) || vm.selectedFilter == bg.image
+                                                ? Color.blue
+                                                : Color.clear,
+                                            lineWidth: 2
+                                        )
+                                )
+                            }
+                        }
+                        .padding(.horizontal,12)
+                    }
+                    .onChange(of: vm.selectedCategory?.id) { newCategoryID in
+                        guard let categoryID = newCategoryID else { return }
+                        DispatchQueue.main.async {
+                            if let selectedFilterID = vm.lastSelectedFilterPosition[categoryID] {
+                                proxy.scrollTo(selectedFilterID, anchor: .center)
+                            } else if let first = vm.allBackgrounds.first {
+                                proxy.scrollTo(first.id, anchor: .leading)
+                            }
+                        }
+                    }
+
+                }
+                .padding(.horizontal,12)
+
+
             }
             .padding(.top,5)
             .onAppear {
                 vm.fetchCategories()
-                vm.prepareAllPreviews()
 
             }
         

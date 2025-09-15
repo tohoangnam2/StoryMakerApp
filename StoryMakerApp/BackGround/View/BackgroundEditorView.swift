@@ -6,12 +6,25 @@
 //
 
 import SwiftUI
+import CoreImage
+import CoreImage.CIFilterBuiltins
 
 struct BackgroundEditorView: View {
-    @StateObject var vm = BackgroundEditorViewModel()
-    
-    @State var editEnum : BackGroundEditEditEnum = .filter
+    @EnvironmentObject var vm: BackgroundEditorViewModel
+    @Environment(\.dismiss) private var dismiss
 
+
+    @State var editEnum : BackGroundEditEditEnum = .filter
+    
+    @ObservedObject  var overlayVM : OverlayTextViewModel
+    
+    @State private var frame: Frame?
+    
+    
+    @Binding var isShowBackgroundPicker : Bool
+    @Binding var showBackgroundEdit : Bool
+
+    
     var body: some View {
         ZStack{
             VStack {
@@ -35,12 +48,23 @@ struct BackgroundEditorView: View {
                     HStack(spacing: 20) {
                         Button(action: {
                             editEnum = .none
+                            isShowBackgroundPicker = true
+
                         }) {
                             Image("none")
                                 .foregroundColor(editEnum == .none ? .red : .black)
                         }
+                        
+                
+                        
+                        
+
                         Button(action: {
                             editEnum = .filter
+                            DispatchQueue.main.async {
+                                isShowBackgroundPicker = false
+                                showBackgroundEdit = false
+                               }
                         }) {
                             Image("ic_filter")
                                 .foregroundColor(editEnum == .filter ? .red : .black)
@@ -70,6 +94,7 @@ struct BackgroundEditorView: View {
                 .id(editEnum)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                 .animation(.easeInOut(duration: 0.2), value: editEnum)
+
                 
                 
 
@@ -79,3 +104,71 @@ struct BackgroundEditorView: View {
 }
 
 
+//MARK: EXTENSION LUT- FILTER
+
+extension UIImage {
+    func applyingLUT(lutImage: UIImage, dimension: Int = 64) -> UIImage? {
+        guard let ciImage = CIImage(image: self),
+              let lutCI = CIImage(image: lutImage) else { return nil }
+
+        let size = lutCI.extent.size
+        let rowCount = Int(size.height) / dimension
+        let columnCount = Int(size.width) / dimension
+        let dataSize = dimension * dimension * dimension * 4
+        var cubeData = [Float](repeating: 0, count: dataSize)
+
+        var offset = 0
+        let bitmap = lutCI.bitmapRepresentation() // sẽ viết helper bên dưới
+        for z in 0..<dimension {
+            let zOffset = z / columnCount
+            let xOffset = z % columnCount
+            for y in 0..<dimension {
+                for x in 0..<dimension {
+                    let px = (x + xOffset * dimension)
+                    let py = (y + zOffset * dimension)
+                    let pixelIndex = (py * Int(size.width) + px) * 4
+                    let r = bitmap[pixelIndex]
+                    let g = bitmap[pixelIndex + 1]
+                    let b = bitmap[pixelIndex + 2]
+                    let a = bitmap[pixelIndex + 3]
+
+                    cubeData[offset] = Float(r) / 255.0
+                    cubeData[offset + 1] = Float(g) / 255.0
+                    cubeData[offset + 2] = Float(b) / 255.0
+                    cubeData[offset + 3] = Float(a) / 255.0
+                    offset += 4
+                }
+            }
+        }
+
+        let data = Data(buffer: UnsafeBufferPointer(start: &cubeData, count: cubeData.count))
+        guard let filter = CIFilter(name: "CIColorCube") else { return nil }
+        filter.setValue(dimension, forKey: "inputCubeDimension")
+        filter.setValue(data, forKey: "inputCubeData")
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+
+        guard let output = filter.outputImage else { return nil }
+        let context = CIContext()
+        if let cgimg = context.createCGImage(output, from: output.extent) {
+            return UIImage(cgImage: cgimg)
+        }
+        return nil
+    }
+}
+
+private extension CIImage {
+    func bitmapRepresentation() -> [UInt8] {
+        let context = CIContext()
+        let width = Int(extent.width)
+        let height = Int(extent.height)
+        var bitmap = [UInt8](repeating: 0, count: width * height * 4)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        context.render(self,
+                       toBitmap: &bitmap,
+                       rowBytes: width * 4,
+                       bounds: extent,
+                       format: .RGBA8,
+                       colorSpace: colorSpace)
+        return bitmap
+    }
+}

@@ -354,8 +354,8 @@ struct CustomSliderRowColor: View {
 struct CustomSliderRowBgOpacity: View {
     let title: String
     @Binding var valueOpacity: Double
-    var minValue: Double = 0
-    var maxValue: Double = 1.0
+    var minValue: Double = 0.1
+    var maxValue: Double = 1
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
@@ -368,7 +368,7 @@ struct CustomSliderRowBgOpacity: View {
                 CustomUISlider(
                                 valueOpacity: $valueOpacity,
                                 minValue: 0.1,
-                                maxValue: 1.0,
+                                maxValue: 1,
                                 trackColor: .gray,
                                 thumbColor: .red // màu thumb
                             )

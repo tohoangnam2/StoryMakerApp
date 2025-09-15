@@ -9,6 +9,9 @@ import SwiftUI
 
 struct HomeView: View {
     
+    @EnvironmentObject var vm: BackgroundEditorViewModel
+
+    
     @State var mockDataImage: [UIImage] = [
         UIImage(imageLiteralResourceName: "home_mockdata"),
         UIImage(imageLiteralResourceName: "home_mockdata"),
@@ -74,6 +77,3 @@ struct HomeView: View {
     }
 }
 
-#Preview {
-    HomeView()
-}

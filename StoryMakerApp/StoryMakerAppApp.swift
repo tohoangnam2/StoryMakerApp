@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct StoryMakerAppApp: App {
+    @StateObject var vm = BackgroundEditorViewModel()
+
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .environmentObject(vm)
         }
     }
 }
