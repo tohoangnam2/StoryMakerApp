@@ -60,7 +60,7 @@ struct HomeView: View {
                     }
                     VStack(spacing:15){
                         withAnimation(.spring){
-                            NavigationLink(destination: AddProjectView()) {
+                            NavigationLink(destination: AddProjectView(overlayVM: overlayVM, frame: nil, showTextField: $showTextField, isTextFieldFocused: $isTextFieldFocused, isSelected: $isSelected, isEditingText: $isEditingText, onAddTap: {}, onTapOutside: {}, onOpenBackgroundEditor: {}, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit)) {
                                 Image("home_icBtn")
                             }
                         }
