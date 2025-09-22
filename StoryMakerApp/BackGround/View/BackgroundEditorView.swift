@@ -23,6 +23,9 @@ struct BackgroundEditorView: View {
     
     @Binding var isShowBackgroundPicker : Bool
     @Binding var showBackgroundEdit : Bool
+    
+    @Binding var isSelected : Bool
+
 
     
     var body: some View {
@@ -39,32 +42,29 @@ struct BackgroundEditorView: View {
                             .font(.system(size: 16, weight: .medium))
                         Spacer()
                         Button(action: {
+                            showBackgroundEdit = false
+
                         }) {
                             Image("img_bg_check")
                         }
                         .background(.white)
                     }
+                    .padding(.top, 10)
                     .padding(.horizontal)
                     HStack(spacing: 20) {
                         Button(action: {
                             editEnum = .none
                             isShowBackgroundPicker = true
+                            showBackgroundEdit = false
 
                         }) {
                             Image("none")
                                 .foregroundColor(editEnum == .none ? .red : .black)
                         }
-                        
-                
-                        
-                        
 
                         Button(action: {
                             editEnum = .filter
-                            DispatchQueue.main.async {
-                                isShowBackgroundPicker = false
-                                showBackgroundEdit = false
-                               }
+
                         }) {
                             Image("ic_filter")
                                 .foregroundColor(editEnum == .filter ? .red : .black)
@@ -89,6 +89,7 @@ struct BackgroundEditorView: View {
                         FilterEditorView()
                     case .brightness:
                         BrightNessBGView()
+                        
                     }
                 }
                 .id(editEnum)
@@ -100,6 +101,10 @@ struct BackgroundEditorView: View {
 
             }
         }
+        .background(.white)
+        .padding(.top,5)
+
+
     }
 }
 

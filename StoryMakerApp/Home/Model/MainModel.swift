@@ -13,6 +13,4 @@ struct MainModel: View {
     }
 }
 
-#Preview {
-    MainModel()
-}
+

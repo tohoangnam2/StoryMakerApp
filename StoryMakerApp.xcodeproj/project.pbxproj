@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		543401092E815A790047336A /* MainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543401082E815A790047336A /* MainModel.swift */; };
+		5454444D2E7A6A780080D518 /* AddBackgroundsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */; };
 		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
 		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
 		546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */; };
@@ -40,6 +42,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		543401082E815A790047336A /* MainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModel.swift; sourceTree = "<group>"; };
+		5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBackgroundsView.swift; sourceTree = "<group>"; };
 		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
 		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
 		546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundViewModel.swift; sourceTree = "<group>"; };
@@ -57,7 +61,7 @@
 		546968A82E6E8C2E00BD2B77 /* StoryMakerAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMakerAppApp.swift; sourceTree = "<group>"; };
 		546968A92E6E8C2E00BD2B77 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		546968BB2E6E8C6D00BD2B77 /* PPNeueMachina-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PPNeueMachina-Regular.otf"; sourceTree = "<group>"; };
-		546968BD2E6E8CA600BD2B77 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		546968BD2E6E8CA600BD2B77 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		546968BE2E6E8DB600BD2B77 /* MonsieurLaDoulaise-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MonsieurLaDoulaise-Regular.ttf"; sourceTree = "<group>"; };
 		546968C02E6E960900BD2B77 /* Barriecito-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barriecito-Regular.ttf"; sourceTree = "<group>"; };
 		546968C22E6E96B700BD2B77 /* Pacifico-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pacifico-Regular.ttf"; sourceTree = "<group>"; };
@@ -76,14 +80,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5454444E2E7AA7B30080D518 /* Preview */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Preview;
+			sourceTree = "<group>";
+		};
 		546968D62E702F9800BD2B77 /* Color */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Color;
-			sourceTree = "<group>";
-		};
-		546968E42E71760A00BD2B77 /* BackgroundEditmodel */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BackgroundEditmodel;
 			sourceTree = "<group>";
 		};
 		546968E52E717EC200BD2B77 /* Filter */ = {
@@ -109,10 +113,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		543401072E815A5B0047336A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		546968902E6E8C2E00BD2B77 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				546968E42E71760A00BD2B77 /* BackgroundEditmodel */,
 				5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */,
 			);
 			path = Model;
@@ -150,7 +161,7 @@
 		546968972E6E8C2E00BD2B77 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */,
+				543401082E815A790047336A /* MainModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -170,6 +181,7 @@
 				546968992E6E8C2E00BD2B77 /* ViewModel */,
 				5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */,
 				5469689B2E6E8C2E00BD2B77 /* HomeView.swift */,
+				5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -201,6 +213,7 @@
 		546968A42E6E8C2E00BD2B77 /* Text */ = {
 			isa = PBXGroup;
 			children = (
+				543401072E815A5B0047336A /* Model */,
 				546968A32E6E8C2E00BD2B77 /* TextView.swift */,
 			);
 			path = Text;
@@ -209,9 +222,9 @@
 		546968AA2E6E8C2E00BD2B77 /* StoryMakerApp */ = {
 			isa = PBXGroup;
 			children = (
+				5454444E2E7AA7B30080D518 /* Preview */,
 				546968EC2E73D2D000BD2B77 /* Extensions */,
 				546968D62E702F9800BD2B77 /* Color */,
-				546968BD2E6E8CA600BD2B77 /* Info.plist */,
 				546968BA2E6E8C3700BD2B77 /* FontFamily */,
 				546968952E6E8C2E00BD2B77 /* BackGround */,
 				5469689C2E6E8C2E00BD2B77 /* Home */,
@@ -219,6 +232,7 @@
 				546968A02E6E8C2E00BD2B77 /* Splash */,
 				546968A22E6E8C2E00BD2B77 /* Subcription */,
 				546968A42E6E8C2E00BD2B77 /* Text */,
+				546968BD2E6E8CA600BD2B77 /* Info.plist */,
 				546968A52E6E8C2E00BD2B77 /* Assets.xcassets */,
 				546968A62E6E8C2E00BD2B77 /* ContentView.swift */,
 				546968A72E6E8C2E00BD2B77 /* StoryMakerApp.entitlements */,
@@ -280,8 +294,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				5454444E2E7AA7B30080D518 /* Preview */,
 				546968D62E702F9800BD2B77 /* Color */,
-				546968E42E71760A00BD2B77 /* BackgroundEditmodel */,
 				546968E52E717EC200BD2B77 /* Filter */,
 				546968EC2E73D2D000BD2B77 /* Extensions */,
 			);
@@ -316,6 +330,9 @@
 			);
 			mainGroup = BB94D9E52E541CBD008F66EA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5451E1312E80FC6800D9BBB1 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BB94D9EF2E541CBD008F66EA /* Products */;
 			projectDirPath = "";
@@ -355,12 +372,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				543401092E815A790047336A /* MainModel.swift in Sources */,
 				546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */,
 				546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */,
 				546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */,
 				546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */,
 				546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */,
 				546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */,
+				5454444D2E7A6A780080D518 /* AddBackgroundsView.swift in Sources */,
 				546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */,
 				546968B12E6E8C2E00BD2B77 /* HomeView.swift in Sources */,
 				546968B22E6E8C2E00BD2B77 /* OnboardingView.swift in Sources */,
@@ -506,7 +525,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StoryMakerApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -517,7 +538,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
@@ -547,7 +568,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StoryMakerApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -558,7 +581,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
@@ -597,6 +620,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5451E1312E80FC6800D9BBB1 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 26.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = BB94D9E62E541CBD008F66EA /* Project object */;
 }

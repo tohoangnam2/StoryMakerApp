@@ -35,6 +35,9 @@ struct HomePreview: View {
     
     @State private var isImageLoaded = false
     
+    @FocusState private var fakeFocus: Bool
+
+    
     
     //export
     @State private var snapshotImage: UIImage? = nil
@@ -61,22 +64,24 @@ struct HomePreview: View {
             .padding()
             
             SnapshotContainer(content:
-                AddBackgroundsView(
-                    overlayVM: overlayVM,
-                    frame: frame,
-                    showTextField: $showTextField,
-                    isTextFieldFocused: $isTextFieldFocused,
-                    isSelected: $isSelected,
-                    isEditingText: $isEditingText,
-                    onAddTap: { isShowBackgroundPicker = true },
-                    onTapOutside: { },
-                    onOpenBackgroundEditor: { showBackgroundEdit = true },
-                    isShowBackgroundPicker: $isShowBackgroundPicker,
-                    showBackgroundEdit: $showBackgroundEdit,
-                    filteredImage: vm.finalImage
-                )
+                                AddBackgroundsView(
+                                    overlayVM: overlayVM,
+                                    frame: frame,
+                                    showTextField: .constant(false),
+                                    isTextFieldFocused: $fakeFocus,
+                                    isSelected: .constant(false),
+                                    isEditingText: .constant(false),
+                                    onAddTap: {},
+                                    onTapOutside: {},
+                                    onOpenBackgroundEditor: {},
+                                    isShowBackgroundPicker: .constant(false),
+                                    showBackgroundEdit: .constant(false),
+                                    filteredImage: vm.finalImage
+                                )
                 .environmentObject(vm)
             , snapshot: $snapshotImage, trigger: $triggerSnapshot)
+            .allowsHitTesting(false)
+            .padding(.horizontal,20)
 
             
 
@@ -113,7 +118,21 @@ struct HomePreview: View {
             ExportingView(exportingVM: exportingVM)
         }
         .fullScreenCover(isPresented: $exportingVM.isDone) {
-            ExportingView(exportingVM: exportingVM)
+            ExportingDoneView(
+                exportingVM: exportingVM, overlayVM: overlayVM,
+                frame: frame,
+                showTextField: $showTextField,
+                isTextFieldFocused: $isTextFieldFocused,
+                isSelected: $isSelected,
+                isEditingText: $isEditingText,
+                onAddTap: { isShowBackgroundPicker = true },
+                onTapOutside: { },
+                onOpenBackgroundEditor: { showBackgroundEdit = true },
+                isShowBackgroundPicker: $isShowBackgroundPicker,
+                showBackgroundEdit: $showBackgroundEdit,
+                filteredImage: vm.finalImage, snapshotImage: snapshotImage!
+            )
+            .environmentObject(vm)
         }
         
     }

@@ -72,7 +72,7 @@ struct TextView: View {
                     VStack{
                         VStack(spacing: 2) {
                             CustomSliderRow(title: "Font size", value: overlay.fontSize, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                            CustomSliderRow(title: "Line height", value: overlay.lineHeight, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                            CustomSliderRowLineHeight(title: "Line height", value: overlay.lineHeight, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                             CustomSliderRowLetter(title: "Letter Spacing", value: overlay.letterSpacing, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         }
                         .padding()
@@ -256,6 +256,8 @@ struct TextView: View {
 //                Text("Không có overlay nào được chọn")
 //            }
         }
+        .background(.white)
+        .padding(.top,5)
     }
 }
 
@@ -265,6 +267,34 @@ struct CustomSliderRow: View {
     let title: String
     @Binding var value: Double
     var minValue: Double = 15
+    var maxValue: Double = 80
+    var sliderColor: Color = .red
+    var thumbColor: Color = .red
+    var trackHeight: CGFloat = 3
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 12))
+                .frame(width: 200, alignment: .leading)
+            
+            HStack {
+                CustomSlider(value: $value,
+                             minValue: minValue,
+                             maxValue: maxValue,
+                             trackColor: .gray,
+                             thumbColor: .red)
+                .frame(height: 25)
+
+                Text("\(Int(value))")
+            }
+        }
+    }
+}
+struct CustomSliderRowLineHeight: View {
+    let title: String
+    @Binding var value: Double
+    var minValue: Double = 5
     var maxValue: Double = 80
     var sliderColor: Color = .red
     var thumbColor: Color = .red
@@ -432,21 +462,21 @@ struct CustomAlign: View {
                         selectedAlign = .left
                     }) {
                         Image("align_left")
-                            .background(selectedAlign == .left ? Color.black : Color.clear)
+                            .background(selectedAlign == .left ? Color.black.opacity(0.65) : Color.clear)
                             .frame(width: 30, height: 30)
                     }
                     Button(action: {
                         selectedAlign = .center
                     }) {
                         Image("align_left")
-                            .background(selectedAlign == .center ? Color.black : Color.clear)
+                            .background(selectedAlign == .center ? Color.black.opacity(0.65) : Color.clear)
                             .frame(width: 30, height: 30)
                     }
                     Button(action: {
                         selectedAlign = .right
                     }) {
                         Image("align_right")
-                            .background(selectedAlign == .right ? Color.black : Color.clear)
+                            .background(selectedAlign == .right ? Color.black.opacity(0.65) : Color.clear)
                             .frame(width: 30, height: 30)
                     }
                 }

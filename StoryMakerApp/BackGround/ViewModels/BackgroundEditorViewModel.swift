@@ -13,46 +13,47 @@ class BackgroundEditorViewModel: ObservableObject {
         }
     }
     
+    
     @Published var selectedBackground: BackgroundModel? = nil
     
     
-    @Published var opacity: Double = UserDefaults.standard.object(forKey: "opacity") as? Double ?? 1 {
-        didSet {
-            UserDefaults.standard.set(opacity, forKey: "opacity")
-        }
-    }
+//    @Published var opacity: Double = UserDefaults.standard.object(forKey: "opacity") as? Double ?? 1 {
+//        didSet {
+//            UserDefaults.standard.set(opacity, forKey: "opacity")
+//        }
+//    }
     @Published var valueOpacity : Double = 1
-//    @Published var opacity : Double = 1
-//    @Published var lightness : Double = 0
-//    @Published var saturation : Double = 1
+    @Published var opacity : Double = 1
+    @Published var lightness : Double = 0
+    @Published var saturation : Double = 1
+
+    @Published var blur : Double = 0
+    @Published var shadow : Double = 0
+
+
+
+//    @Published var lightness: Double = UserDefaults.standard.object(forKey: "lightness") as? Double ?? 0 {
+//        didSet {
+//            UserDefaults.standard.set(lightness, forKey: "lightness")
+//        }
+//    }
 //
-//    @Published var blur : Double = 0
-//    @Published var shadow : Double = 0
-
-
-
-    @Published var lightness: Double = UserDefaults.standard.object(forKey: "lightness") as? Double ?? 0 {
-        didSet {
-            UserDefaults.standard.set(lightness, forKey: "lightness")
-        }
-    }
-
-    @Published var saturation: Double = UserDefaults.standard.object(forKey: "saturation") as? Double ?? 1 {
-        didSet {
-            UserDefaults.standard.set(saturation, forKey: "saturation")
-        }
-    }
-
-    @Published var blur: Double = UserDefaults.standard.object(forKey: "blur") as? Double ?? 0 {
-        didSet {
-            UserDefaults.standard.set(blur, forKey: "blur")
-        }
-    }
-    @Published var shadow: Double = UserDefaults.standard.object(forKey: "shadow") as? Double ?? 0 {
-        didSet {
-            UserDefaults.standard.set(shadow, forKey: "shadow")
-        }
-    }
+//    @Published var saturation: Double = UserDefaults.standard.object(forKey: "saturation") as? Double ?? 1 {
+//        didSet {
+//            UserDefaults.standard.set(saturation, forKey: "saturation")
+//        }
+//    }
+//
+//    @Published var blur: Double = UserDefaults.standard.object(forKey: "blur") as? Double ?? 0 {
+//        didSet {
+//            UserDefaults.standard.set(blur, forKey: "blur")
+//        }
+//    }
+//    @Published var shadow: Double = UserDefaults.standard.object(forKey: "shadow") as? Double ?? 0 {
+//        didSet {
+//            UserDefaults.standard.set(shadow, forKey: "shadow")
+//        }
+//    }
 
     
     @Published var selectedFilter: String? = nil
@@ -77,9 +78,78 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var scrollOffsets: [String: CGFloat] = [:] // key = categoryId
     
     @Published var lastSelectedFilterPosition: [String: UUID] = [:]
-
-
     
+    // dùng khi ko cần click vào preview
+    private let context = CIContext()
+
+    // lưu project
+    @Published var projects: [Frame] = []  // lưu danh sách project
+    
+    
+    @Published  var isImageLoaded = false
+
+
+
+
+    //func edit brghtness
+    
+    //  Lưu filter riêng cho từng bg (key = frame.id)
+      private var adjustments: [String: (opacity: Double, lightness: Double, saturation: Double, blur: Double, shadow: Double)] = [:]
+
+      func applyAdjustments(for bgID: String) {
+          if let saved = adjustments[bgID] {
+              // load lại chỉnh sửa cũ
+              opacity = saved.opacity
+              lightness = saved.lightness
+              saturation = saved.saturation
+              blur = saved.blur
+              shadow = saved.shadow
+          } else {
+              // nếu chưa có → set default
+              resetAdjustments()
+          }
+      }
+
+      func saveAdjustments(for bgID: String) {
+          adjustments[bgID] = (opacity, lightness, saturation, blur, shadow)
+      }
+
+      func resetAdjustments() {
+          opacity = 1
+          lightness = 0
+          saturation = 1
+          blur = 0
+          shadow = 0
+      }
+    
+    //func update preview
+    func updatePreview() {
+        guard let base = baseImage else { return }
+        var ciImage = CIImage(image: base)
+
+        // Lightness + Saturation
+        let colorControls = CIFilter.colorControls()
+        colorControls.inputImage = ciImage
+        colorControls.brightness = Float(lightness)   // -1...1
+        colorControls.saturation = Float(saturation) // 0...2
+        ciImage = colorControls.outputImage
+
+        // Blur
+        if blur > 0 {
+            let blurFilter = CIFilter.gaussianBlur()
+            blurFilter.inputImage = ciImage
+            blurFilter.radius = Float(blur * 10) // scale cho rõ
+            ciImage = blurFilter.outputImage
+        }
+
+        guard let output = ciImage,
+              let cgimg = context.createCGImage(output, from: output.extent) else { return }
+
+        DispatchQueue.main.async {
+            self.finalImage = UIImage(cgImage: cgimg)
+        }
+    }
+
     
 
     

@@ -21,7 +21,7 @@ struct BackGroundView: View {
     @Binding var isShowBackgroundPicker : Bool
 
     
-    let onPicked: (Frame) -> Void
+    let onPicked: (Frame?) -> Void
 
     
     var body: some View {
@@ -29,15 +29,17 @@ struct BackGroundView: View {
             ZStack{
                 VStack{
                     HStack{
-                        Image("img_bg_check")
-                            .opacity(0)
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Image("home_back")
+                        }
                         Spacer()
                         Text("Background")
                             .font(.system(size: 18, weight: .medium, design: .default))
                         Spacer()
                         Button(action: {
-                            onPicked(selectedFrame!)
-                            
+                            onPicked(selectedFrame)
                                 dismiss()
                         }) {
                             Image("img_bg_check")
@@ -54,13 +56,11 @@ struct BackGroundView: View {
                                         spacing: 5
                                     ) {
                                         ForEach(vm.framesForSelectedCategory()) { frame in
-                                            
+                                                
                                                 AsyncImage(url: frame.thumbURL) { img in
-                                                    
                                                     img.resizable()
                                                         .scaledToFill()
                                                 }
-                                                
                                                 placeholder: {
                                                     Color.gray.opacity(0.3)
                                                 }
@@ -72,7 +72,6 @@ struct BackGroundView: View {
                                                     RoundedRectangle(cornerRadius: 8)
                                                         .stroke(selectedFrame?.id == frame.id ? Color.blue : Color.clear, lineWidth: 3)
                                                 )
-                                               
                                                 .onTapGesture {
                                                     selectedFrame = frame
                                             }
@@ -80,10 +79,38 @@ struct BackGroundView: View {
                                         }
                                     }
                                     .padding(.all, 12)
+                                    
                                 }
 
                         } else {
-                            Text("Error")
+                            VStack {
+                                   ScrollView(.horizontal) {
+                                       HStack {
+                                           ForEach(0..<5, id: \.self) { _ in
+                                               RoundedRectangle(cornerRadius: 8)
+                                                   .fill(Color.gray.opacity(0.3))
+                                                   .frame(width: 80, height: 30)
+                                                   .shimmering() // optional, nếu bạn muốn hiệu ứng shimmer
+
+                                           }
+                                       }
+                                       .padding(.horizontal)
+                                   }
+                                   
+                                   LazyVGrid(
+                                       columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
+                                       spacing: 5
+                                   ) {
+                                       ForEach(0..<16, id: \.self) { _ in
+                                           RoundedRectangle(cornerRadius: 8)
+                                               .fill(Color.gray.opacity(0.3))
+                                               .frame(width: UIScreen.main.bounds.width/5 - 16,
+                                                      height: UIScreen.main.bounds.width/5 - 16)
+                                       }
+                                   }
+                                   .padding(.all, 12)
+                               }
+                            Spacer()
                         }
                     }
                     .onAppear {
