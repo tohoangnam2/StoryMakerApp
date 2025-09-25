@@ -17,28 +17,6 @@ class ExportingViewModel: ObservableObject {
     
     private var documentController: UIDocumentInteractionController?
 
-
-
-    
-//    func startExporting() {
-//        // Reset trạng thái
-//        self.isExporting = true
-//        self.progress = 0.0
-//        self.isDone = false
-//        
-//        // Mô phỏng quá trình xuất file thực tế
-//        // Trong thực tế, bạn sẽ gọi một hàm xử lý ảnh nặng tại đây.
-//        // Đây chỉ là một ví dụ mô phỏng bằng timer.
-//        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-//            self.progress += 0.01 // Tăng progress
-//            
-//            if self.progress >= 1.0 {
-//                timer.invalidate() // Dừng timer khi đạt 100%
-//                self.isExporting = false // Đóng màn hình exporting
-//                self.isDone = true // Báo hiệu đã hoàn thành
-//            }
-//        }
-//    }
     func startExporting(from frame: Frame?) {
             guard let frame = frame,
                   let url = frame.backgroundURL else {
@@ -88,6 +66,17 @@ class ExportingViewModel: ObservableObject {
         
         DispatchQueue.global(qos: .background).async {
             self.saveImageToDocumentsDirectory(image: image, filename: "namto_\(UUID().uuidString).jpg")
+        }
+    }
+    
+    func quickExport(image: UIImage, filename: String = "snapshot_\(UUID().uuidString).jpg") {
+        // Không bật progress, chỉ lưu ngay
+        self.isExporting = false
+        self.progress = 1.0
+        self.isDone = true
+        
+        DispatchQueue.global(qos: .background).async {
+            self.saveImageToDocumentsDirectory(image: image, filename: filename)
         }
     }
 
@@ -149,6 +138,23 @@ class ExportingViewModel: ObservableObject {
             rootVC.present(activityVC, animated: true)
         }
     }
+    
+    @MainActor func snapshotAndSave<V: View>(view: V, size: CGSize, filename: String = "snapshot_\(UUID().uuidString).jpg") {
+          let renderer = ImageRenderer(content: view)
+          renderer.proposedSize = .init(size)
+          
+          if let uiImage = renderer.uiImage {
+              // Lưu ngay không cần progress
+              saveImageToDocumentsDirectory(image: uiImage, filename: filename)
+          } else {
+              print("Không render được snapshot")
+          }
+      }
+      
+      /// Chụp ngay từ UIImage có sẵn và lưu
+      func snapshotAndSave(image: UIImage, filename: String = "snapshot_\(UUID().uuidString).jpg") {
+          saveImageToDocumentsDirectory(image: image, filename: filename)
+      }
 
 
 

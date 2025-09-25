@@ -18,7 +18,7 @@ struct BackgroundEditorView: View {
     
     @ObservedObject  var overlayVM : OverlayTextViewModel
     
-    @State private var frame: Frame?
+    let frame: Frame?
     
     
     @Binding var isShowBackgroundPicker : Bool
