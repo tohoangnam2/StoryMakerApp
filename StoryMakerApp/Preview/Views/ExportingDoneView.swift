@@ -40,7 +40,6 @@ struct ExportingDoneView: View {
     
     
     //export
-    //    @State private var snapshotImage: UIImage? = nil
     @State private var triggerSnapshot = false
     
     @EnvironmentObject var vm: BackgroundEditorViewModel

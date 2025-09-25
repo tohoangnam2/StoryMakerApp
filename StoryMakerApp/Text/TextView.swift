@@ -120,7 +120,7 @@ struct TextView: View {
                                         .frame(width: 40, height: 40)
                                         .foregroundColor(Color(color))
                                         .onTapGesture {
-                                            overlay.colorSolid.wrappedValue = Color(color)
+                                            overlay.colorSolid.wrappedValue = color
                                             overlay.userGradient.wrappedValue = false
 
                                         }
@@ -150,11 +150,10 @@ struct TextView: View {
                                         )
                                         .frame(width: 40, height: 40)
                                         .onTapGesture {
-                                            overlay.colorGradient.wrappedValue = LinearGradient(
-                                                gradient: Gradient(colors: [first, second]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
+                                            overlay.colorGradient.wrappedValue = [
+                                                first.toHex() ?? "#FFFFFF",
+                                                second.toHex() ?? "#FFFFFF"
+                                            ]
                                             overlay.userGradient.wrappedValue = true
 
                                         }
@@ -178,7 +177,7 @@ struct TextView: View {
                                         .foregroundColor(Color(color))
                                         .frame(width: 40, height: 40)
                                         .onTapGesture {
-                                            overlay.colorSolid.wrappedValue = Color(color)
+                                            overlay.colorSolid.wrappedValue = color
                                         }
                                 }
                             }
@@ -209,7 +208,7 @@ struct TextView: View {
                                         .foregroundColor(Color(color))
                                         .frame(width: 40, height: 40)
                                         .onTapGesture {
-                                            overlay.bgColor.wrappedValue = Color(color)
+                                            overlay.bgColor.wrappedValue = color
                                         }
                                 }
                             }
@@ -236,7 +235,7 @@ struct TextView: View {
                                         .foregroundColor(Color(color))
                                         .frame(width: 40, height: 40)
                                         .onTapGesture {
-                                            overlay.shawDowColor.wrappedValue = Color(color)
+                                            overlay.shawDowColor.wrappedValue = color
 
                                         }
                                 }

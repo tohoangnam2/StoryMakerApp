@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		543401092E815A790047336A /* MainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543401082E815A790047336A /* MainModel.swift */; };
+		543401112E83CF9A0047336A /* ProjectStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543401102E83CF980047336A /* ProjectStorage.swift */; };
 		5454444D2E7A6A780080D518 /* AddBackgroundsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */; };
 		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
 		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
@@ -43,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		543401082E815A790047336A /* MainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModel.swift; sourceTree = "<group>"; };
+		543401102E83CF980047336A /* ProjectStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectStorage.swift; sourceTree = "<group>"; };
 		5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBackgroundsView.swift; sourceTree = "<group>"; };
 		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
 		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 		546968992E6E8C2E00BD2B77 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				543401102E83CF980047336A /* ProjectStorage.swift */,
 				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
 			);
 			path = ViewModel;
@@ -386,6 +389,7 @@
 				546968B32E6E8C2E00BD2B77 /* SplashView.swift in Sources */,
 				546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */,
 				546968B42E6E8C2E00BD2B77 /* SubcriptionView.swift in Sources */,
+				543401112E83CF9A0047336A /* ProjectStorage.swift in Sources */,
 				546968B52E6E8C2E00BD2B77 /* TextView.swift in Sources */,
 				546968B62E6E8C2E00BD2B77 /* ContentView.swift in Sources */,
 				546968B72E6E8C2E00BD2B77 /* StoryMakerAppApp.swift in Sources */,

@@ -45,12 +45,23 @@ struct HomeView: View {
                         }
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 16) {
-                                ForEach(mockDataImage.indices, id: \.self) { index in
-                                    Image(uiImage: mockDataImage[index])
-                                        .resizable()
-                                        .frame(width: 97, height: 207)
-                                        .cornerRadius(8)
+                                ForEach(vm.mainprojects, id: \.id) { project in
+                                    
+                                    if let data = project.previewImageData,
+                                       let image = UIImage(data: data) {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .frame(width: 97, height: 207)
+                                            .cornerRadius(8)
+                                    } else {
+                                        Rectangle()
+                                            .fill(Color.gray.opacity(0.3))
+                                            .frame(width: 97, height: 207)
+                                            .cornerRadius(8)
+                                            .overlay(Text("No preview").font(.caption))
+                                    }
                                 }
+
                             }
                             .padding(.horizontal)
                             Spacer()
@@ -60,7 +71,8 @@ struct HomeView: View {
                     }
                     VStack(spacing:15){
                         withAnimation(.spring){
-                            NavigationLink(destination: AddProjectView()) {
+                            NavigationLink(destination: AddProjectView()
+                                .environmentObject(vm)) {
                                 Image("home_icBtn")
                             }
                         }
@@ -71,8 +83,34 @@ struct HomeView: View {
                 }
             }
         }
+        .onAppear {
+            loadSavedProjects()
+        }
         .navigationBarBackButtonHidden(true)
         
     }
+    func loadSavedProjects() {
+        let fileManager = FileManager.default
+        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        do {
+            let files = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+            let jsonFiles = files.filter { $0.pathExtension == "json" }
+
+            var loadedProjects: [MainModel] = []
+
+            for file in jsonFiles {
+                if let data = try? Data(contentsOf: file),
+                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
+                    loadedProjects.append(project)
+                }
+            }
+
+            vm.mainprojects = loadedProjects
+        } catch {
+            print("Failed to load projects: \(error)")
+        }
+    }
+
 }
 

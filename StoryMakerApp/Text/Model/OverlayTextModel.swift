@@ -9,14 +9,14 @@ import Foundation
 
 import SwiftUI
 
-enum OverlayGestureType {
+enum OverlayGestureType : Codable {
     case none
     case move
     case rotate
     case zoom
 }
 
-struct OverlayTextModel: Identifiable {
+struct OverlayTextModel: Identifiable , Codable {
     var id = UUID()
     var text: String
     var offset: CGSize = .zero
@@ -25,10 +25,10 @@ struct OverlayTextModel: Identifiable {
     //rotate
     
     // 1. Biến trạng thái để lưu góc xoay
-    var currentRotation: Angle = .degrees(0)
+    var currentRotation: Double = 0
     
     // Biến tạm để lưu góc ban đầu khi bắt đầu kéo
-    var startAngle: Angle = .degrees(0)
+    var startAngle: Double = 0
     
     // Biến tạm để lưu vị trí ban đầu của ngón tay
     var startLocation: CGPoint?
@@ -41,30 +41,19 @@ struct OverlayTextModel: Identifiable {
     
     // Biến tạm để lưu khoảng cách ban đầu từ tâm khi zoom
     var startDistance: CGFloat = 0.0
-    
-    var topLeft: CGPoint = .zero
-    var topRight: CGPoint = .zero
-    var bottomLeft: CGPoint = .zero
-    var bottomRight: CGPoint = .zero
-    var textSize: CGSize = .zero
-    var isZoom: Bool = false
+
     var isSelected: Bool = false
     var isEditingText: Bool = false
-    var isShowBGText : Bool = false
-    
-    var startDragAngle: CGFloat? = nil
-    var startZoomDistance: CGFloat? = nil
+
     var activeGesture: OverlayGestureType = .none
     
-    var startAngleToCenter: CGFloat? = nil
-    var startRadius: CGFloat? = nil
+    var startAngleToCenter: Double?
     //zoom
     
     var initialZoom: CGFloat = 1
     var currentZoom: CGFloat = 1
     var displayZoom: CGFloat = 1
     
-    // MARK: Edit Text
     //font size
     var value : Double
     
@@ -83,15 +72,22 @@ struct OverlayTextModel: Identifiable {
     var cuver : Double = 0
     
     // Color solid
-    var colorSolid: Color = .white
+    var colorSolid: String = "#FFFFFF"
     var valueOpacity : Double = 1
     
     //color gradient
-    var colorGradient: LinearGradient = LinearGradient(
-        gradient: Gradient(colors: [Color.white, Color.white]),
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    var colorGradient: [String] = ["#FFFFFF", "#FF0000"]
+
+    var gradient: LinearGradient {
+        let colors = colorGradient.toColorArray()
+        let safeColors = colors.isEmpty ? [.white, .black] : colors
+        return LinearGradient(
+            gradient: Gradient(colors: safeColors),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
     var userGradient: Bool = false
     
     // Stroke
@@ -103,49 +99,21 @@ struct OverlayTextModel: Identifiable {
     var paddingBG: Double = 10
     var cornerRadiusBG: Double = 10
     var opacityBG: Double = 0.2
-    var bgColor: Color = .white
+    var bgColor:  String = "#FFFFFF"
     
     // Shadow
     var offSetXSD: Double = 0
     var offSetYSD: Double = 0
     var blurSD: Double = 1
     var opacitySD: Double = 1
-    var shawDowColor: Color = .white
+    var shawDowColor: String = "#FFFFFF"
     
-    var baseScale: CGFloat = 1.0 // scale gốc lúc thêm overlay
-    var startOffset: CGSize = .zero
-    
+    //move
     var startPoint: CGPoint = .zero
     var originalScale: CGFloat = 1.0
     var startCenter: CGPoint = .zero
-    
-    
-    //picker color
-    var showColorPicker = false
-    var selectedColor: Color = .red
-    
-    
-    //bg edit
-    
 
-    
-    
 }
-
-struct SavedProject {
-    let id: UUID
-    let snapshot: UIImage       // hình preview
-    let backgroundImage: UIImage
-    let overlays: [[String: Any]] // overlay serialize thành dictionary
-    let vmSettings: [String: Any] // brightness, blur, opacity, ...
-}
-
-
-
-
-
-
-
 
 enum OverlayTextEditEnum : Equatable , CaseIterable {
     case fontSize
@@ -209,7 +177,7 @@ enum OverlayTextEditEnum : Equatable , CaseIterable {
     
     
 }
-enum FontFmailyEnum : String , CaseIterable {
+enum FontFmailyEnum : String , CaseIterable , Codable {
     case ff1
     case ff2
     case ff3
@@ -291,14 +259,14 @@ enum FontFmailyEnum : String , CaseIterable {
     }
 }
 
-enum AlignEnum : String , CaseIterable {
+enum AlignEnum : String , CaseIterable , Codable {
     case left
     case center
     case right
     case none
 }
 
-enum AlignCaseEnum : String , CaseIterable {
+enum AlignCaseEnum : String , CaseIterable , Codable {
     case up
     case cap
     case low

@@ -8,8 +8,8 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var selectedCategory: CategoryBG? = nil {
         didSet {
             if let id = selectedCategory?.id {
-                fetchBackgrounds(for: id)
-            }
+                    fetchBackgrounds(for: id)
+                }
         }
     }
     
@@ -87,6 +87,9 @@ class BackgroundEditorViewModel: ObservableObject {
     
     
     @Published  var isImageLoaded = false
+    
+    @Published var mainprojects: [MainModel] = []
+
 
 
 

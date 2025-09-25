@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomePreview: View {
 //    let snapshotImage: UIImage
-    @StateObject private var exportingVM = ExportingViewModel()
+    @ObservedObject var exportingVM: ExportingViewModel
     @Environment(\.dismiss) var dismiss
     
     
@@ -40,7 +40,7 @@ struct HomePreview: View {
     
     
     //export
-    @State private var snapshotImage: UIImage? = nil
+    @Binding  var snapshotImage: UIImage?
     @State private var triggerSnapshot = false
     
     @EnvironmentObject var vm: BackgroundEditorViewModel
@@ -82,8 +82,6 @@ struct HomePreview: View {
             , snapshot: $snapshotImage, trigger: $triggerSnapshot)
             .allowsHitTesting(false)
             .padding(.horizontal,20)
-
-            
 
             ZStack {
                 RoundedRectangle(cornerRadius: 60)

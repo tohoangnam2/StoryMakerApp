@@ -40,6 +40,8 @@ struct AddBackgroundsView: View {
     @State private var isImageLoaded = false
     
     let filteredImage: UIImage?
+    
+    //hex to c
 
 
     var body: some View {
@@ -108,6 +110,7 @@ struct AddBackgroundsView: View {
                                         }
                                         
                                         else if !overlay.text.isEmpty  {
+                                            
                                             ZStack{
                                                 //case
                                                 Text({
@@ -137,15 +140,15 @@ struct AddBackgroundsView: View {
                                                 .contentShape(Rectangle())
                                                 //solid
                                                 .if(!overlay.userGradient) { view in
-                                                    view.foregroundColor(overlay.colorSolid.opacity(overlay.valueOpacity))
-                                                }
+                                                    view.foregroundColor(Color(hex: overlay.colorSolid)?.opacity(overlay.valueOpacity) ?? .black)                                                }
                                                 //gradient
                                                 .if(overlay.userGradient) { view in
-                                                    view.foregroundStyle(overlay.colorGradient.opacity(overlay.valueOpacity))
+                                                    view.foregroundStyle(overlay.gradient)
+                                                        .opacity(overlay.valueOpacity)
                                                 }
                                                 .padding(overlay.paddingBG)
                                                 .shadow(
-                                                    color: overlay.shawDowColor.opacity(overlay.opacitySD),
+                                                    color:Color(hex: overlay.shawDowColor)?.opacity(overlay.opacitySD) ?? .black,
                                                     //độ mở
                                                     radius: overlay.blurSD,
                                                     x: overlay.offSetXSD,
@@ -185,7 +188,7 @@ struct AddBackgroundsView: View {
                                                     Group{
                                                         GeometryReader {textGeo in
                                                             ZStack {
-                                                                overlay.bgColor
+                                                                Color(hex: overlay.bgColor)?
                                                                     .opacity(overlay.opacityBG)
                                                                     .cornerRadius(overlay.cornerRadiusBG)
                                                                     .frame(width: textGeo.size.width, height: textGeo.size.height)
@@ -233,27 +236,39 @@ struct AddBackgroundsView: View {
                                                                         .gesture(
                                                                             DragGesture(minimumDistance: 10, coordinateSpace: .named("canvas"))
                                                                                 .onChanged { value in
-                                                                                    let center = CGPoint(x: textGeo.frame(in: .named("canvas")).midX,
-                                                                                                         y: textGeo.frame(in: .named("canvas")).midY)
+                                                                                    let center = CGPoint(
+                                                                                        x: textGeo.frame(in: .named("canvas")).midX,
+                                                                                        y: textGeo.frame(in: .named("canvas")).midY
+                                                                                    )
                                                                                     
                                                                                     if overlay.startLocation == nil {
                                                                                         let dx = value.startLocation.x - center.x
                                                                                         let dy = value.startLocation.y - center.y
                                                                                         overlay.startLocation = CGPoint(x: dx, y: dy)
-                                                                                        overlay.startAngle = overlay.currentRotation
+                                                                                        overlay.startAngle = overlay.currentRotation   // Double
                                                                                     }
                                                                                     
-                                                                                    let currentVector = CGVector(dx: value.location.x - center.x,
-                                                                                                                 dy: value.location.y - center.y)
-                                                                                    let startVector = CGVector(dx: overlay.startLocation!.x,
-                                                                                                               dy: overlay.startLocation!.y)
-                                                                                    let angleChange = atan2(currentVector.dy, currentVector.dx) - atan2(startVector.dy, startVector.dx)
-                                                                                    overlay.currentRotation = overlay.startAngle + Angle(radians: Double(angleChange))
+                                                                                    let currentVector = CGVector(
+                                                                                        dx: value.location.x - center.x,
+                                                                                        dy: value.location.y - center.y
+                                                                                    )
+                                                                                    let startVector = CGVector(
+                                                                                        dx: overlay.startLocation!.x,
+                                                                                        dy: overlay.startLocation!.y
+                                                                                    )
+                                                                                    
+                                                                                    let angleChange = atan2(currentVector.dy, currentVector.dx)
+                                                                                                     - atan2(startVector.dy, startVector.dx)
+
+                                                                                    let angleInDegrees = CGFloat(angleChange) * 180 / .pi
+
+                                                                                    overlay.currentRotation = overlay.startAngle + angleInDegrees
                                                                                 }
                                                                                 .onEnded { _ in
                                                                                     overlay.startLocation = nil
                                                                                 }
                                                                         )
+
                                                                     
                                                                     Image("img_edit_zoom")
                                                                         .resizable()
@@ -266,55 +281,54 @@ struct AddBackgroundsView: View {
                                                                             DragGesture(minimumDistance: 0, coordinateSpace: .named("canvas"))
                                                                                 .onChanged { value in
                                                                                     if overlay.startDistance == 0 {
-                                                                                        // Dùng size thay vì frame để tránh lỗi khi move
                                                                                         let frameSize = textGeo.size
-                                                                                        
+
                                                                                         overlay.startCenter = CGPoint(
                                                                                             x: (frameSize.width / 2) + overlay.endset.width,
                                                                                             y: (frameSize.height / 2) + overlay.endset.height
                                                                                         )
-                                                                                        
+
                                                                                         overlay.startDistance = hypot(
                                                                                             value.location.x - overlay.startCenter.x,
                                                                                             value.location.y - overlay.startCenter.y
                                                                                         )
                                                                                         overlay.startScale = overlay.currentScale
-                                                                                        
+
                                                                                         overlay.startAngleToCenter = atan2(
                                                                                             value.location.y - overlay.startCenter.y,
                                                                                             value.location.x - overlay.startCenter.x
                                                                                         )
                                                                                     }
-                                                                                    
+
                                                                                     let currentAngle = atan2(
                                                                                         value.location.y - overlay.startCenter.y,
                                                                                         value.location.x - overlay.startCenter.x
                                                                                     )
-                                                                                    
+
                                                                                     if let startAngle = overlay.startAngleToCenter {
                                                                                         let angleDiff = abs((currentAngle - startAngle).truncatingRemainder(dividingBy: .pi * 2))
                                                                                         if angleDiff > (.pi / 4) { // ±45°
                                                                                             return
                                                                                         }
                                                                                     }
-                                                                                    
+
                                                                                     let currentDistance = hypot(
                                                                                         value.location.x - overlay.startCenter.x,
                                                                                         value.location.y - overlay.startCenter.y
                                                                                     )
                                                                                     let scaleFactor = currentDistance / overlay.startDistance
-                                                                                    
+
                                                                                     let minScale: CGFloat = 0.5
                                                                                     let maxScale: CGFloat = 3.0
-                                                                                    
+
                                                                                     var newScale = overlay.startScale * scaleFactor
-                                                                                    
+
                                                                                     if newScale < minScale {
                                                                                         newScale = minScale
                                                                                     } else if newScale > maxScale {
                                                                                         newScale = maxScale
                                                                                     }
-                                                                                    
+
                                                                                     overlay.currentScale = newScale
                                                                                 }
                                                                                 .onEnded { _ in
@@ -323,22 +337,19 @@ struct AddBackgroundsView: View {
                                                                                     overlay.startAngleToCenter = nil
                                                                                 }
                                                                         )
-                                                                    
                                                                 }
-                                                                
-                                                                
                                                             }
                                                         }
-                                                        
                                                     }
                                                 )
                                                 //move+ rotate + zoom
-                                                .rotationEffect(overlay.currentRotation, anchor: .center)
+                                                .rotationEffect(.degrees(overlay.currentRotation), anchor: .center)
                                                 .offset(x: overlay.offset.width / overlay.currentScale,
                                                         y: overlay.offset.height / overlay.currentScale)
                                                 .scaleEffect(overlay.currentScale)
                                             }
-                                        }}
+                                        }
+                                    }
                                     .coordinateSpace(name: "canvas")
                                     
                                 }

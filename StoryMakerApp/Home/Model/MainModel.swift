@@ -7,10 +7,28 @@
 
 import SwiftUI
 
-struct MainModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
+struct MainModel: Identifiable, Codable {
+    var id: UUID = UUID()
+    
+    
+    // Text layers
+    var textLayers: [OverlayTextModel] = []
+    
+    // Background
+    var selectedFilter: String? = nil
+    var blur: Double = 0
+    var shadow: Double = 0
+    var opacity: Double = 1
+    var lightness: Double = 0
+    var saturation: Double = 1
+    
+    // Frame
+    var frame : Frame? = nil
+    var frameID: String? = nil
+    
+    // Preview
+    var previewImageData: Data? = nil // lưu UIImage dưới dạng Data nếu cần
 }
+
 
 

@@ -88,7 +88,44 @@ class OverlayTextViewModel: ObservableObject {
         }
     }
 
-  
+
+    //save preview
+        func saveProject(_ project: MainModel, filename: String) {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            do {
+                let data = try encoder.encode(project)
+                let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let fileURL = documentsURL.appendingPathComponent(filename)
+                try data.write(to: fileURL)
+                print(" Saved project to:", fileURL)
+            } catch {
+                print(" Error saving project:", error)
+            }
+        }
+
+
+        
+        func loadProject(from filename: String) -> MainModel? {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileURL = documentsURL.appendingPathComponent(filename)
+
+            do {
+                let data = try Data(contentsOf: fileURL)
+                let decoder = JSONDecoder()
+                let project = try decoder.decode(MainModel.self, from: data)
+                return project
+            } catch {
+                print(" Failed to load project:", error)
+                return nil
+            }
+        }
+        func listSavedProjects() -> [URL] {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let files = try? FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+            return files?.filter { $0.pathExtension == "json" } ?? []
+        }
+
 
     
 

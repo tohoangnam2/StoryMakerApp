@@ -23,7 +23,7 @@ struct AddProjectView: View {
     @State  var showBackgroundEdit = false
 
     
-    @State private var frame: Frame?
+    @State var frame: Frame?
     
     //show bàn phím
     @FocusState private var isTextFieldFocused: Bool
@@ -45,11 +45,18 @@ struct AddProjectView: View {
     @State private var editEnum: BackGroundEditEditEnum = .filter
     
     //snapshort
-    @State private var snapshotImage: UIImage? = nil
     @State private var showPreview = false
     
 
     @State private var takeSnapshot = false
+
+    @State private var snapshotImage: UIImage? = nil
+    @State private var triggerSnapshot = false
+    
+    @StateObject private var exportingVM = ExportingViewModel()
+    
+    
+
 
 
     var body: some View {
@@ -59,13 +66,40 @@ struct AddProjectView: View {
                     
                     HStack{
                         Button(action: {
-                            if let frame = frame {
-                                vm.projects.append(frame)
+                            
+                            triggerSnapshot = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                if let image = snapshotImage {
+                                    let previewData = image.jpegData(compressionQuality: 0.8)
+
+                                    let newProject = MainModel(
+                                        textLayers: overlayVM.overlays,
+                                        selectedFilter: vm.selectedFilter,
+                                        blur: vm.blur,
+                                        shadow: vm.shadow,
+                                        opacity: vm.opacity,
+                                        lightness: vm.lightness,
+                                        saturation: vm.saturation,
+                                        frameID: frame?.id.uuidString,
+                                        previewImageData: previewData
+                                    )
+
+                                    vm.mainprojects.append(newProject)
+                                    ProjectStorage.saveProject(newProject, filename: "project_\(newProject.id).json")
+                                    exportingVM.startExporting(image: image)
+
+                                }
                             }
-                            presentationMode.wrappedValue.dismiss()
+                           
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                            
                         }) {
                             Image("home_back")
                         }
+
                         Spacer()
                         
                         Button {
@@ -84,6 +118,27 @@ struct AddProjectView: View {
                     Spacer()
                     ZStack (alignment: .bottom){
 
+                    SnapshotContainer(
+                               content: AddBackgroundsView(
+                                   overlayVM: overlayVM,
+                                   frame: frame,
+                                   showTextField: .constant(false),
+                                   isTextFieldFocused: $isTextFieldFocused,
+                                   isSelected: .constant(false),
+                                   isEditingText: .constant(false),
+                                   onAddTap: {},
+                                   onTapOutside: {},
+                                   onOpenBackgroundEditor: {},
+                                   isShowBackgroundPicker: .constant(false),
+                                   showBackgroundEdit: .constant(false),
+                                   filteredImage: vm.finalImage
+                               )
+                               .environmentObject(vm),
+                               snapshot: $snapshotImage,
+                               trigger: $triggerSnapshot
+                           )
+                           .frame(width: 97, height: 207)
+                           .opacity(0)
                     AddBackgroundsView(
                         overlayVM: overlayVM,
                         frame: frame,
@@ -404,7 +459,7 @@ struct AddProjectView: View {
         }
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
-            HomePreview(  overlayVM: overlayVM,
+            HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
                           frame: frame,
                           showTextField: $showTextField,
                           isTextFieldFocused: $isTextFieldFocused,
@@ -414,7 +469,7 @@ struct AddProjectView: View {
                           onTapOutside: {  },
                           onOpenBackgroundEditor: { showBackgroundEdit = true },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
-                          showBackgroundEdit: $showBackgroundEdit, filteredImage: vm.finalImage)
+                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, filteredImage: vm.finalImage)
                           .environmentObject(vm)
         }
     }

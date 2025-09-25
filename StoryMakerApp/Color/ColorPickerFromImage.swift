@@ -18,7 +18,14 @@ struct ColorPickerFromImage: View {
 //                .colorMultiply(overlay.colorSolid)
                 .allowsHitTesting(false) // ảnh không chặn sự kiện tap
 
-            ColorPicker("Colors", selection: $overlay.colorSolid)
+            ColorPicker("Colors", selection: Binding<Color>(
+                get: {
+                    Color(overlay.colorSolid) ?? .black
+                },
+                set: { newColor in
+                    overlay.colorSolid = newColor.toHex() ?? "#000000"
+                }
+            ))
                 .labelsHidden()
                 .opacity(0.02)
                 .frame(width: 40, height: 40)
