@@ -8,19 +8,43 @@
 import Foundation
 
 struct ProjectStorage {
-    static func saveProject(_ project: MainModel, filename: String) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        do {
-            let data = try encoder.encode(project)
-            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let fileURL = documentsURL.appendingPathComponent(filename)
-            try data.write(to: fileURL)
-            print(" Saved project to:", fileURL)
-        } catch {
-            print(" Error saving project:", error)
+    static func getDocumentsDirectory() -> URL {
+            FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         }
-    }
+
+        static func saveProject(_ project: MainModel, filename: String) {
+            let url = getDocumentsDirectory().appendingPathComponent(filename)
+            do {
+                let data = try JSONEncoder().encode(project)
+                try data.write(to: url)
+                print("Saved project to: \(url)")
+            } catch {
+                print(" Failed to save project: \(error)")
+            }
+        }
+
+        static func loadAllProjects() -> [MainModel] {
+            let url = getDocumentsDirectory()
+            do {
+                let files = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+                let projectFiles = files.filter { $0.lastPathComponent.hasPrefix("project_") && $0.pathExtension == "json" }
+                
+                return projectFiles.compactMap { fileURL in
+                    do {
+                        let data = try Data(contentsOf: fileURL)
+                        return try JSONDecoder().decode(MainModel.self, from: data)
+                    } catch {
+                        print(" Decode error for \(fileURL.lastPathComponent): \(error)")
+                        return nil
+                    }
+
+                }
+            } catch {
+                print(" Failed to list directory: \(error)")
+                return []
+            }
+        }
+
 
     static func loadProject(from filename: String) -> MainModel? {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -34,6 +58,7 @@ struct ProjectStorage {
             print(" Failed to load project:", error)
             return nil
         }
+        
     }
 
     static func listSavedProjects() -> [URL] {

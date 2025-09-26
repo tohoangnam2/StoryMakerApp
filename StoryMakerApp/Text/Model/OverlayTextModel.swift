@@ -112,6 +112,8 @@ struct OverlayTextModel: Identifiable , Codable {
     var startPoint: CGPoint = .zero
     var originalScale: CGFloat = 1.0
     var startCenter: CGPoint = .zero
+    
+    
 
 }
 

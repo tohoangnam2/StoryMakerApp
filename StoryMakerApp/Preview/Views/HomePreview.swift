@@ -83,6 +83,8 @@ struct HomePreview: View {
             .allowsHitTesting(false)
             .padding(.horizontal,20)
 
+            
+
             ZStack {
                 RoundedRectangle(cornerRadius: 60)
                     .fill(

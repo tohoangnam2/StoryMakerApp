@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainModel: Identifiable, Codable {
-    var id: UUID = UUID()
+    var id: UUID
     
     
     // Text layers
@@ -28,7 +28,15 @@ struct MainModel: Identifiable, Codable {
     
     // Preview
     var previewImageData: Data? = nil // lưu UIImage dưới dạng Data nếu cần
+    
+    init(id: UUID = UUID()) {
+            self.id = id
+        }
 }
 
 
-
+extension MainModel {
+    var isNew: Bool {
+        return previewImageData == nil
+    }
+}

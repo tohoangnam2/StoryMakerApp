@@ -58,18 +58,16 @@ struct BackgroundResponse: Codable {
     let data: [String]   // danh sách URL ảnh
 }
 
-struct BackgroundItem: Identifiable {
+struct BackgroundItem: Identifiable , Codable {
     let id: UUID
     let image: String
     var isDefault: Bool = false
-    var baseImage: UIImage? = nil
+    var baseImage: Data? = nil
     
     // Custom initializer
-    init(id: UUID = UUID(), image: String, isDefault: Bool = false, baseImage: UIImage? = nil) {
-        self.id = id
-        self.image = image
-        self.isDefault = isDefault
-        self.baseImage = baseImage
+    var uiImage: UIImage? {
+        guard let baseImage = baseImage else { return nil }
+        return UIImage(data: baseImage)
     }
 }
 
@@ -97,31 +95,47 @@ struct Category: Codable ,Equatable{
 
 
 struct Frame: Codable, Identifiable {
-    let id = UUID()
+    let id =  UUID()
     let category: String
     let thumb: String
     let background: String
     let feature: Int
     let updated: Double
     
-    //fake id bg
     var backgroundID: String {
         return background.hash.description
     }
 
-    
     var thumbURL: URL? {
-         return URL(string: "https://api.fleet-tech.net" + thumb)
-     }
-     
-     var backgroundURL: URL? {
-         return URL(string: "https://api.fleet-tech.net" + background)
-     }
+        URL(string: "https://api.fleet-tech.net" + thumb)
+    }
+
+    var backgroundURL: URL? {
+        URL(string: "https://api.fleet-tech.net" + background)
+    }
 }
 
 
 
-
+//tránh mở lần 2 ko hiện        
+extension BackgroundItem {
+    init(id: UUID = UUID(), image: String, isDefault: Bool = false, baseImage: UIImage? = nil) {
+        self.id = id
+        self.image = image
+        self.isDefault = isDefault
+        self.baseImage = baseImage?.jpegData(compressionQuality: 0.8)
+    }
+}
+//extension Frame {
+//    init(category: String, thumb: String, background: String, feature: Int, updated: Double) {
+//        self.id = UUID()
+//        self.category = category
+//        self.thumb = thumb
+//        self.background = background
+//        self.feature = feature
+//        self.updated = updated
+//    }
+//}
 
 
 

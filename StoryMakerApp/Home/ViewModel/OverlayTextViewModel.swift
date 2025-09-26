@@ -12,6 +12,7 @@ class OverlayTextViewModel: ObservableObject {
     @Published var overlays: [OverlayTextModel] = []
     @Published var selectedOverlayID: UUID? = nil
     
+    
     var isAnyOverlayEditing: Bool {
         overlays.contains { $0.isEditingText }
     }
@@ -132,3 +133,9 @@ class OverlayTextViewModel: ObservableObject {
 
 }
 
+extension OverlayTextViewModel {
+    convenience init(overlays: [OverlayTextModel] = []) {
+        self.init()
+        self.overlays = overlays
+    }
+}

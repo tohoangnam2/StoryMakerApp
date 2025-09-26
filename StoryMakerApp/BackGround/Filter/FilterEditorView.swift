@@ -32,7 +32,7 @@ struct FilterEditorView: View {
                         HStack {
                             ForEach(vm.allBackgrounds) { bg in
                                 ZStack {
-                                    if bg.isDefault, let base = bg.baseImage {
+                                    if bg.isDefault, let base = bg.uiImage {
                                         Image(uiImage: base)
                                             .resizable()
                                             .scaledToFill()
@@ -49,7 +49,7 @@ struct FilterEditorView: View {
                                 .id(bg.id)
                                 .onTapGesture {
                                     if bg.isDefault {
-                                        vm.finalImage = bg.baseImage
+                                        vm.finalImage = bg.uiImage
                                         vm.selectedFilter = nil
                                     } else {
                                         vm.selectedFilter = bg.image

@@ -19,6 +19,8 @@ struct HomeView: View {
         
     ]
     
+    @State private var selectedProjectID: UUID?
+    
     var body: some View {
         NavigationView{
             ZStack{
@@ -46,32 +48,30 @@ struct HomeView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 16) {
                                 ForEach(vm.mainprojects, id: \.id) { project in
-                                    
                                     if let data = project.previewImageData,
-                                       let image = UIImage(data: data) {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .frame(width: 97, height: 207)
-                                            .cornerRadius(8)
-                                    } else {
-                                        Rectangle()
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 97, height: 207)
-                                            .cornerRadius(8)
-                                            .overlay(Text("No preview").font(.caption))
+                                       let image = UIImage(data: data),
+                                       project.isNew == false {  
+                                       
+                                        NavigationLink(
+                                            
+                                            destination: AddProjectView(projectID: project.id)
+                                                .environmentObject(vm)
+                                        ) {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .frame(width: 97, height: 207)
+                                                .cornerRadius(8)
+                                        }
                                     }
                                 }
 
                             }
                             .padding(.horizontal)
-                            Spacer()
                         }
-                        
-                        
                     }
                     VStack(spacing:15){
                         withAnimation(.spring){
-                            NavigationLink(destination: AddProjectView()
+                            NavigationLink(destination: AddProjectView(project : nil, projectID: nil)
                                 .environmentObject(vm)) {
                                 Image("home_icBtn")
                             }
@@ -83,9 +83,16 @@ struct HomeView: View {
                 }
             }
         }
+//        .onAppear {
+//            vm.mainprojects = ProjectStorage.loadAllProjects()
+//        }
         .onAppear {
-            loadSavedProjects()
+            let projects = ProjectStorage.loadAllProjects()
+            print(" Reloaded projects: \(projects.count)")
+            projects.forEach { print("   id: \($0.id)") }
+            vm.mainprojects = projects
         }
+
         .navigationBarBackButtonHidden(true)
         
     }
@@ -111,6 +118,28 @@ struct HomeView: View {
             print("Failed to load projects: \(error)")
         }
     }
+    static func loadAllProjects() -> [MainModel] {
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        do {
+            let files = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+            let projectFiles = files.filter { $0.lastPathComponent.hasPrefix("project_") && $0.pathExtension == "json" }
+            
+            return projectFiles.compactMap { fileURL in
+                do {
+                    let data = try Data(contentsOf: fileURL)
+                    return try JSONDecoder().decode(MainModel.self, from: data)
+                } catch {
+                    print("Failed to load \(fileURL): \(error)")
+                    return nil
+                }
+            }
+        } catch {
+            print("Failed to list directory: \(error)")
+            return []
+        }
+    }
+
+
 
 }
 

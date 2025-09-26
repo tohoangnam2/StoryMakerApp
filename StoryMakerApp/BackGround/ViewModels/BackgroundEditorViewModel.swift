@@ -91,7 +91,7 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var mainprojects: [MainModel] = []
 
 
-
+    
 
 
     //func edit brghtness
