@@ -24,8 +24,8 @@ struct HomeView: View {
     var body: some View {
         NavigationView{
             ZStack{
-                VStack(spacing:300){
-                    VStack(spacing: 30){
+                VStack(){
+                    VStack(){
                         VStack(spacing: 25){
                             HStack{
                                 NavigationLink(destination: SplashView()){
@@ -45,30 +45,29 @@ struct HomeView: View {
                                 .frame(maxWidth: .infinity, alignment: .topLeading)
                                 .padding(.leading,25)
                         }
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            LazyVGrid(
+                                columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 3),
+                                spacing: 16
+                            ) {
                                 ForEach(vm.mainprojects, id: \.id) { project in
-                                    if let data = project.previewImageData,
-                                       let image = UIImage(data: data),
-                                       project.isNew == false {  
-                                       
+                                    
+                                        
                                         NavigationLink(
-                                            
                                             destination: AddProjectView(projectID: project.id)
                                                 .environmentObject(vm)
                                         ) {
-                                            Image(uiImage: image)
-                                                .resizable()
-                                                .frame(width: 97, height: 207)
-                                                .cornerRadius(8)
+                                            ThumbnailView(project: project)
+                                                .environmentObject(vm)
                                         }
-                                    }
+                                    
                                 }
-
                             }
                             .padding(.horizontal)
+                            
                         }
                     }
+                    Spacer()
                     VStack(spacing:15){
                         withAnimation(.spring){
                             NavigationLink(destination: AddProjectView(project : nil, projectID: nil)
@@ -79,7 +78,7 @@ struct HomeView: View {
                         Text("Add new Project")
                             .font(.system(size: 16, weight: .medium, design: .default))
                     }
-                    .padding(.bottom,20)
+                    .padding(.top)
                 }
             }
         }

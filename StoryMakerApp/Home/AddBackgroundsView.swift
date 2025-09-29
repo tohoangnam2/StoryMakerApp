@@ -41,7 +41,7 @@ struct AddBackgroundsView: View {
     
     let filteredImage: UIImage?
     
-    //hex to c
+
 
 
     var body: some View {

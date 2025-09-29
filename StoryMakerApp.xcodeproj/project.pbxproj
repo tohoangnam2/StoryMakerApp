@@ -40,6 +40,7 @@
 		546968D52E6E988E00BD2B77 /* RubikIso-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */; };
 		546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */; };
 		546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */; };
+		54F4FEE02E8A743200A1B5CF /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4FEDF2E8A743200A1B5CF /* ThumbnailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,7 @@
 		546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RubikIso-Regular.ttf"; sourceTree = "<group>"; };
 		546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorView.swift; sourceTree = "<group>"; };
 		546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorViewModel.swift; sourceTree = "<group>"; };
+		54F4FEDF2E8A743200A1B5CF /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
 		BB94D9EE2E541CBD008F66EA /* StoryMakerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMakerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -185,6 +187,7 @@
 				5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */,
 				5469689B2E6E8C2E00BD2B77 /* HomeView.swift */,
 				5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */,
+				54F4FEDF2E8A743200A1B5CF /* ThumbnailView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -379,6 +382,7 @@
 				546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */,
 				546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */,
 				546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */,
+				54F4FEE02E8A743200A1B5CF /* ThumbnailView.swift in Sources */,
 				546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */,
 				546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */,
 				546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */,

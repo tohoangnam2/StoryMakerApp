@@ -76,7 +76,8 @@ struct HomePreview: View {
                                     onOpenBackgroundEditor: {},
                                     isShowBackgroundPicker: .constant(false),
                                     showBackgroundEdit: .constant(false),
-                                    filteredImage: vm.finalImage
+                                    filteredImage: vm.finalImage,
+
                                 )
                 .environmentObject(vm)
             , snapshot: $snapshotImage, trigger: $triggerSnapshot)

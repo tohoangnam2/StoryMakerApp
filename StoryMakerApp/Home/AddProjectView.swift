@@ -16,6 +16,7 @@ struct AddProjectView: View {
     var isNewProject: Bool = false
     
     
+    
     @StateObject private var overlayVM = OverlayTextViewModel()
     @EnvironmentObject var vm: BackgroundEditorViewModel
     @Environment(\.dismiss) var dismiss
@@ -47,19 +48,21 @@ struct AddProjectView: View {
     @State var isExport = false
 
 
+    
     var body: some View {
         NavigationView {
             ZStack{
                 VStack{
                     HStack{
                         Button(action: {
-                            if project == nil{
-                                saveCurrentProject(includePreview: true)
-                            }else {
-                                saveCurrentProject(includePreview: false)
-                            }
-                            dismiss()
-                            
+                            saveCurrentProject(
+                                    project: project,
+                                    overlayVM: overlayVM,
+                                    vm: vm,
+                                    exportedImage: snapshotImage
+                                ) {
+                                    dismiss()
+                                }
                         }) {
                             Image("home_back")
                         }
@@ -75,36 +78,38 @@ struct AddProjectView: View {
                     Spacer()
                     ZStack (alignment: .bottom){
                     
-                    if isExport{
-                        SnapshotContainer(
-                            content: AddBackgroundsView(
-                                overlayVM: overlayVM,
-                                frame: frame,
-                                showTextField: $showTextField,
-                                isTextFieldFocused: $isTextFieldFocused,
-                                isSelected: $isSelected,
-                                isEditingText: $isEditingText,
-                                onAddTap: { isShowBackgroundPicker = true },
-                                onTapOutside: { resetEditState() },
-                                onOpenBackgroundEditor: { showBackgroundEdit = true },
-                                isShowBackgroundPicker: $isShowBackgroundPicker,
-                                showBackgroundEdit: $showBackgroundEdit,
-                                filteredImage: vm.finalImage
-                            )
-                            .environmentObject(vm),
-                            snapshot: $snapshotImage,
-                            trigger: $triggerSnapshot
-                        )
-                        .fixedSize()
-                        .opacity(0)
-                    }
+//                    if isExport{
+//                        SnapshotContainer(
+//                            content: AddBackgroundsView(
+//                                overlayVM: overlayVM,
+//                                frame: frame,
+//                                showTextField: $showTextField,
+//                                isTextFieldFocused: $isTextFieldFocused,
+//                                isSelected: $isSelected,
+//                                isEditingText: $isEditingText,
+//                                onAddTap: { isShowBackgroundPicker = true },
+//                                onTapOutside: { resetEditState() },
+//                                onOpenBackgroundEditor: { showBackgroundEdit = true },
+//                                isShowBackgroundPicker: $isShowBackgroundPicker,
+//                                showBackgroundEdit: $showBackgroundEdit,
+//                                filteredImage: vm.finalImage,
+//
+//                            )
+//                            .environmentObject(vm),
+//                            snapshot: $snapshotImage,
+//                            trigger: $triggerSnapshot,
+//
+//                        )
+//                        .fixedSize()
+//                        .opacity(0)
+//                    }
                         
                     Group {
                         if let project = vm.mainprojects.first(where: { $0.id == projectID })  {
                                 // mở lại project đã lưu
                                 AddBackgroundsView(
-                                    overlayVM: OverlayTextViewModel(overlays: project.textLayers),
-                                    frame: project.frame,
+                                    overlayVM: overlayVM,
+                                    frame: frame,
                                     showTextField: $showTextField,
                                     isTextFieldFocused: $isTextFieldFocused,
                                     isSelected: $isSelected,
@@ -114,9 +119,14 @@ struct AddProjectView: View {
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: nil
+                                    filteredImage: vm.finalImage
                                 )
                                 .environmentObject(vm)
+                                .onAppear {
+                                    self.project = project
+                                    overlayVM.overlays = project.textLayers
+                                    frame = project.frame
+                                }
                                 
                                 
                             } else {
@@ -429,6 +439,17 @@ struct AddProjectView: View {
                   }
             }
         }
+//        .onChange(of: snapshotImage) { newImage in
+//            if let img = newImage {
+//                // Khi snapshot đã có dữ liệu thì mới save
+//                saveCurrentProject(includePreview: true, exportedImage: img) {
+//                    dismiss()
+//                    isExport = false
+//                }
+//            }
+//        }
+
+
         .onChange(of: frame?.id) { _ in
             if selectedTab == 1 {
                 overlayVM.overlays.removeAll()
@@ -461,79 +482,42 @@ struct AddProjectView: View {
         isSelected = false
         overlayVM.deselectAll()
     }
-    
-    //save project
-//    func exitExport(completion: @escaping () -> Void)   {
-//        isExport = true
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//            triggerSnapshot = true
-//            exportingVM.isDone = true
-//            print("snapshotImage:\(snapshotImage)")
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                    if let image = snapshotImage {
-//                        if let data = image.jpegData(compressionQuality: 0.8),
-//                           let uiImage = UIImage(data: data, scale: UIScreen.main.scale) {
-//                            
-//                            let newProject = MainModel(
-//                                textLayers: overlayVM.overlays,
-//                                selectedFilter: vm.selectedFilter,
-//                                blur: vm.blur,
-//                                shadow: vm.shadow,
-//                                opacity: vm.opacity,
-//                                lightness: vm.lightness,
-//                                saturation: vm.saturation,
-//                                frame : frame,
-//                                frameID: frame?.id.uuidString,
-//                                previewImageData: data
-//                            )
-//                            
-//                            // Export giữ nguyên scale
-//                            exportingVM.startExporting(image: uiImage)
-//                            
-//                            vm.mainprojects.append(newProject)
-//                            ProjectStorage.saveProject(newProject, filename: "project_\(newProject.id).json")
-//                        }
-//                    }
-//
-//                }
-//                completion()
-//        }
-//    }
-        
-    func saveCurrentProject(includePreview: Bool) {
+//    func exportAndSave(completion: @escaping () -> Void) {
 //        isExport = true
 //        triggerSnapshot = true
-//        exportingVM.isDone = true
+//        exportingVM.isExporting = true
+//
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+//            if let img = snapshotImage {
+//                saveCurrentProject(includePreview: true, exportedImage: img) {
+//                    isExport = false
+//                    completion()   // chỉ gọi completion sau khi save xong
+//                }
+//            } else {
+//                completion()
+//            }
+//        }
+//    }
+
+
+    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,exportedImage: UIImage? = nil,completion: @escaping () -> Void) {
+        // Nếu chưa có project thì tạo mới
         var currentProject = project ?? MainModel(id: UUID())
 
-// Cập nhật lại dữ liệu mới nhất từ VM
-        currentProject.textLayers = overlayVM.overlays
-        currentProject.frame = frame
+        // Cập nhật dữ liệu từ VM
+        currentProject.textLayers     = overlayVM.overlays
+        currentProject.frame          = frame
         currentProject.selectedFilter = vm.selectedFilter
-        currentProject.blur = vm.blur
-        currentProject.shadow = vm.shadow
-        currentProject.opacity = vm.opacity
-        currentProject.lightness = vm.lightness
-        currentProject.saturation = vm.saturation
-//preview
-        if includePreview {
-            if let snapshot = snapshotImage {
-                currentProject.previewImageData = snapshot.jpegData(compressionQuality: 0.8)
-            } else if let final = vm.finalImage {
-                currentProject.previewImageData = final.jpegData(compressionQuality: 0.8)
-            }
-        }
+        currentProject.blur           = vm.blur
+        currentProject.shadow         = vm.shadow
+        currentProject.opacity        = vm.opacity
+        currentProject.lightness      = vm.lightness
+        currentProject.saturation     = vm.saturation
 
-
-//        if let data = currentProject.previewImageData {
-//            print("Preview có dữ liệu, size = \(data.count) bytes")
-//        } else {
-//            print("Preview = nil")
-//        }
-//        if let data = project?.previewImageData {
-//            print("Preview có dữ liệu, size = \(data.count) bytes")
-//        } else {
-//            print("Preview = nil")
+        // Nếu có preview image thì lưu
+//        if let image = exportedImage,
+//           let data = image.jpegData(compressionQuality: 0.8) {
+//            currentProject.previewImageData = data
 //        }
 
         // Lưu xuống Documents
@@ -541,17 +525,15 @@ struct AddProjectView: View {
         ProjectStorage.saveProject(currentProject, filename: filename)
         print(" Project saved: \(filename)")
 
-        // Cập nhật vào RAM (vm.mainprojects)
+        // Update vào RAM
         if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
             vm.mainprojects[index] = currentProject
         } else {
-            vm.mainprojects.append(currentProject)
+            vm.mainprojects.insert(currentProject, at: 0)
         }
-         
-        // Cập nhật lại biến project hiện tại
-         self.project = currentProject
-    }
 
+        completion()
+    }
 
     // Helper để tạo nút icon
 
@@ -594,6 +576,38 @@ struct SnapshotContainer<Content: View>: UIViewRepresentable {
         }
     }
 }
+//struct SnapshotContainer<Content: View>: UIViewRepresentable {
+//    let content: Content
+//    @Binding var snapshot: UIImage?
+//    @Binding var trigger: Bool
+//    
+//    func makeUIView(context: Context) -> UIView {
+//        let container = UIView()
+//        container.backgroundColor = .clear
+//        return container
+//    }
+//
+//    func updateUIView(_ uiView: UIView, context: Context) {
+//        if trigger {
+//            DispatchQueue.main.async {
+//                // Tạo hosting controller tạm thời
+//                let hosting = UIHostingController(rootView: content)
+//                hosting.view.frame = uiView.bounds
+//                hosting.view.backgroundColor = .clear
+//
+//                // Render ra UIImage
+//                let renderer = UIGraphicsImageRenderer(size: uiView.bounds.size)
+//                let image = renderer.image { _ in
+//                    hosting.view.drawHierarchy(in: uiView.bounds, afterScreenUpdates: true)
+//                }
+//
+//                snapshot = image
+//                trigger = false
+//            }
+//        }
+//    }
+//}
+
 
 
 
