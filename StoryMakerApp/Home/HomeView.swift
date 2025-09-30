@@ -51,17 +51,17 @@ struct HomeView: View {
                                 spacing: 16
                             ) {
                                 ForEach(vm.mainprojects, id: \.id) { project in
-                                    
-                                        
+                                    if project.frame != nil && !project.textLayers.isEmpty {
                                         NavigationLink(
                                             destination: AddProjectView(projectID: project.id)
                                                 .environmentObject(vm)
                                         ) {
                                             ThumbnailView(project: project)
-                                                .environmentObject(vm)
+                                                
                                         }
-                                    
+                                    }
                                 }
+
                             }
                             .padding(.horizontal)
                             

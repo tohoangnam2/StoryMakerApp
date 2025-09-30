@@ -63,8 +63,11 @@ struct AddBackgroundsView: View {
 
                                 vm.baseImage = uiImage
                                 vm.defaultPreview = uiImage
+                                
                                 vm.prepareAllPreviews()
-                                vm.resetAdjustments()
+                          
+//                                vm.resetAdjustments()
+                                
                                 vm.updatePreview()
                                 vm.isImageLoaded = true
 
@@ -202,7 +205,7 @@ struct AddBackgroundsView: View {
                                                                     Image("img_edit_x")
                                                                         .resizable()
                                                                         .scaledToFit()
-                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
                                                                         .padding(10 / overlay.currentScale)
                                                                         .contentShape(Rectangle())
                                                                     
@@ -214,7 +217,7 @@ struct AddBackgroundsView: View {
                                                                     Image("img_edit_copy")
                                                                         .resizable()
                                                                         .scaledToFit()
-                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
                                                                         .padding(10 / overlay.currentScale)
                                                                         .contentShape(Rectangle())
                                                                         .position(x: textGeo.size.width, y: 0)
@@ -229,7 +232,7 @@ struct AddBackgroundsView: View {
                                                                     Image("img_edit_xoay")
                                                                         .resizable()
                                                                         .scaledToFit()
-                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
                                                                         .padding(10 / overlay.currentScale)
                                                                         .contentShape(Rectangle())
                                                                         .position(x: 0, y: textGeo.size.height)
@@ -273,7 +276,7 @@ struct AddBackgroundsView: View {
                                                                     Image("img_edit_zoom")
                                                                         .resizable()
                                                                         .scaledToFit()
-                                                                        .frame(width: 30 / overlay.currentScale, height: 30 / overlay.currentScale)
+                                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
                                                                         .padding(10 / overlay.currentScale)
                                                                         .contentShape(Rectangle())
                                                                         .position(x: textGeo.size.width, y: textGeo.size.height)

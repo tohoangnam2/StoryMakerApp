@@ -15,7 +15,7 @@ struct MainModel: Identifiable, Codable {
     var textLayers: [OverlayTextModel] = []
     
     // Background
-    var selectedFilter: String? = nil
+    var filteredImageData: Data? = nil
     var blur: Double = 0
     var shadow: Double = 0
     var opacity: Double = 1
@@ -39,4 +39,20 @@ extension MainModel {
     var isNew: Bool {
         return previewImageData == nil
     }
+}
+extension MainModel {
+    var previewUIImage: UIImage? {
+        guard let data = previewImageData else { return nil }
+        return UIImage(data: data)
+    }
+    var filteredUIImage: UIImage? {
+        get {
+            guard let data = filteredImageData else { return nil }
+            return UIImage(data: data)
+        }
+        set {
+            filteredImageData = newValue?.jpegData(compressionQuality: 0.8)
+        }
+    }
+
 }

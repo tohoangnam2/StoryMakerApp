@@ -113,7 +113,7 @@ struct OverlayTextModel: Identifiable , Codable {
     var originalScale: CGFloat = 1.0
     var startCenter: CGPoint = .zero
     
-    
+    var buttonSize : CGFloat = 30
 
 }
 

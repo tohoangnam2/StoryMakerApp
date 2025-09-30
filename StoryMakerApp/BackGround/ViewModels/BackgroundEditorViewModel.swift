@@ -89,6 +89,7 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published  var isImageLoaded = false
     
     @Published var mainprojects: [MainModel] = []
+    
 
 
     
