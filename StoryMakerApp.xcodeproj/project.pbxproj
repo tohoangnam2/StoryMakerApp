@@ -41,6 +41,7 @@
 		546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */; };
 		546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */; };
 		54F4FEE02E8A743200A1B5CF /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4FEDF2E8A743200A1B5CF /* ThumbnailView.swift */; };
+		54F4FEE22E8CC56C00A1B5CF /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4FEE12E8CC56C00A1B5CF /* ProjectManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,7 @@
 		546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorView.swift; sourceTree = "<group>"; };
 		546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorViewModel.swift; sourceTree = "<group>"; };
 		54F4FEDF2E8A743200A1B5CF /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
+		54F4FEE12E8CC56C00A1B5CF /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManager.swift; sourceTree = "<group>"; };
 		BB94D9EE2E541CBD008F66EA /* StoryMakerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMakerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -175,6 +177,7 @@
 			children = (
 				543401102E83CF980047336A /* ProjectStorage.swift */,
 				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
+				54F4FEE12E8CC56C00A1B5CF /* ProjectManager.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -383,6 +386,7 @@
 				546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */,
 				546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */,
 				54F4FEE02E8A743200A1B5CF /* ThumbnailView.swift in Sources */,
+				54F4FEE22E8CC56C00A1B5CF /* ProjectManager.swift in Sources */,
 				546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */,
 				546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */,
 				546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */,
@@ -526,6 +530,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = StoryMakerApp/StoryMakerApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TBM2UMUR63;
@@ -553,6 +558,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = a.StoryMakerApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";

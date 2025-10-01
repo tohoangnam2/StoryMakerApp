@@ -98,7 +98,7 @@ struct OverlayTextModel: Identifiable , Codable {
     // Background
     var paddingBG: Double = 10
     var cornerRadiusBG: Double = 10
-    var opacityBG: Double = 0.2
+    var opacityBG: Double = 0
     var bgColor:  String = "#FFFFFF"
     
     // Shadow

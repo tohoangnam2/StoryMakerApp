@@ -15,7 +15,6 @@ struct MainModel: Identifiable, Codable {
     var textLayers: [OverlayTextModel] = []
     
     // Background
-    var filteredImageData: Data? = nil
     var blur: Double = 0
     var shadow: Double = 0
     var opacity: Double = 1
@@ -26,33 +25,32 @@ struct MainModel: Identifiable, Codable {
     var frame : Frame? = nil
     var frameID: String? = nil
     
-    // Preview
-    var previewImageData: Data? = nil // lưu UIImage dưới dạng Data nếu cần
+    // dữ liệu ảnh snapshot cuối cùng (preview)
+    var filteredImageData: Data?
+    
+    // computed property để hiển thị lại snapshot
+    var filteredUIImage: UIImage? {
+        if let data = filteredImageData {
+            return UIImage(data: data)
+        }
+        return nil
+    }
+    
+    var previewImage: UIImage?
+    
+    enum CodingKeys: String, CodingKey {
+            case id, textLayers, frame, blur, shadow, opacity, lightness, saturation, filteredImageData
+        }
     
     init(id: UUID = UUID()) {
             self.id = id
         }
 }
 
+//
+//extension MainModel {
+//    var isNew: Bool {
+//        return previewImageData == nil
+//    }
+//}
 
-extension MainModel {
-    var isNew: Bool {
-        return previewImageData == nil
-    }
-}
-extension MainModel {
-    var previewUIImage: UIImage? {
-        guard let data = previewImageData else { return nil }
-        return UIImage(data: data)
-    }
-    var filteredUIImage: UIImage? {
-        get {
-            guard let data = filteredImageData else { return nil }
-            return UIImage(data: data)
-        }
-        set {
-            filteredImageData = newValue?.jpegData(compressionQuality: 0.8)
-        }
-    }
-
-}

@@ -38,6 +38,7 @@ class OverlayTextViewModel: ObservableObject {
         
         var newOverlay = overlay
         newOverlay.id = UUID()
+        
         newOverlay.offset.width += 30
         newOverlay.offset.height += 30
         overlays.append(newOverlay)
@@ -54,8 +55,13 @@ class OverlayTextViewModel: ObservableObject {
 
     
     func selectOverlay(_ id: UUID) {
+        for index in overlays.indices {
+            overlays[index].isEditingText = true
+        }
         selectedOverlayID = id
         setEditingSelectedOverlay(false)
+
+        
     }
     
     func addOverlay(_ text: String) -> OverlayTextModel {

@@ -365,12 +365,12 @@ struct CustomSliderRowColor: View {
             HStack {
                 CustomUISlider(
                                 valueOpacity: $valueOpacity,
-                                minValue: 0.1,
+                                minValue: 0.3,
                                 maxValue: 1.0,
                                 trackColor: .gray,
                                 thumbColor: .red // màu thumb
                  )
-                            .frame(height: 25)
+                .frame(height: 25)
                 
                 Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
             }
@@ -396,7 +396,7 @@ struct CustomSliderRowBgOpacity: View {
             HStack {
                 CustomUISlider(
                                 valueOpacity: $valueOpacity,
-                                minValue: 0.1,
+                                minValue: 0,
                                 maxValue: 1,
                                 trackColor: .gray,
                                 thumbColor: .red // màu thumb

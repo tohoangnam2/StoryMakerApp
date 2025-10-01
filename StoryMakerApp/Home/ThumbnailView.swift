@@ -11,8 +11,9 @@ struct ThumbnailView: View {
     let project: MainModel
     @ObservedObject private var overlayVM: OverlayTextViewModel
     @FocusState private var isFocused: Bool
-    @EnvironmentObject var vm: BackgroundEditorViewModel
-    
+//    @EnvironmentObject var vm: BackgroundEditorViewModel
+    @EnvironmentObject var projectManager: ProjectManager
+
 
     init(project: MainModel) {
         self.project = project
@@ -45,6 +46,7 @@ struct ThumbnailView: View {
 
 
     var body: some View {
+        let projectVM = projectManager.editor(for: project)
             AddBackgroundsView(
                 overlayVM: overlayVM,
                 frame: project.frame,
@@ -59,7 +61,7 @@ struct ThumbnailView: View {
                 showBackgroundEdit: .constant(false),
                 filteredImage: project.filteredUIImage
             )
-            .environmentObject(vm)
+            .environmentObject(projectVM)
             .frame(width: 97, height: 207)
             .cornerRadius(8)
             .allowsHitTesting(false)
@@ -93,4 +95,5 @@ extension BackgroundEditorViewModel {
         // gán lại vào mảng
         mainprojects[index] = currentProject
     }
+    
 }
