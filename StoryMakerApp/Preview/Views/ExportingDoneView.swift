@@ -40,7 +40,7 @@ struct ExportingDoneView: View {
     
     
     //export
-    @State private var triggerSnapshot = false
+    @Binding var triggerSnapshot : Bool
     
     @EnvironmentObject var vm: BackgroundEditorViewModel
     

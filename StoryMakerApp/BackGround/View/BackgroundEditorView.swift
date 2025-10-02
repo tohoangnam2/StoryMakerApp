@@ -25,7 +25,7 @@ struct BackgroundEditorView: View {
     @Binding var showBackgroundEdit : Bool
     
     @Binding var isSelected : Bool
-
+     
 
     
     var body: some View {

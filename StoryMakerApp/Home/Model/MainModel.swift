@@ -7,9 +7,9 @@
 
 import SwiftUI
 
+
 struct MainModel: Identifiable, Codable {
     var id: UUID
-    
     
     // Text layers
     var textLayers: [OverlayTextModel] = []
@@ -22,35 +22,17 @@ struct MainModel: Identifiable, Codable {
     var saturation: Double = 1
     
     // Frame
-    var frame : Frame? = nil
+    var frame: Frame? = nil
     var frameID: String? = nil
     
-    // dữ liệu ảnh snapshot cuối cùng (preview)
-    var filteredImageData: Data?
-    
-    // computed property để hiển thị lại snapshot
-    var filteredUIImage: UIImage? {
-        if let data = filteredImageData {
-            return UIImage(data: data)
-        }
-        return nil
-    }
-    
-    var previewImage: UIImage?
+    var previewImage: UIImage? = nil
     
     enum CodingKeys: String, CodingKey {
-            case id, textLayers, frame, blur, shadow, opacity, lightness, saturation, filteredImageData
-        }
+        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation
+    }
     
     init(id: UUID = UUID()) {
-            self.id = id
-        }
+        self.id = id
+    }
 }
-
-//
-//extension MainModel {
-//    var isNew: Bool {
-//        return previewImageData == nil
-//    }
-//}
 

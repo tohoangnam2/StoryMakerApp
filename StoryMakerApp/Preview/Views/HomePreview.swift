@@ -41,13 +41,13 @@ struct HomePreview: View {
     
     //export
     @Binding  var snapshotImage: UIImage?
-    @State private var triggerSnapshot = false
-    
+    @Binding var triggerSnapshot : Bool
+
     @EnvironmentObject var vm: BackgroundEditorViewModel
 
     let filteredImage: UIImage?
 
-  
+    let project: MainModel?
 
     var body: some View {
         VStack {
@@ -100,8 +100,12 @@ struct HomePreview: View {
                 Button(action: {
                     triggerSnapshot = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        
                         if let image = snapshotImage {
-                            exportingVM.startExporting(image: image)
+                            
+                            if let project = project {
+                                exportingVM.startExporting(projectID: project.id, image: image)
+                            }
                         }
                     }
                 })
@@ -131,7 +135,7 @@ struct HomePreview: View {
                 onOpenBackgroundEditor: { showBackgroundEdit = true },
                 isShowBackgroundPicker: $isShowBackgroundPicker,
                 showBackgroundEdit: $showBackgroundEdit,
-                filteredImage: vm.finalImage, snapshotImage: snapshotImage!
+                triggerSnapshot: $triggerSnapshot, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
             )
             .environmentObject(vm)
         }

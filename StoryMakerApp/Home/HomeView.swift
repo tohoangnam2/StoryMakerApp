@@ -20,7 +20,7 @@ struct HomeView: View {
     ]
     
     @State private var selectedProjectID: UUID?
-    @StateObject var projectManager = ProjectManager()
+//    @StateObject var projectManager = ProjectManager()
     var body: some View {
         NavigationView{
             ZStack{
@@ -51,37 +51,25 @@ struct HomeView: View {
                                 spacing: 16
                             ) {
                                 ForEach(vm.mainprojects, id: \.id) { project in
-                                        NavigationLink(
-                                            destination: AddProjectView(projectID: project.id)
-                                                .environmentObject(vm)
-                                        ) {
-                                            if let preview = project.previewImage {
-                                                // Ưu tiên ảnh preview trong RAM
-                                                Image(uiImage: preview)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 97, height: 207)
-                                                    .cornerRadius(8)
-                                                    .clipped()
-                                                
-                                            }
-                                            else if let final = project.filteredUIImage {
-                                                // Nếu không có preview thì dùng ảnh decode từ Data
-                                                Image(uiImage: final)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 97, height: 207)
-                                                    .cornerRadius(8)
-                                                    .clipped()
-                                            } else {
-                                                // Nếu không có gì thì placeholder
-                                                Color.gray
-                                                    .frame(width: 97, height: 207)
-                                                    .cornerRadius(8)
-                                            }
-                                            
+                                    NavigationLink(
+                                        destination: AddProjectView(projectID: project.id)
+                                            .environmentObject(vm)
+                                    ) {
+                                        if let preview = project.previewImage {
+                                            // Ưu tiên ảnh preview trong RAM hoặc load từ file .jpg
+                                            Image(uiImage: preview)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 97, height: 207)
+                                                .cornerRadius(8)
+                                                .clipped()
+                                        } else {
+                                            // Nếu không có gì thì placeholder
+                                            Color.gray
+                                                .frame(width: 97, height: 207)
+                                                .cornerRadius(8)
                                         }
-                                    
+                                    }
                                 }
 
 
