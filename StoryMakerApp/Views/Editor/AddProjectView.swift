@@ -19,7 +19,7 @@ struct AddProjectView: View {
     
     @StateObject private var overlayVM = OverlayTextViewModel()
     @EnvironmentObject var vm: BackgroundEditorViewModel
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int? = nil
     @State  var isShowBackgroundPicker = false
     @State  var showBackgroundEdit = false
@@ -56,15 +56,18 @@ struct AddProjectView: View {
                 VStack{
                     HStack{
                         Button(action: {
-                            exitExport {
-                                saveCurrentProject(project: project,
-                                                   overlayVM: overlayVM,
-                                                   vm: vm) {
-                                    print("x : \(snapshotImage)")
-                                    dismiss()
-
-                                }
-                            }
+//                            exitExport {
+//                                saveCurrentProject(project: project,
+//                                                   overlayVM: overlayVM,
+//                                                   vm: vm) {
+//                                    print("x : \(snapshotImage)")
+//                                    presentationMode.wrappedValue.dismiss()
+//
+//                                }
+//                            }
+                            backAndSave(project: project, overlayVM: overlayVM,vm:vm) {
+                                   presentationMode.wrappedValue.dismiss()
+                               }
                         }) {
                             Image("home_back")
                         }
@@ -73,22 +76,6 @@ struct AddProjectView: View {
                         Button {
                             resetEditState()
                             showPreview = true
-                            exitExport {
-                                var currentProject = project ?? MainModel(id: UUID())
-                                currentProject.previewImage = snapshotImage
-
-                                if !vm.mainprojects.contains(where: { $0.id == currentProject.id }) {
-                                    vm.mainprojects.append(currentProject)
-                                } else if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-                                    vm.mainprojects[index].previewImage = snapshotImage
-                                }
-
-                                saveCurrentProject(project: currentProject,
-                                                   overlayVM: overlayVM,
-                                                   vm: vm) {
-                                    print(" Saved project \(currentProject.id)")
-                                }
-                            }
                         } label: {
                             Image("home_share")
                         }
@@ -117,14 +104,8 @@ struct AddProjectView: View {
                                 .environmentObject(vm),
                                 snapshot: $snapshotImage,
                                 trigger: $triggerSnapshot,
-                                
-                                
-                                
                             )
                         }
-                      
-                        
-                        
                     Group {
                         if let project = vm.mainprojects.first(where: { $0.id == projectID })  {
                                 // mở lại project đã lưu
@@ -147,12 +128,9 @@ struct AddProjectView: View {
                                     self.project = project
                                     overlayVM.overlays = project.textLayers
                                     frame = project.frame
-                                   
                                 }
                                 
-                                
                             } else {
-                                // fallback khi chưa có project
                                 AddBackgroundsView(
                                     overlayVM: overlayVM,
                                     frame: frame,
@@ -160,7 +138,10 @@ struct AddProjectView: View {
                                     isTextFieldFocused: $isTextFieldFocused,
                                     isSelected: $isSelected,
                                     isEditingText: $isEditingText,
-                                    onAddTap: { isShowBackgroundPicker = true },
+                                    onAddTap: {
+                                        isShowBackgroundPicker = true
+                                        let newProject = vm.createEmptyProject()
+                                        self.project = newProject},
                                     onTapOutside: { resetEditState() },
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
@@ -213,8 +194,6 @@ struct AddProjectView: View {
                                         .background(Color.gray.opacity(0.2).cornerRadius(70))
 
                                     }
-        //                            .background(Color.white)
-
                                     ZStack {
                                         switch selectedEditText {
                                         case .fontSize:
@@ -292,10 +271,7 @@ struct AddProjectView: View {
                                             }
                                             .padding(.top)
                                             .background(ignoresSafeAreaEdges: .bottom)
-                                        
-                                          
-                                        
-                                       
+                                                                                
                                     } else {
                                         ScrollView(.horizontal,showsIndicators: false){
                                             HStack (spacing: 16) {
@@ -312,7 +288,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .fontFamily
-
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_size")
@@ -323,7 +298,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .colorSolid
-
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_color")
@@ -334,7 +308,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .gradient
-
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_gradient")
@@ -345,7 +318,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .stroke
-
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_stroke")
@@ -356,7 +328,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .align
-
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_align")
@@ -367,7 +338,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .shadow
-
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_shadow")
@@ -378,7 +348,6 @@ struct AddProjectView: View {
                                                 Spacer()
                                                 Button(action: {
                                                     selectedEditText = .background
-                                                    
                                                 }) {
                                                     VStack {
                                                         Image("img_edit1_bg")
@@ -391,10 +360,8 @@ struct AddProjectView: View {
                                             .padding(.top)
                                             .background(ignoresSafeAreaEdges: .bottom)
                                             .background(.white)
-
                                         }
                                         .background(.white)
-                                        
                                     }
                                 }
                                 else {
@@ -405,7 +372,6 @@ struct AddProjectView: View {
                                                     .opacity(0)
                                             }
                                             Spacer()
-                                            
                                             Text("Text Edit")
                                                 .font(.system(size: 16, weight: .medium, design: .default))
                                             Spacer()
@@ -422,9 +388,6 @@ struct AddProjectView: View {
                                         .padding(.top, 8)
                                         .padding(.horizontal,20)
                                         .background(.white)
-
-                                    
-                                   
                                 }
                                 
                             }
@@ -432,36 +395,97 @@ struct AddProjectView: View {
 
                     }
                 }
+                .onDisappear {
+                    if vm.finalImage != nil {
+                        vm.updatePreview()
+                        print("Saved onDisappear")
+                    } else {
+                        print(" baseImage nil, không thể snapshot")
+                    }
+                }
+//                .onAppear {
+//                    if let loaded = ProjectStorage.loadProjectForEditing(id: projectID?,
+//                                                                         vm: vm,
+//                                                                         overlayVM: overlayVM) {
+//                        self.project = loaded
+//                        self.frame   = loaded.frame
+//                    }
+//                }
+
+
             }
         }
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView(isShowBackgroundPicker: $isShowBackgroundPicker) { picked in
-                if let newFrame = picked{
+                if let newFrame = picked {
                     self.frame = newFrame
-                }
-                else {
-
                 }
                 if vm.currentFrameID != picked?.backgroundID {
                     vm.currentFrameID = picked?.backgroundID
 
-                      overlayVM.overlays.removeAll()
-                      overlayVM.addOverlay("")
-                      vm.finalImage = nil
-                      vm.opacity = 1.0
-                      vm.selectedFilterImage = nil
-                      vm.selectedFilter = nil
-                      vm.previewImages.removeAll()
+                    overlayVM.overlays.removeAll()
+                    overlayVM.addOverlay("")
+                    vm.finalImage = nil
+                    vm.opacity = 1.0
+                    vm.selectedFilterImage = nil
+                    vm.selectedFilter = nil
+                    vm.previewImages.removeAll()
 
                     if let url = picked?.backgroundURL,
-                         let data = try? Data(contentsOf: url),
-                         let uiImage = UIImage(data: data) {
-                          vm.baseImage = uiImage
-                      }
-                  }
-            }
-        }
+                       let data = try? Data(contentsOf: url),
+                       let uiImage = UIImage(data: data) {
+                        
+                        // Gán baseImage
+                        vm.baseImage = uiImage
+                        vm.defaultPreview = uiImage
 
+                        //  Lưu project ngay lần đầu chọn background
+                        if var current = self.project {
+                            current.frame = picked
+
+                            // 1. Lưu ảnh gốc
+                            let folderURL = ProjectStorage.projectFolder(for: current.id)
+                            let originalURL = folderURL.appendingPathComponent("original.jpg")
+                            try? data.write(to: originalURL)
+
+                            // 2. Lưu JSON + preview (chưa có edit thì preview = ảnh gốc)
+                            current.previewImage = uiImage
+                            ProjectStorage.saveProject(current, previewImage: uiImage)
+
+                            // 3. Update vào RAM
+                            if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
+                                vm.mainprojects[index] = current
+                            } else {
+                                vm.mainprojects.insert(current, at: 0)
+                            }
+                            self.project = current
+                        }
+                    }
+                }
+            }
+//            BackGroundView(isShowBackgroundPicker: $isShowBackgroundPicker) { picked in
+//                if let picked = picked, let url = picked.backgroundURL,
+//                   let data = try? Data(contentsOf: url),
+//                   let uiImage = UIImage(data: data) {
+//
+//                    // Gán frame + baseImage
+//                    self.frame = picked
+//                    vm.baseImage = uiImage
+//                    vm.defaultPreview = uiImage
+//
+//                    // Lưu JSON + ảnh gốc ngay lần đầu chọn
+//                    if var current = self.project {
+//                        current.frame = picked
+//                        ProjectStorage.saveProject(current, previewImage: uiImage)
+//                        if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
+//                            vm.mainprojects[index] = current
+//                        }
+//                        self.project = current
+//                    }
+//                }
+//            }
+
+        }
         .onChange(of: frame?.id) { _ in
             if selectedTab == 1 {
                 overlayVM.overlays.removeAll()
@@ -469,6 +493,19 @@ struct AddProjectView: View {
                 showTextField = false
             }
         }
+//        .onAppear{
+//            if let project = self.project {
+//                let folderURL = ProjectStorage.projectFolder(for: project.id)
+//                let originalURL = folderURL.appendingPathComponent("original.jpg")
+//                if let data = try? Data(contentsOf: originalURL),
+//                   let uiImage = UIImage(data: data) {
+//                    vm.baseImage = uiImage
+//                    vm.defaultPreview = uiImage
+//                    vm.isImageLoaded = true
+//                }
+//            }
+//
+//        }
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
@@ -484,24 +521,6 @@ struct AddProjectView: View {
                           showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, filteredImage: vm.finalImage, project: project)
                           .environmentObject(vm)
         }
-
-//        .fullScreenCover(isPresented: $exportingVM.isDone) {
-//            ExportingDoneView(
-//                exportingVM: exportingVM, overlayVM: overlayVM,
-//                frame: frame,
-//                showTextField: $showTextField,
-//                isTextFieldFocused: $isTextFieldFocused,
-//                isSelected: $isSelected,
-//                isEditingText: $isEditingText,
-//                onAddTap: { isShowBackgroundPicker = true },
-//                onTapOutside: { },
-//                onOpenBackgroundEditor: { showBackgroundEdit = true },
-//                isShowBackgroundPicker: $isShowBackgroundPicker,
-//                showBackgroundEdit: $showBackgroundEdit,
-//                triggerSnapshot: $triggerSnapshot, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
-//            )
-//            .environmentObject(vm)
-//        }
     }
     
     //func
@@ -512,58 +531,18 @@ struct AddProjectView: View {
         isSelected = false
         overlayVM.deselectAll()
     }
-//    func exitExport(completion: @escaping () -> Void)   {
-//            isExport = true
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//            resetEditState()
-//
-//            showPreview = true
-//            triggerSnapshot = true
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//            print("snapshotImage:\(snapshotImage)")
-//            if let image = snapshotImage {
-//                if let data = image.jpegData(compressionQuality: 0.8),
-//                   let uiImage = UIImage(data: data, scale: UIScreen.main.scale) {
-//                    // Export giữ nguyên scale
-//                    exportingVM.quickExport(image: uiImage)
-//                }
-//
-//        }
-//        }
-//            completion()
-//
-//        }
-//
-//        }
-//    func exitExport(completion: @escaping () -> Void) {
-//        isExport = true
-//        resetEditState()
-//        showPreview = true
-//        triggerSnapshot = true
-//
-//        // Chờ snapshot render xong
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-//            if let snap = snapshotImage {
-//                if let index = vm.mainprojects.firstIndex(where: { $0.id == project?.id }) {
-//                    vm.mainprojects[index].previewImage = snap
-//                    
-//                    vm.mainprojects[index].filteredImageData = snap.jpegData(compressionQuality: 0.8)
-//                }
-//            }
-//
-//            completion()
-//        }
-//    }
+
     func exitExport(completion: @escaping () -> Void) {
         isExport = true
         resetEditState()
-//        triggerSnapshot = true
+        triggerSnapshot = true
+//        exportingVM.isDone = true
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             if let snap = snapshotImage,
                let index = vm.mainprojects.firstIndex(where: { $0.id == project?.id }) {
                 vm.mainprojects[index].previewImage = snap
-                exportingVM.quickExport(projectID: vm.mainprojects[index].id, image: snap)
+//                exportingVM.quickExport(projectID: vm.mainprojects[index].id, image: snap)
                 print(" Snapshot captured: \(snap)")
             } else {
                 print(" Snapshot still nil")
@@ -572,12 +551,9 @@ struct AddProjectView: View {
         }
     }
 
-
-
     func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-        
         var currentProject = project ?? MainModel(id: UUID())
-        
+
         // Cập nhật dữ liệu từ VM
         currentProject.textLayers = overlayVM.overlays
         currentProject.frame      = frame
@@ -586,69 +562,81 @@ struct AddProjectView: View {
         currentProject.opacity    = vm.opacity
         currentProject.lightness  = vm.lightness
         currentProject.saturation = vm.saturation
-        
-        // Lấy previewImage hiện tại (nếu có) để lưu kèm
-        let preview = currentProject.previewImage
-        
-        // Lưu xuống Documents (folder riêng cho project)
-        ProjectStorage.saveProject(currentProject, previewImage: preview)
-        
+
+        // Lấy previewImage hiện tại
+        if let filtered = vm.finalImage {
+            currentProject.previewImage = filtered
+        } else if let snap = snapshotImage {
+            currentProject.previewImage = snap
+        }
+
+
+        // lưu docs
+        ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage)
+
         // Update vào RAM
         if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
             vm.mainprojects[index] = currentProject
         } else {
             vm.mainprojects.insert(currentProject, at: 0)
         }
-        
+
         completion()
     }
 
+    func backAndSave(project: MainModel?,
+                     overlayVM: OverlayTextViewModel,
+                     vm: BackgroundEditorViewModel,
+                     completion: @escaping () -> Void) {
+        resetEditState()
+        triggerSnapshot = true
 
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            if let snap = snapshotImage {
+                var current = project ?? MainModel(id: UUID())
 
-    
+                // cập nhật dữ liệu từ VM
+                current.textLayers = overlayVM.overlays
+                current.frame      = frame
+                current.blur       = vm.blur
+                current.shadow     = vm.shadow
+                current.opacity    = vm.opacity
+                current.lightness  = vm.lightness
+                current.saturation = vm.saturation
 
-    
-//    func saveCurrentProject(project: MainModel?,
-//                            overlayVM: OverlayTextViewModel,
-//                            vm: BackgroundEditorViewModel,
-//                            exportedImage: UIImage?,
-//                            completion: @escaping () -> Void) {
-//        
-//        var currentProject = project ?? MainModel(id: UUID())
-//        
-//        // Cập nhật dữ liệu từ VM
-//        currentProject.textLayers = overlayVM.overlays
-//        currentProject.frame      = frame
-//
-//        currentProject.blur       = vm.blur
-//        currentProject.shadow     = vm.shadow
-//        currentProject.opacity    = vm.opacity
-//        currentProject.lightness  = vm.lightness
-//        currentProject.saturation = vm.saturation
-//        
-//        // Chỉ cần dùng snapshot đã có
-//        if let image = exportedImage,
-//           let data = image.jpegData(compressionQuality: 0.8) {
-//            currentProject.filteredImageData = data
-//        }
-//        
-//        // Lưu xuống Documents
-//        let filename = "project_\(currentProject.id).json"
-//        ProjectStorage.saveProject(currentProject, filename: filename)
-//        print(" Project saved: \(filename)")
-//        
-//        // Update vào RAM
-//        if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-//            vm.mainprojects[index] = currentProject
-//        } else {
-//            vm.mainprojects.insert(currentProject, at: 0)
-//        }
-//        
-//        completion()
-//    }
+                // lưu preview = snapshot (ảnh edit cuối cùng)
+                current.previewImage = snap
 
+                // 1. Lưu JSON
+                // 2. Lưu preview.jpg = snap
+                ProjectStorage.saveProject(current, previewImage: snap)
 
+                // 3. Giữ origin.jpg nếu chưa có (chỉ lưu lần đầu khi chọn background)
+                let folderURL = ProjectStorage.projectFolder(for: current.id)
+                let originURL = folderURL.appendingPathComponent("original.jpg")
+                if !FileManager.default.fileExists(atPath: originURL.path),
+                   let base = vm.baseImage,
+                   let data = base.jpegData(compressionQuality: 0.9) {
+                    try? data.write(to: originURL)
+                }
 
+                
+                
+                
+                // Update vào RAM
+                if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
+                    vm.mainprojects[index] = current
+                } else {
+                    vm.mainprojects.insert(current, at: 0)
+                }
+
+                print(" Back saved project \(current.id)")
+            } else {
+                print(" Snapshot nil khi back")
+            }
+            completion()
+        }
+    }
 
     // Helper để tạo nút icon
 
@@ -687,49 +675,10 @@ struct SnapshotContainer<Content: View>: UIViewRepresentable {
                 }
                 snapshot = image
                 trigger = false
-//                completion?(image)   // báo ngược ra ngoài
             }
         }
     }
 }
-//struct SnapshotContainer<Content: View>: UIViewRepresentable {
-//    let content: Content
-//    @Binding var snapshot: UIImage?
-//    @Binding var trigger: Bool
-//    
-//    func makeUIView(context: Context) -> UIView {
-//        let container = UIView()
-//        container.backgroundColor = .clear
-//        return container
-//    }
-//
-//    func updateUIView(_ uiView: UIView, context: Context) {
-//        if trigger {
-//            DispatchQueue.main.async {
-//                // Tạo hosting controller tạm thời
-//                let hosting = UIHostingController(rootView: content)
-//                hosting.view.frame = uiView.bounds
-//                hosting.view.backgroundColor = .clear
-//
-//                // Render ra UIImage
-//                let renderer = UIGraphicsImageRenderer(size: uiView.bounds.size)
-//                let image = renderer.image { _ in
-//                    hosting.view.drawHierarchy(in: uiView.bounds, afterScreenUpdates: true)
-//                }
-//
-//                snapshot = image
-//                trigger = false
-//            }
-//        }
-//    }
-//}
-
-
-
-
-
-
-
 
 // MARK: EXTENSION
 
@@ -798,52 +747,52 @@ extension Text {
 //auto size
 
 
-// MARK: - Wrapper UIViewController
-struct AutoSizingSheet<Content: View>: UIViewControllerRepresentable {
-    @Binding var isPresented: Bool
-    let content: Content
-    
-    init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
-        self._isPresented = isPresented
-        self.content = content()
-        
-    }
-    
-    func makeUIViewController(context: Context) -> UIViewController {
-        return UIViewController()
-    }
-    
-    func updateUIViewController(_ vc: UIViewController, context: Context) {
-        if isPresented {
-            let hosting = UIHostingController(rootView: content)
-            hosting.view.backgroundColor = .clear
-            
-            // Wrap trong UINavigationController để dùng .preferredContentSize
-            let nav = UINavigationController(rootViewController: hosting)
-            nav.modalPresentationStyle = .formSheet
-            
-            // Tính height theo nội dung SwiftUI
-            hosting.view.layoutIfNeeded()
-            let targetSize = hosting.sizeThatFits(in: UIScreen.main.bounds.size)
-            hosting.preferredContentSize = targetSize
-            
-            vc.present(nav, animated: true)
-        } else {
-            vc.presentedViewController?.dismiss(animated: true)
-        }
-    }
-}
-
-struct PendingExportState {
-    var textLayers: [OverlayTextModel]
-    var selectedFilter: String?
-    var blur: Double
-    var shadow: Double
-    var opacity: Double
-    var lightness: Double
-    var saturation: Double
-    var frameID: String?
-}
+//// MARK: - Wrapper UIViewController
+//struct AutoSizingSheet<Content: View>: UIViewControllerRepresentable {
+//    @Binding var isPresented: Bool
+//    let content: Content
+//    
+//    init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
+//        self._isPresented = isPresented
+//        self.content = content()
+//        
+//    }
+//    
+//    func makeUIViewController(context: Context) -> UIViewController {
+//        return UIViewController()
+//    }
+//    
+//    func updateUIViewController(_ vc: UIViewController, context: Context) {
+//        if isPresented {
+//            let hosting = UIHostingController(rootView: content)
+//            hosting.view.backgroundColor = .clear
+//            
+//            // Wrap trong UINavigationController để dùng .preferredContentSize
+//            let nav = UINavigationController(rootViewController: hosting)
+//            nav.modalPresentationStyle = .formSheet
+//            
+//            // Tính height theo nội dung SwiftUI
+//            hosting.view.layoutIfNeeded()
+//            let targetSize = hosting.sizeThatFits(in: UIScreen.main.bounds.size)
+//            hosting.preferredContentSize = targetSize
+//            
+//            vc.present(nav, animated: true)
+//        } else {
+//            vc.presentedViewController?.dismiss(animated: true)
+//        }
+//    }
+//}
+//
+//struct PendingExportState {
+//    var textLayers: [OverlayTextModel]
+//    var selectedFilter: String?
+//    var blur: Double
+//    var shadow: Double
+//    var opacity: Double
+//    var lightness: Double
+//    var saturation: Double
+//    var frameID: String?
+//}
 
 
 

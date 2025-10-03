@@ -69,10 +69,13 @@ extension OnboardingView {
                             .font(.system(size: 28))
                             .fontWeight(.bold)
                             .foregroundColor(Color.bgSplashBtn)
-                        Text("More than 1000 Template with many topic gkugui")
+                        Text("More than 1000 Template with many topic")
                             .font(.system(size: 18))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.bgSplashBtn)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 75)
                     }
                     VStack(spacing:19){
                         Button(action: {
@@ -113,7 +116,7 @@ extension OnboardingView {
                 
                 VStack(spacing: 45) {
                     VStack(spacing: 7) {
-                        Text("Template")
+                        Text("Effect & Filter")
                             .font(.system(size: 28))
                             .fontWeight(.bold)
                             .foregroundColor(Color.bgSplashBtn)
@@ -121,6 +124,9 @@ extension OnboardingView {
                             .font(.system(size: 18))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.bgSplashBtn)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 75)
                     }
                     VStack(spacing:19){
                         Button(action: {
@@ -153,16 +159,34 @@ extension OnboardingView {
     
     private var threeOnboarding: some View {
         VStack{
-            Image("bg_onb_3")
-                .resizable()
-                .edgesIgnoringSafeArea(.all)
-                .frame(height: 556)
+            ZStack {
+                Image("bg_onb_3")
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+
+                ZStack {
+                    Image("bg_onb_3_1")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .background(
+                            Image("bg_onb_bg_3")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 250, height: 250)
+                        )
+                        .offset(y: -16)
+                        .offset(x: 13)
+                   
+                }
+            }
             VStack {
                 Spacer()
                 
                 VStack(spacing: 45) {
                     VStack(spacing: 7) {
-                        Text("Template")
+                        Text("Text Art")
                             .font(.system(size: 28))
                             .fontWeight(.bold)
                             .foregroundColor(Color.bgSplashBtn)
@@ -170,8 +194,11 @@ extension OnboardingView {
                             .font(.system(size: 18))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.bgSplashBtn)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 75)
                     }
-                    VStack(spacing:19){
+                    VStack(){
                         Button(action: {
                             self.onboardingState += 1
 
@@ -186,13 +213,15 @@ extension OnboardingView {
                             .font(.footnote)
                             .foregroundColor(Color.bgSplashBtn)
                     }
+                    .padding(.bottom,10)
+
                     
                 }
                 .frame(maxWidth: .infinity)
                 .background(
                     TopCurvedShape()
                         .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -4) // drop shadow
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -4)
                         .frame(height: 332)
                     
                 )
@@ -211,7 +240,7 @@ extension OnboardingView {
                 
                 VStack(spacing: 45) {
                     VStack(spacing: 7) {
-                        Text("Template")
+                        Text("Sticker & Shape")
                             .font(.system(size: 28))
                             .fontWeight(.bold)
                             .foregroundColor(Color.bgSplashBtn)
@@ -219,6 +248,9 @@ extension OnboardingView {
                             .font(.system(size: 18))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.bgSplashBtn)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 75)
                     }
                     VStack(spacing:19){
                         Button(action: {

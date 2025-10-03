@@ -18,11 +18,8 @@ struct SplashView: View {
                                startPoint: .topLeading,
                                endPoint: .bottomTrailing)
                 .edgesIgnoringSafeArea(.all)
-                
-                
                 VStack(spacing:232) {
                     Spacer()
-                    
                     VStack(spacing: 28){
                         Image("img_splash")
                             .frame(width: 80,height: 75)
@@ -34,7 +31,6 @@ struct SplashView: View {
                                 .font(.system(size: 15, weight: .regular, design: .default))
                                 .foregroundStyle(.white)
                         }
-                        
                     }
                     VStack(spacing:19){
                         NavigationLink {
@@ -49,23 +45,13 @@ struct SplashView: View {
                                 .frame(width: 258,height: 47)
                                 .background(Color.white.cornerRadius(57))
                         }
-                        
-                        
                         Text("Terms of Use  ·  Privacy Policy")
                             .font(.system(size: 12, weight: .medium, design: .default))
                             .foregroundStyle(.white)
                     }
-                    
-                    
                 }
-                
-                
             }
         }
         
     }
-}
-
-#Preview {
-    SplashView()
 }

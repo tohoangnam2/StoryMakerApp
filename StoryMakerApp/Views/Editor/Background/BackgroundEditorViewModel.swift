@@ -97,26 +97,33 @@ class BackgroundEditorViewModel: ObservableObject {
 
     //func edit brghtness
     
-    //  Lưu filter riêng cho từng bg (key = frame.id)
-      private var adjustments: [String: (opacity: Double, lightness: Double, saturation: Double, blur: Double, shadow: Double)] = [:]
 
-      func applyAdjustments(for bgID: String) {
-          if let saved = adjustments[bgID] {
-              // load lại chỉnh sửa cũ
-              opacity = saved.opacity
-              lightness = saved.lightness
-              saturation = saved.saturation
-              blur = saved.blur
-              shadow = saved.shadow
-          } else {
-              // nếu chưa có → set default
-              resetAdjustments()
-          }
-      }
+    
+    func createEmptyProject() -> MainModel {
+           let newProject = MainModel(id: UUID())
+           
+           ProjectStorage.saveProject(newProject, previewImage: nil)
+           self.mainprojects.insert(newProject, at: 0)
+           return newProject
+       }
 
-      func saveAdjustments(for bgID: String) {
-          adjustments[bgID] = (opacity, lightness, saturation, blur, shadow)
-      }
+//      func applyAdjustments(for bgID: String) {
+//          if let saved = adjustments[bgID] {
+//              // load lại chỉnh sửa cũ
+//              opacity = saved.opacity
+//              lightness = saved.lightness
+//              saturation = saved.saturation
+//              blur = saved.blur
+//              shadow = saved.shadow
+//          } else {
+//              // nếu chưa có → set default
+//              resetAdjustments()
+//          }
+//      }
+//
+//      func saveAdjustments(for bgID: String) {
+//          adjustments[bgID] = (opacity, lightness, saturation, blur, shadow)
+//      }
 
       func resetAdjustments() {
           opacity = 1

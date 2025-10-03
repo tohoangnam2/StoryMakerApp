@@ -126,16 +126,7 @@ extension BackgroundItem {
         self.baseImage = baseImage?.jpegData(compressionQuality: 0.8)
     }
 }
-//extension Frame {
-//    init(category: String, thumb: String, background: String, feature: Int, updated: Double) {
-//        self.id = UUID()
-//        self.category = category
-//        self.thumb = thumb
-//        self.background = background
-//        self.feature = feature
-//        self.updated = updated
-//    }
-//}
+
 
 
 

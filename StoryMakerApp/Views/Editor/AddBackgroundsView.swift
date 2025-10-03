@@ -72,6 +72,17 @@ struct AddBackgroundsView: View {
                                 vm.isImageLoaded = true
 
                             }
+                            
+//                            .onAppear {
+//                                if let data = try? Data(contentsOf: url),
+//                                   let uiImage = UIImage(data: data) {
+//                                    vm.baseImage = uiImage
+//                                    vm.defaultPreview = uiImage
+//                                    vm.prepareAllPreviews()
+//                                    vm.updatePreview(projectID: project.id)
+//                                    vm.isImageLoaded = true
+//                                }
+//                            }
                             .overlay(
                                 Group {
                                     if let filtered = filteredImage {
@@ -366,12 +377,14 @@ struct AddBackgroundsView: View {
                 else {
                     Color.colHomeBg
                     VStack(spacing: 16){
-                        Button(action: onAddTap){
+                        Button(action: onAddTap)
+                        {
                             Image("home_add")
                                 .frame(width: 50,height: 50)
                         }
                         Text("Tap to add Background")
                             .font(.system(size: 16, weight: .regular, design: .default))
+                        
                     }
                 }
             }

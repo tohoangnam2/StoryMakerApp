@@ -99,23 +99,33 @@ struct HomePreview: View {
 
                 Button(action: {
                     triggerSnapshot = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         if let image = snapshotImage {
-                            
-                            if let project = project {
-                                exportingVM.startExporting(projectID: project.id, image: image)
+                            // Nếu chưa có project thì tạo mới
+                            var currentProject = project ?? MainModel(id: UUID())
+                            currentProject.previewImage = image
+
+                            // Update RAM
+                            if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
+                                vm.mainprojects[index] = currentProject
+                            } else {
+                                vm.mainprojects.insert(currentProject, at: 0)
                             }
+                                // Export JPG ra thư mục + Photos
+                                exportingVM.startExporting(projectID: currentProject.id, image: image)
+                            
+                        } else {
+                            print(" Snapshot chưa kịp tạo")
                         }
                     }
-                })
-                {
+                }) {
                     HStack {
                         Text("Export Photo")
                             .foregroundColor(.white)
                         Image("ic_right")
                     }
                 }
+
             }
             .padding(.horizontal, 80)
         }

@@ -94,14 +94,16 @@ struct HomeView: View {
             }
         }
 //        .onAppear {
-//            vm.mainprojects = ProjectStorage.loadAllProjects()
+//            let projects = ProjectStorage.loadAllProjects()
+//            print(" Reloaded projects: \(projects.count)")
+//            projects.forEach { print("   id: \($0.id)") }
+//            vm.mainprojects = projects
 //        }
         .onAppear {
             let projects = ProjectStorage.loadAllProjects()
-            print(" Reloaded projects: \(projects.count)")
-            projects.forEach { print("   id: \($0.id)") }
             vm.mainprojects = projects
         }
+
 
         .navigationBarBackButtonHidden(true)
         
@@ -129,25 +131,34 @@ struct HomeView: View {
         }
     }
     static func loadAllProjects() -> [MainModel] {
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        var loaded: [MainModel] = []
+
         do {
-            let files = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
-            let projectFiles = files.filter { $0.lastPathComponent.hasPrefix("project_") && $0.pathExtension == "json" }
-            
-            return projectFiles.compactMap { fileURL in
-                do {
-                    let data = try Data(contentsOf: fileURL)
-                    return try JSONDecoder().decode(MainModel.self, from: data)
-                } catch {
-                    print("Failed to load \(fileURL): \(error)")
-                    return nil
+            let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+            for folder in folders where folder.lastPathComponent.hasPrefix("project_") {
+                let jsonURL = folder.appendingPathComponent("\(folder.lastPathComponent).json")
+                if FileManager.default.fileExists(atPath: jsonURL.path),
+                   let data = try? Data(contentsOf: jsonURL),
+                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
+                    // load preview.jpg nếu có
+                    let previewURL = folder.appendingPathComponent("\(folder.lastPathComponent).jpg")
+                    if let imgData = try? Data(contentsOf: previewURL),
+                       let uiImage = UIImage(data: imgData) {
+                        var proj = project
+                        proj.previewImage = uiImage
+                        loaded.append(proj)
+                    } else {
+                        loaded.append(project)
+                    }
                 }
             }
         } catch {
-            print("Failed to list directory: \(error)")
-            return []
+            print("Failed to list projects: \(error)")
         }
+        return loaded
     }
+
 
 
 

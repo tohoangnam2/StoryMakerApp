@@ -104,6 +104,7 @@ struct ProjectStorage {
         }
     }
     
+    
     /// Load tất cả project từ Documents
     static func loadAllProjects() -> [MainModel] {
         let documentsURL = getDocumentsDirectory()
@@ -147,7 +148,7 @@ struct ProjectStorage {
             }
             return project
         } catch {
-            print("❌ Failed to load project: \(error)")
+            print(" Failed to load project: \(error)")
             return nil
         }
     }
@@ -187,3 +188,45 @@ extension OverlayTextViewModel {
 //        return self.backgrounds.first { $0.id == id }
 //    }
 //}
+extension ProjectStorage {
+    static func loadProjectForEditing(id: UUID,
+                                      vm: BackgroundEditorViewModel,
+                                      overlayVM: OverlayTextViewModel) -> MainModel? {
+        let folderURL = projectFolder(for: id)
+        let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+
+        do {
+            let data = try Data(contentsOf: jsonURL)
+            var project = try JSONDecoder().decode(MainModel.self, from: data)
+
+            // Load preview.jpg (ảnh edit cuối cùng)
+            let previewURL = folderURL.appendingPathComponent("preview.jpg")
+            if let imgData = try? Data(contentsOf: previewURL),
+               let uiImage = UIImage(data: imgData) {
+                project.previewImage = uiImage
+                vm.finalImage = uiImage
+            }
+
+            // Load origin.jpg (ảnh gốc)
+            let originURL = folderURL.appendingPathComponent("original.jpg")
+            if let imgData = try? Data(contentsOf: originURL),
+               let uiImage = UIImage(data: imgData) {
+                vm.baseImage = uiImage
+                vm.defaultPreview = uiImage
+            }
+
+            // Gán lại state từ JSON
+            overlayVM.overlays = project.textLayers
+            vm.blur       = project.blur
+            vm.shadow     = project.shadow
+            vm.opacity    = project.opacity
+            vm.lightness  = project.lightness
+            vm.saturation = project.saturation
+
+            return project
+        } catch {
+            print("❌ Failed to load project for editing: \(error)")
+            return nil
+        }
+    }
+}

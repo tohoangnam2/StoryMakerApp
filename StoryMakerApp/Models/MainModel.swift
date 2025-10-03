@@ -27,6 +27,10 @@ struct MainModel: Identifiable, Codable {
     
     var previewImage: UIImage? = nil
     
+    var originImage : String?
+    
+    
+    
     enum CodingKeys: String, CodingKey {
         case id, textLayers, frame, blur, shadow, opacity, lightness, saturation
     }
