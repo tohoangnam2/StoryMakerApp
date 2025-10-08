@@ -56,18 +56,15 @@ struct AddProjectView: View {
                 VStack{
                     HStack{
                         Button(action: {
-//                            exitExport {
-//                                saveCurrentProject(project: project,
-//                                                   overlayVM: overlayVM,
-//                                                   vm: vm) {
-//                                    print("x : \(snapshotImage)")
-//                                    presentationMode.wrappedValue.dismiss()
-//
-//                                }
-//                            }
-                            backAndSave(project: project, overlayVM: overlayVM,vm:vm) {
-                                   presentationMode.wrappedValue.dismiss()
-                               }
+                            exitExport {
+                                saveCurrentProject(project: project,
+                                                   overlayVM: overlayVM,
+                                                   vm: vm) {
+                                    print("x : \(snapshotImage)")
+                                    presentationMode.wrappedValue.dismiss()
+
+                                }
+                            }
                         }) {
                             Image("home_back")
                         }
@@ -141,7 +138,8 @@ struct AddProjectView: View {
                                     onAddTap: {
                                         isShowBackgroundPicker = true
                                         let newProject = vm.createEmptyProject()
-                                        self.project = newProject},
+                                        self.project = newProject
+                                    },
                                     onTapOutside: { resetEditState() },
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
@@ -154,9 +152,9 @@ struct AddProjectView: View {
 
                     if showBackgroundEdit {
                         BackgroundEditorView(overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected)
-                                .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
-                                .transition(.move(edge: .bottom).combined(with: .opacity)) // trượt từ dưới lên + fade
-                                .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit) // animate khi state thay đổi
+                                    .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
+                                    .transition(.move(edge: .bottom).combined(with: .opacity)) // trượt từ dưới lên + fade
+                                    .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit) // animate khi state thay đổi
                     }
                         else {
                             if  selectedEditText != .none {
@@ -202,31 +200,31 @@ struct AddProjectView: View {
 
                                         case .fontFamily:
                                             TextView(overlayVM: overlayVM, selectedEditText: .fontFamily)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .colorSolid:
                                             TextView(overlayVM: overlayVM, selectedEditText: .colorSolid)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .gradient:
                                             TextView(overlayVM: overlayVM, selectedEditText: .gradient)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .stroke:
                                             TextView(overlayVM: overlayVM, selectedEditText: .stroke)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .align:
                                             TextView(overlayVM: overlayVM, selectedEditText: .align)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .shadow:
                                             TextView(overlayVM: overlayVM, selectedEditText: .shadow)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .background:
                                             TextView(overlayVM: overlayVM, selectedEditText: .background)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
+                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                                         case .none:
                                             EmptyView()
@@ -379,7 +377,6 @@ struct AddProjectView: View {
                                                 showTextField = false
                                                 isTextFieldFocused = false
                                                 isSelected = true
-                                                
                                             }) {
                                                 Image("img_bg_check")
                                             }
@@ -396,29 +393,86 @@ struct AddProjectView: View {
                     }
                 }
                 .onDisappear {
-                    if vm.finalImage != nil {
-                        vm.updatePreview()
-                        print("Saved onDisappear")
-                    } else {
-                        print(" baseImage nil, không thể snapshot")
+                    guard var current = project else {
+                        print("Không có project, bỏ qua lưu")
+                        return
+                    }
+                    guard vm.baseImage != nil || snapshotImage != nil else {
+                        print("Project chưa chọn background, bỏ qua lưu")
+                        return
+                    }
+
+                    // merge state từ vm.projectStates
+
+                    if let snap = snapshotImage {
+                        ProjectStorage.saveProject(current, previewImage: snap)
+                        print("Saved snapshot onDisappear")
+                    } else if let filtered = vm.finalImage {
+                        ProjectStorage.saveProject(current, previewImage: filtered)
+                        print("Saved filtered image onDisappear")
                     }
                 }
-//                .onAppear {
-//                    if let loaded = ProjectStorage.loadProjectForEditing(id: projectID?,
-//                                                                         vm: vm,
-//                                                                         overlayVM: overlayVM) {
-//                        self.project = loaded
-//                        self.frame   = loaded.frame
-//                    }
-//                }
 
 
             }
         }
+//        .fullScreenCover(isPresented: $isShowBackgroundPicker) {
+//            BackGroundView(isShowBackgroundPicker: $isShowBackgroundPicker) { picked in
+//                guard let picked = picked else { return }
+//
+//                // Gán frame cho project đang mở
+//                guard var current = self.project else { return }
+//                current.frame = picked
+//
+//                // Load ảnh gốc
+//                if let url = picked.backgroundURL,
+//                   let data = try? Data(contentsOf: url),
+//                   let uiImage = UIImage(data: data) {
+//
+//                    vm.baseImage = uiImage
+//                    vm.defaultPreview = uiImage
+//
+//                    // Lưu original
+//                    let folderURL = ProjectStorage.projectFolder(for: current.id)
+//                    let originalURL = folderURL.appendingPathComponent("original.jpg")
+//                    try? data.write(to: originalURL)
+//
+//                    // Lưu JSON + preview
+//                    current.previewImage = uiImage
+//                    ProjectStorage.saveProject(current, previewImage: uiImage)
+//
+//                    // Update về RAM đúng index
+//                    if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
+//                        vm.mainprojects[index] = current
+//                    } else {
+//                        vm.mainprojects.insert(current, at: 0)
+//                    }
+//
+//                    self.project = current
+//                    print("Picked BG for project id: \(current.id)")
+//                }
+//
+//                // Reset state filter/text nếu đổi background
+//                if vm.currentFrameID != picked.backgroundID {
+//                    vm.currentFrameID = picked.backgroundID
+//
+//                    overlayVM.overlays.removeAll()
+//                    overlayVM.addOverlay("")
+//
+//                    vm.finalImage = nil
+//                    vm.opacity = 1.0
+//                    vm.selectedFilterImage = nil
+//                    vm.selectedFilter = nil
+//                    vm.previewImages.removeAll()
+//                }
+//            }
+//        }
+
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView(isShowBackgroundPicker: $isShowBackgroundPicker) { picked in
                 if let newFrame = picked {
                     self.frame = newFrame
+                    vm.currentProject = project
                 }
                 if vm.currentFrameID != picked?.backgroundID {
                     vm.currentFrameID = picked?.backgroundID
@@ -460,6 +514,9 @@ struct AddProjectView: View {
                             }
                             self.project = current
                         }
+                        
+                        
+                        
                     }
                 }
             }
@@ -493,19 +550,6 @@ struct AddProjectView: View {
                 showTextField = false
             }
         }
-//        .onAppear{
-//            if let project = self.project {
-//                let folderURL = ProjectStorage.projectFolder(for: project.id)
-//                let originalURL = folderURL.appendingPathComponent("original.jpg")
-//                if let data = try? Data(contentsOf: originalURL),
-//                   let uiImage = UIImage(data: data) {
-//                    vm.baseImage = uiImage
-//                    vm.defaultPreview = uiImage
-//                    vm.isImageLoaded = true
-//                }
-//            }
-//
-//        }
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
@@ -531,30 +575,38 @@ struct AddProjectView: View {
         isSelected = false
         overlayVM.deselectAll()
     }
-
     func exitExport(completion: @escaping () -> Void) {
         isExport = true
         resetEditState()
-        triggerSnapshot = true
-//        exportingVM.isDone = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            triggerSnapshot = true
+        }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             if let snap = snapshotImage,
                let index = vm.mainprojects.firstIndex(where: { $0.id == project?.id }) {
                 vm.mainprojects[index].previewImage = snap
-//                exportingVM.quickExport(projectID: vm.mainprojects[index].id, image: snap)
-                print(" Snapshot captured: \(snap)")
+                print("Snapshot captured: \(snap)")
             } else {
-                print(" Snapshot still nil")
+                print("Snapshot still nil")
             }
             completion()
         }
     }
 
-    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-        var currentProject = project ?? MainModel(id: UUID())
 
-        // Cập nhật dữ liệu từ VM
+    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
+        
+        
+//        var currentProject = project ?? MainModel(id: UUID())
+        guard var currentProject = project else {
+            completion()
+            return
+        }
+//        vm.applyState(to: &currentProject)
+
+
+        // data vm
         currentProject.textLayers = overlayVM.overlays
         currentProject.frame      = frame
         currentProject.blur       = vm.blur
@@ -562,14 +614,13 @@ struct AddProjectView: View {
         currentProject.opacity    = vm.opacity
         currentProject.lightness  = vm.lightness
         currentProject.saturation = vm.saturation
-
-        // Lấy previewImage hiện tại
-        if let filtered = vm.finalImage {
-            currentProject.previewImage = filtered
-        } else if let snap = snapshotImage {
+        
+        // previe
+        if let snap = snapshotImage {
             currentProject.previewImage = snap
+        } else if let filtered = vm.finalImage {
+            currentProject.previewImage = filtered
         }
-
 
         // lưu docs
         ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage)
@@ -577,69 +628,16 @@ struct AddProjectView: View {
         // Update vào RAM
         if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
             vm.mainprojects[index] = currentProject
+            vm.mainprojects = Array(vm.mainprojects) // ép SwiftUI publish lại
         } else {
             vm.mainprojects.insert(currentProject, at: 0)
         }
-
+        self.project = currentProject
+        
         completion()
     }
-
-    func backAndSave(project: MainModel?,
-                     overlayVM: OverlayTextViewModel,
-                     vm: BackgroundEditorViewModel,
-                     completion: @escaping () -> Void) {
-        resetEditState()
-        triggerSnapshot = true
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            if let snap = snapshotImage {
-                var current = project ?? MainModel(id: UUID())
-
-                // cập nhật dữ liệu từ VM
-                current.textLayers = overlayVM.overlays
-                current.frame      = frame
-                current.blur       = vm.blur
-                current.shadow     = vm.shadow
-                current.opacity    = vm.opacity
-                current.lightness  = vm.lightness
-                current.saturation = vm.saturation
-
-                // lưu preview = snapshot (ảnh edit cuối cùng)
-                current.previewImage = snap
-
-                // 1. Lưu JSON
-                // 2. Lưu preview.jpg = snap
-                ProjectStorage.saveProject(current, previewImage: snap)
-
-                // 3. Giữ origin.jpg nếu chưa có (chỉ lưu lần đầu khi chọn background)
-                let folderURL = ProjectStorage.projectFolder(for: current.id)
-                let originURL = folderURL.appendingPathComponent("original.jpg")
-                if !FileManager.default.fileExists(atPath: originURL.path),
-                   let base = vm.baseImage,
-                   let data = base.jpegData(compressionQuality: 0.9) {
-                    try? data.write(to: originURL)
-                }
-
-                
-                
-                
-                // Update vào RAM
-                if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
-                    vm.mainprojects[index] = current
-                } else {
-                    vm.mainprojects.insert(current, at: 0)
-                }
-
-                print(" Back saved project \(current.id)")
-            } else {
-                print(" Snapshot nil khi back")
-            }
-            completion()
-        }
-    }
-
+    
     // Helper để tạo nút icon
-
     @ViewBuilder
     private func iconButton(_ imageName: String, _ type: OverlayTextEditEnum) -> some View {
         Image(imageName)
@@ -739,66 +737,6 @@ extension Text {
         return ""
     }
 }
-
-
-
-
-
-//auto size
-
-
-//// MARK: - Wrapper UIViewController
-//struct AutoSizingSheet<Content: View>: UIViewControllerRepresentable {
-//    @Binding var isPresented: Bool
-//    let content: Content
-//    
-//    init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
-//        self._isPresented = isPresented
-//        self.content = content()
-//        
-//    }
-//    
-//    func makeUIViewController(context: Context) -> UIViewController {
-//        return UIViewController()
-//    }
-//    
-//    func updateUIViewController(_ vc: UIViewController, context: Context) {
-//        if isPresented {
-//            let hosting = UIHostingController(rootView: content)
-//            hosting.view.backgroundColor = .clear
-//            
-//            // Wrap trong UINavigationController để dùng .preferredContentSize
-//            let nav = UINavigationController(rootViewController: hosting)
-//            nav.modalPresentationStyle = .formSheet
-//            
-//            // Tính height theo nội dung SwiftUI
-//            hosting.view.layoutIfNeeded()
-//            let targetSize = hosting.sizeThatFits(in: UIScreen.main.bounds.size)
-//            hosting.preferredContentSize = targetSize
-//            
-//            vc.present(nav, animated: true)
-//        } else {
-//            vc.presentedViewController?.dismiss(animated: true)
-//        }
-//    }
-//}
-//
-//struct PendingExportState {
-//    var textLayers: [OverlayTextModel]
-//    var selectedFilter: String?
-//    var blur: Double
-//    var shadow: Double
-//    var opacity: Double
-//    var lightness: Double
-//    var saturation: Double
-//    var frameID: String?
-//}
-
-
-
-
-
-
 
 
 

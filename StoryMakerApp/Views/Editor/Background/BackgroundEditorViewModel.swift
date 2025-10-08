@@ -90,15 +90,47 @@ class BackgroundEditorViewModel: ObservableObject {
     
     @Published var mainprojects: [MainModel] = []
     
+    @Published var currentProjectID: UUID?
 
-
-    
+//    @Published var projectStates: [UUID: ProjectState] = [:]
+    @Published var currentProject: MainModel?   // project đang edit
 
 
     //func edit brghtness
-    
+//    struct ProjectState {
+//           var lightness: Double = 0
+//           var saturation: Double = 1
+//           var blur: Double = 0
+//       }
+//
+//
+//
+//       // Hàm binding cho từng thuộc tính
+//    func binding(for keyPath: WritableKeyPath<ProjectState, Double>, projectID: UUID) -> Binding<Double> {
+//        Binding(
+//            get: {
+//                // lấy state hiện tại, nếu chưa có thì tạo mới
+//                self.projectStates[projectID]?[keyPath: keyPath] ?? ProjectState()[keyPath: keyPath]
+//            },
+//            set: { newValue in
+//                // update state cho projectID
+//                var state = self.projectStates[projectID] ?? ProjectState()
+//                state[keyPath: keyPath] = newValue
+//                self.projectStates[projectID] = state
+//                print("SET \(keyPath) for \(projectID): \(newValue)")
+//            }
+//        )
+//    }
 
-    
+
+
+//    func applyState(to project: inout MainModel) {
+//        guard let state = projectStates[project.id] else { return }
+//        project.lightness  = state.lightness
+//        project.saturation = state.saturation
+//        project.blur       = state.blur
+//    }
+
     func createEmptyProject() -> MainModel {
            let newProject = MainModel(id: UUID())
            
@@ -106,6 +138,7 @@ class BackgroundEditorViewModel: ObservableObject {
            self.mainprojects.insert(newProject, at: 0)
            return newProject
        }
+    
 
 //      func applyAdjustments(for bgID: String) {
 //          if let saved = adjustments[bgID] {
@@ -368,7 +401,15 @@ extension BackgroundEditorViewModel {
     }
     
 
-    
+    func deleteProject(_ project: MainModel) {
+          // 1. Xoá trong docs
+          ProjectStorage.deleteProject(id: project.id)
+
+          // 2. Xoá trong RAM
+          if let index = mainprojects.firstIndex(where: { $0.id == project.id }) {
+              mainprojects.remove(at: index)
+          }
+      }
 
 
 

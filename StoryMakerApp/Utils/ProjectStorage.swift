@@ -159,6 +159,19 @@ struct ProjectStorage {
         let files = try? FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
         return files?.filter { $0.lastPathComponent.hasPrefix("project_") } ?? []
     }
+    
+    //delete
+    static func deleteProject(id: UUID) {
+          let folderURL = projectFolder(for: id)
+          do {
+              if FileManager.default.fileExists(atPath: folderURL.path) {
+                  try FileManager.default.removeItem(at: folderURL)
+                  print(" Deleted project folder: \(folderURL.lastPathComponent)")
+              }
+          } catch {
+              print(" Failed to delete project: \(error)")
+          }
+      }
 }
 
 

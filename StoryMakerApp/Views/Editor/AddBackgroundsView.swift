@@ -63,14 +63,10 @@ struct AddBackgroundsView: View {
 
                                 vm.baseImage = uiImage
                                 vm.defaultPreview = uiImage
-                                
                                 vm.prepareAllPreviews()
-                          
 //                                vm.resetAdjustments()
-                                
                                 vm.updatePreview()
                                 vm.isImageLoaded = true
-
                             }
                             
 //                            .onAppear {

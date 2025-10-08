@@ -690,7 +690,7 @@ struct CustomUISlider: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+    //khi kéo nhận giá trị ở đay và gửi sang vm.lightness
     class Coordinator: NSObject {
         var parent: CustomUISlider
         init(_ parent: CustomUISlider) {

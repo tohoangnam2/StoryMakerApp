@@ -47,31 +47,35 @@ struct HomeView: View {
                         }
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVGrid(
-                                columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 3),
+                                columns: Array(repeating: GridItem(.flexible()), count: 3),
                                 spacing: 16
                             ) {
                                 ForEach(vm.mainprojects, id: \.id) { project in
-                                    NavigationLink(
-                                        destination: AddProjectView(projectID: project.id)
-                                            .environmentObject(vm)
-                                    ) {
-                                        if let preview = project.previewImage {
-                                            // Ưu tiên ảnh preview trong RAM hoặc load từ file .jpg
-                                            Image(uiImage: preview)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 97, height: 207)
-                                                .cornerRadius(8)
-                                                .clipped()
-                                        } else {
-                                            // Nếu không có gì thì placeholder
-                                            Color.gray
-                                                .frame(width: 97, height: 207)
-                                                .cornerRadius(8)
+                                    if project.frame != nil {
+                                        ZStack(alignment: .topTrailing) {
+                                            NavigationLink(
+                                                destination: AddProjectView(projectID: project.id)
+                                                    .environmentObject(vm)
+                                            ) {
+                                                if let preview = project.previewImage {
+                                                    Image(uiImage: preview)
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(width:98,height:208)
+                                                        .cornerRadius(8)
+                                                        .clipped()
+                                                }
+                                            }
+                                            Button(action: {
+                                                vm.deleteProject(project)
+                                            }) {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .foregroundColor(.white)
+                                                    .padding(6)
+                                            }
                                         }
                                     }
                                 }
-
 
                             }
                             .padding(.horizontal)

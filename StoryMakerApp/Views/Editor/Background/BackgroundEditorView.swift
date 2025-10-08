@@ -26,7 +26,7 @@ struct BackgroundEditorView: View {
     
     @Binding var isSelected : Bool
      
-
+//    @Binding var project: MainModel?
     
     var body: some View {
         ZStack{
@@ -71,6 +71,7 @@ struct BackgroundEditorView: View {
                         }
                         Button(action: {
                             editEnum = .brightness
+                            
                         }) {
                             Image("ic_brightness")
                                 .foregroundColor(editEnum == .brightness ? .red : .black)
@@ -90,6 +91,8 @@ struct BackgroundEditorView: View {
                     case .brightness:
                         BrightNessBGView()
                         
+
+                        
                     }
                 }
                 .id(editEnum)
@@ -103,6 +106,16 @@ struct BackgroundEditorView: View {
         }
         .background(.white)
         .padding(.top,5)
+//        .onAppear {
+//            if let p = project, vm.projectStates[p.id] == nil {
+//                vm.projectStates[p.id] = BackgroundEditorViewModel.ProjectState(
+//                    lightness: p.lightness,
+//                    saturation: p.saturation,
+//                    blur: p.blur
+//                )
+//            }
+//        }
+        
 
 
     }
