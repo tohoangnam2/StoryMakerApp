@@ -56,6 +56,7 @@ struct AddProjectView: View {
                 VStack{
                     HStack{
                         Button(action: {
+                            
                             exitExport {
                                 saveCurrentProject(project: project,
                                                    overlayVM: overlayVM,
@@ -96,7 +97,7 @@ struct AddProjectView: View {
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: vm.finalImage
+                                    filteredImage: vm.finalImage, project: $project
                                 )
                                 .environmentObject(vm),
                                 snapshot: $snapshotImage,
@@ -118,7 +119,7 @@ struct AddProjectView: View {
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: vm.finalImage
+                                    filteredImage: vm.finalImage, project: $project
                                 )
                                 .environmentObject(vm)
                                 .onAppear {
@@ -144,14 +145,14 @@ struct AddProjectView: View {
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: vm.finalImage
+                                    filteredImage: vm.finalImage, project: $project
                                 )
                                 .environmentObject(vm)
                             }
                         }
 
                     if showBackgroundEdit {
-                        BackgroundEditorView(overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected)
+                        BackgroundEditorView(overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected, project: $project)
                                     .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
                                     .transition(.move(edge: .bottom).combined(with: .opacity)) // trượt từ dưới lên + fade
                                     .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit) // animate khi state thay đổi
@@ -562,7 +563,7 @@ struct AddProjectView: View {
                           onTapOutside: {  },
                           onOpenBackgroundEditor: { showBackgroundEdit = true },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
-                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, filteredImage: vm.finalImage, project: project)
+                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, filteredImage: vm.finalImage, project: $project)
                           .environmentObject(vm)
         }
     }

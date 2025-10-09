@@ -26,7 +26,7 @@ struct BackgroundEditorView: View {
     
     @Binding var isSelected : Bool
      
-//    @Binding var project: MainModel?
+    @Binding var project: MainModel?
     
     var body: some View {
         ZStack{
@@ -89,8 +89,15 @@ struct BackgroundEditorView: View {
                     case .filter:
                         FilterEditorView()
                     case .brightness:
-                        BrightNessBGView()
-                        
+                        if let _ = project {
+                            BrightNessBGView(
+                                project: Binding(
+                                    get: { project! },
+                                    set: { project = $0 }
+                                )
+                            )
+                        }
+
 
                         
                     }

@@ -41,8 +41,7 @@ struct AddBackgroundsView: View {
     
     let filteredImage: UIImage?
     
-
-
+    @Binding var project : MainModel?
 
     var body: some View {
         NavigationView {
@@ -68,26 +67,15 @@ struct AddBackgroundsView: View {
                                 vm.updatePreview()
                                 vm.isImageLoaded = true
                             }
-                            
-//                            .onAppear {
-//                                if let data = try? Data(contentsOf: url),
-//                                   let uiImage = UIImage(data: data) {
-//                                    vm.baseImage = uiImage
-//                                    vm.defaultPreview = uiImage
-//                                    vm.prepareAllPreviews()
-//                                    vm.updatePreview(projectID: project.id)
-//                                    vm.isImageLoaded = true
-//                                }
-//                            }
                             .overlay(
                                 Group {
-                                    if let filtered = filteredImage {
+                                    if let filtered = filteredImage, let p = project {
                                         Image(uiImage: filtered)
                                             .resizable()
                                             .scaledToFill()
-                                            .opacity(vm.opacity)
-                                            .brightness(vm.lightness)   // điều chỉnh sáng tối
-                                            .saturation(vm.saturation) // điều chỉnh độ bão hòa
+                                            .opacity(p.opacity)
+                                            .brightness(p.lightness)   // điều chỉnh sáng tối
+                                            .saturation(p.saturation) // điều chỉnh độ bão hòa
                                             .blur(radius: vm.blur)
                                             .shadow(radius: vm.blur)
                                             .allowsHitTesting(false)
@@ -120,7 +108,6 @@ struct AddBackgroundsView: View {
                                         }
                                         
                                         else if !overlay.text.isEmpty  {
-                                            
                                             ZStack{
                                                 //case
                                                 Text({

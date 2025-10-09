@@ -95,7 +95,9 @@ class BackgroundEditorViewModel: ObservableObject {
 //    @Published var projectStates: [UUID: ProjectState] = [:]
     @Published var currentProject: MainModel?   // project đang edit
 
-
+    
+    @Published var project: MainModel = MainModel()
+    
     //func edit brghtness
 //    struct ProjectState {
 //           var lightness: Double = 0

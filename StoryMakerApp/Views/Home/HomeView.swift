@@ -21,6 +21,7 @@ struct HomeView: View {
     
     @State private var selectedProjectID: UUID?
 //    @StateObject var projectManager = ProjectManager()
+    
     var body: some View {
         NavigationView{
             ZStack{
