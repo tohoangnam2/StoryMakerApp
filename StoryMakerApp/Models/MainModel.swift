@@ -29,10 +29,10 @@ struct MainModel: Identifiable, Codable {
     
     var originImage : String?
     
-    
-    
+    var selectedFilter: String?
+
     enum CodingKeys: String, CodingKey {
-        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation
+        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation,selectedFilter
     }
     
     init(id: UUID = UUID()) {

@@ -87,7 +87,10 @@ struct BackgroundEditorView: View {
                     case .none:
                         EmptyView()
                     case .filter:
-                        FilterEditorView()
+                        FilterEditorView( project: Binding(
+                            get: { project! },
+                            set: { project = $0 }
+                        ))
                     case .brightness:
                         if let _ = project {
                             BrightNessBGView(
@@ -122,6 +125,7 @@ struct BackgroundEditorView: View {
 //                )
 //            }
 //        }
+       
         
 
 

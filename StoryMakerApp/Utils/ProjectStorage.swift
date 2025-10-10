@@ -97,6 +97,7 @@ struct ProjectStorage {
                let imgData = img.jpegData(compressionQuality: 0.9) {
                 let imageURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
                 try imgData.write(to: imageURL)
+                print(String(data: data, encoding: .utf8)!)
                 print(" Saved Image: \(imageURL)")
             }
         } catch {
@@ -134,6 +135,24 @@ struct ProjectStorage {
     }
     
     /// Load 1 project cụ thể
+//    static func loadProject(id: UUID) -> MainModel? {
+//        let folderURL = projectFolder(for: id)
+//        let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+//        do {
+//            let data = try Data(contentsOf: jsonURL)
+//            var project = try JSONDecoder().decode(MainModel.self, from: data)
+//            
+//            let imageURL = folderURL.appendingPathComponent("project_\(id).jpg")
+//            if let imgData = try? Data(contentsOf: imageURL),
+//               let uiImage = UIImage(data: imgData) {
+//                project.previewImage = uiImage
+//            }
+//            return project
+//        } catch {
+//            print(" Failed to load project: \(error)")
+//            return nil
+//        }
+//    }
     static func loadProject(id: UUID) -> MainModel? {
         let folderURL = projectFolder(for: id)
         let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
@@ -141,17 +160,22 @@ struct ProjectStorage {
             let data = try Data(contentsOf: jsonURL)
             var project = try JSONDecoder().decode(MainModel.self, from: data)
             
+            // Load ảnh preview nếu có
             let imageURL = folderURL.appendingPathComponent("project_\(id).jpg")
             if let imgData = try? Data(contentsOf: imageURL),
                let uiImage = UIImage(data: imgData) {
                 project.previewImage = uiImage
             }
+            
             return project
         } catch {
             print(" Failed to load project: \(error)")
             return nil
         }
     }
+    
+
+    
     
     /// Liệt kê tất cả folder project
     static func listSavedProjects() -> [URL] {

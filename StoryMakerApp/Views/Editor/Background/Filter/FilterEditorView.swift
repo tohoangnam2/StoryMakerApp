@@ -10,6 +10,11 @@ import SwiftUI
 struct FilterEditorView: View {
     @EnvironmentObject var vm: BackgroundEditorViewModel
     
+    @Binding var project: MainModel
+    
+    
+    
+    
     var body: some View {
             
             VStack {
@@ -51,11 +56,15 @@ struct FilterEditorView: View {
                                     if bg.isDefault {
                                         vm.finalImage = bg.uiImage
                                         vm.selectedFilter = nil
+                                        project.selectedFilter = nil //upadte
+                                        project.previewImage = bg.uiImage
                                     } else {
                                         vm.selectedFilter = bg.image
+                                        project.selectedFilter = bg.image //update filter cho proj
                                         if let base = vm.baseImage {
                                             vm.loadSelectedFilter(baseImage: base) { filtered in
                                                 vm.finalImage = filtered
+                                                project.previewImage = filtered
                                             }
                                         }
                                     }
@@ -100,8 +109,10 @@ struct FilterEditorView: View {
             .padding(.top,5)
             .onAppear {
                 vm.fetchCategories()
-
+                // đồng bộ lại filter từ project
+               
             }
+
         
       
     }

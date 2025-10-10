@@ -10,7 +10,6 @@ import SwiftUI
 struct HomeView: View {
     
     @EnvironmentObject var vm: BackgroundEditorViewModel
-
     
     @State var mockDataImage: [UIImage] = [
         UIImage(imageLiteralResourceName: "home_mockdata"),
@@ -20,7 +19,6 @@ struct HomeView: View {
     ]
     
     @State private var selectedProjectID: UUID?
-//    @StateObject var projectManager = ProjectManager()
     
     var body: some View {
         NavigationView{

@@ -98,40 +98,7 @@ class BackgroundEditorViewModel: ObservableObject {
     
     @Published var project: MainModel = MainModel()
     
-    //func edit brghtness
-//    struct ProjectState {
-//           var lightness: Double = 0
-//           var saturation: Double = 1
-//           var blur: Double = 0
-//       }
-//
-//
-//
-//       // Hàm binding cho từng thuộc tính
-//    func binding(for keyPath: WritableKeyPath<ProjectState, Double>, projectID: UUID) -> Binding<Double> {
-//        Binding(
-//            get: {
-//                // lấy state hiện tại, nếu chưa có thì tạo mới
-//                self.projectStates[projectID]?[keyPath: keyPath] ?? ProjectState()[keyPath: keyPath]
-//            },
-//            set: { newValue in
-//                // update state cho projectID
-//                var state = self.projectStates[projectID] ?? ProjectState()
-//                state[keyPath: keyPath] = newValue
-//                self.projectStates[projectID] = state
-//                print("SET \(keyPath) for \(projectID): \(newValue)")
-//            }
-//        )
-//    }
-
-
-
-//    func applyState(to project: inout MainModel) {
-//        guard let state = projectStates[project.id] else { return }
-//        project.lightness  = state.lightness
-//        project.saturation = state.saturation
-//        project.blur       = state.blur
-//    }
+    
 
     func createEmptyProject() -> MainModel {
            let newProject = MainModel(id: UUID())
@@ -259,38 +226,88 @@ class BackgroundEditorViewModel: ObservableObject {
 
 
     
-    func loadSelectedFilter(baseImage: UIImage? = nil, completion: ((UIImage) -> Void)? = nil) {
-        guard let urlString = selectedFilter, let url = URL(string: urlString) else { return }
+//    func loadSelectedFilter(baseImage: UIImage? = nil, completion: ((UIImage) -> Void)? = nil) {
+//        guard let urlString = selectedFilter, let url = URL(string: urlString) else { return }
+//        URLSession.shared.dataTask(with: url) { data, _, _ in
+//            if let data = data, let image = UIImage(data: data) {
+//                DispatchQueue.main.async {
+//                    self.selectedFilterImage = image
+//                    // Nếu có ảnh gốc thì apply luôn filter
+//                    if let base = baseImage {
+//                        self.applyFilter(to: base) { filtered in
+//                            completion?(filtered) // trả về UIImage đã filter xong
+//                        }
+//                    }   
+//                }
+//            }
+//        }.resume()
+//    }
+//
+//
+//
+//
+//    func applyFilter(to baseImage: UIImage, completion: ((UIImage) -> Void)? = nil) {
+//        guard let filterImage = selectedFilterImage else { return }
+//        DispatchQueue.global().async {
+//            if let newImage = baseImage.applyingLUT(lutImage: filterImage, dimension: 64) {
+//                DispatchQueue.main.async {
+//                    self.finalImage = newImage
+//                    completion?(newImage) // trả về cho preview
+//                }
+//            }
+//        }
+//    }
+
+    func loadSelectedFilter(baseImage: UIImage, completion: @escaping (UIImage) -> Void) {
+        guard let filterPath = selectedFilter,
+              let url = URL(string: filterPath) else {
+            completion(baseImage)
+            return
+        }
+
         URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data, let image = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    self.selectedFilterImage = image
-                    // Nếu có ảnh gốc thì apply luôn filter
-                    if let base = baseImage {
-                        self.applyFilter(to: base) { filtered in
-                            completion?(filtered) // trả về UIImage đã filter xong
+            if let data = data, let lutImage = UIImage(data: data) {
+                DispatchQueue.global().async {
+                    if let newImage = baseImage.applyingLUT(lutImage: lutImage, dimension: 64) {
+                        DispatchQueue.main.async {
+                            self.finalImage = newImage
+                            completion(newImage)
                         }
-                    }   
+                    } else {
+                        DispatchQueue.main.async {
+                            self.finalImage = baseImage
+                            completion(baseImage)
+                        }
+                    }
                 }
             }
         }.resume()
     }
 
-
-
-
     func applyFilter(to baseImage: UIImage, completion: ((UIImage) -> Void)? = nil) {
-        guard let filterImage = selectedFilterImage else { return }
+        guard let filterImage = selectedFilterImage else {
+            // Nếu chưa có filter thì finalImage = base
+            DispatchQueue.main.async {
+                self.finalImage = baseImage
+                completion?(baseImage)
+            }
+            return
+        }
+
         DispatchQueue.global().async {
             if let newImage = baseImage.applyingLUT(lutImage: filterImage, dimension: 64) {
                 DispatchQueue.main.async {
                     self.finalImage = newImage
-                    completion?(newImage) // trả về cho preview
+                    completion?(newImage)
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.finalImage = baseImage
+                    completion?(baseImage)
                 }
             }
         }
     }
-
 
 
 

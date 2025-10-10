@@ -10,7 +10,9 @@ import SwiftUI
 
 
 struct AddProjectView: View {
+    
     @State var project: MainModel?
+    
     @State var openedProjectID: UUID? = nil
     let projectID: UUID?
     var isNewProject: Bool = false
@@ -50,20 +52,19 @@ struct AddProjectView: View {
     var completion: ((UIImage) -> Void)? = nil
 
     
+    
     var body: some View {
         NavigationView {
             ZStack{
                 VStack{
                     HStack{
                         Button(action: {
-                            
                             exitExport {
                                 saveCurrentProject(project: project,
                                                    overlayVM: overlayVM,
                                                    vm: vm) {
                                     print("x : \(snapshotImage)")
                                     presentationMode.wrappedValue.dismiss()
-
                                 }
                             }
                         }) {
@@ -74,9 +75,11 @@ struct AddProjectView: View {
                         Button {
                             resetEditState()
                             showPreview = true
+                            
                         } label: {
                             Image("home_share")
                         }
+
 
                     }
                     .padding(.horizontal)
@@ -126,6 +129,39 @@ struct AddProjectView: View {
                                     self.project = project
                                     overlayVM.overlays = project.textLayers
                                     frame = project.frame
+                                    
+                                    if let filter = project.selectedFilter {
+                                        vm.selectedFilter = filter
+                                        if let url = project.frame?.backgroundURL,
+                                           let data = try? Data(contentsOf: url),
+                                           let uiImage = UIImage(data: data) {
+                                            vm.baseImage = uiImage
+                                            vm.loadSelectedFilter(baseImage: uiImage) { filtered in
+                                                vm.finalImage = filtered
+                                            }
+                                        }
+                                    } else {
+                                        if let base = project.previewImage {
+                                            vm.finalImage = base
+                                        }
+                                    }
+                                }
+                                .background{
+                                    Group{
+                                        if let base = project.previewImage {
+                                            Image(uiImage: base)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .opacity(project.opacity)
+                                                .brightness(project.lightness)
+                                                .saturation(project.saturation)
+                                                .blur(radius: project.blur)
+                                                .shadow(radius: project.shadow)
+                                                .allowsHitTesting(false)
+
+                                        }
+                                    }
+
                                 }
                                 
                             } else {
@@ -150,7 +186,6 @@ struct AddProjectView: View {
                                 .environmentObject(vm)
                             }
                         }
-
                     if showBackgroundEdit {
                         BackgroundEditorView(overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected, project: $project)
                                     .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
@@ -544,6 +579,9 @@ struct AddProjectView: View {
 //            }
 
         }
+       
+
+
         .onChange(of: frame?.id) { _ in
             if selectedTab == 1 {
                 overlayVM.overlays.removeAll()
@@ -551,6 +589,7 @@ struct AddProjectView: View {
                 showTextField = false
             }
         }
+        
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
@@ -596,25 +635,25 @@ struct AddProjectView: View {
     }
 
 
-    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-        
-        
-//        var currentProject = project ?? MainModel(id: UUID())
+    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {        
         guard var currentProject = project else {
             completion()
             return
         }
-//        vm.applyState(to: &currentProject)
-
-
         // data vm
         currentProject.textLayers = overlayVM.overlays
         currentProject.frame      = frame
-        currentProject.blur       = vm.blur
-        currentProject.shadow     = vm.shadow
-        currentProject.opacity    = vm.opacity
-        currentProject.lightness  = vm.lightness
-        currentProject.saturation = vm.saturation
+
+        currentProject.blur       = project?.blur ?? 0
+        currentProject.shadow     = project?.shadow ?? 0
+        currentProject.opacity    = project?.opacity ?? 1
+        currentProject.lightness  = project?.lightness ?? 0
+        currentProject.saturation = project?.saturation ?? 1
+        currentProject.selectedFilter = vm.selectedFilter
+        currentProject.previewImage   = vm.finalImage
+
+
+
         
         // previe
         if let snap = snapshotImage {

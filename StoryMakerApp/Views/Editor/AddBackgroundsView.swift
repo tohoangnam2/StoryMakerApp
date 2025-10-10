@@ -59,6 +59,7 @@ struct AddBackgroundsView: View {
                                       let uiImage = UIImage(data: data) else {
                                     return
                                 }
+                                
 
                                 vm.baseImage = uiImage
                                 vm.defaultPreview = uiImage
@@ -66,6 +67,7 @@ struct AddBackgroundsView: View {
 //                                vm.resetAdjustments()
                                 vm.updatePreview()
                                 vm.isImageLoaded = true
+                                
                             }
                             .overlay(
                                 Group {
@@ -76,10 +78,11 @@ struct AddBackgroundsView: View {
                                             .opacity(p.opacity)
                                             .brightness(p.lightness)   // điều chỉnh sáng tối
                                             .saturation(p.saturation) // điều chỉnh độ bão hòa
-                                            .blur(radius: vm.blur)
-                                            .shadow(radius: vm.blur)
+                                            .blur(radius: p.blur)
+                                            .shadow(radius: p.blur)
                                             .allowsHitTesting(false)
                                     }
+                                    
                                 }
                             )
                         //img
