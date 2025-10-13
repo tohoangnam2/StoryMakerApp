@@ -53,21 +53,19 @@ struct AddBackgroundsView: View {
                             .frame(maxWidth: .infinity,maxHeight: .infinity)
                             .contentShape(Rectangle())
                             .onAppear {
-                                guard 
-                                      let url = frame.backgroundURL,
-                                      let data = try? Data(contentsOf: url),
-                                      let uiImage = UIImage(data: data) else {
-                                    return
+                                DispatchQueue.main.async {
+                                    if vm.finalImage == nil {
+                                        if let url = frame.backgroundURL,
+                                           let data = try? Data(contentsOf: url),
+                                           let uiImage = UIImage(data: data) {
+                                            vm.baseImage = uiImage
+                                            vm.defaultPreview = uiImage
+                                            vm.prepareAllPreviews()
+                                            vm.updatePreview()
+                                            vm.isImageLoaded = true
+                                        }
+                                    }
                                 }
-                                
-
-                                vm.baseImage = uiImage
-                                vm.defaultPreview = uiImage
-                                vm.prepareAllPreviews()
-//                                vm.resetAdjustments()
-                                vm.updatePreview()
-                                vm.isImageLoaded = true
-                                
                             }
                             .overlay(
                                 Group {

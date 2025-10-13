@@ -308,7 +308,8 @@ class BackgroundEditorViewModel: ObservableObject {
             }
         }
     }
-
+    
+    
 
 
     
@@ -347,6 +348,54 @@ class BackgroundEditorViewModel: ObservableObject {
             }
         }.resume()
     }
+    func reloadProjectsAndCategories() {
+           // Load lại toàn bộ project từ storage
+           self.mainprojects = ProjectStorage.loadAllProjects()
+           
+           // Fetch lại categories (nếu có API hoặc local data)
+           self.fetchCategories()
+           
+           // Reset filter khi đổi background
+           self.selectedFilter = nil
+           self.finalImage = self.baseImage
+    }
+//    func reloadProjectsAndCategories(for projectID: UUID?) {
+//        // Load lại toàn bộ project từ storage
+//        self.mainprojects = ProjectStorage.loadAllProjects()
+//        
+//        // Fetch lại categories
+//        self.fetchCategories()
+//        
+//        // Nếu có project cụ thể
+//        if let id = projectID,
+//           let project = self.mainprojects.first(where: { $0.id == id }) {
+//            
+//            // Nếu project đã có filter thì apply lại
+//            if let filter = project.selectedFilter,
+//               let url = project.frame?.backgroundURL,
+//               let data = try? Data(contentsOf: url),
+//               let uiImage = UIImage(data: data) {
+//                
+//                self.baseImage = uiImage
+//                self.selectedFilter = filter
+//                self.loadSelectedFilter(baseImage: uiImage) { filtered in
+//                    self.finalImage = filtered
+//                }
+//            } else if let url = project.frame?.backgroundURL,
+//                      let data = try? Data(contentsOf: url),
+//                      let uiImage = UIImage(data: data) {
+//                // Nếu chưa có filter thì set default
+//                self.baseImage = uiImage
+//                self.selectedFilter = nil
+//                self.finalImage = uiImage
+//            }
+//        } else {
+//            // Nếu không có project thì reset về default
+//            self.selectedFilter = nil
+//            self.finalImage = self.baseImage
+//        }
+//    }
+
     
     // Lấy backgrounds theo categoryId
     func fetchBackgrounds(for categoryId: String) {

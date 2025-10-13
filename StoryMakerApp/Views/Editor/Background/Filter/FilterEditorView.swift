@@ -109,9 +109,25 @@ struct FilterEditorView: View {
             .padding(.top,5)
             .onAppear {
                 vm.fetchCategories()
-                // đồng bộ lại filter từ project
-               
+                
+                if let url = project.frame?.backgroundURL,
+                   let data = try? Data(contentsOf: url),
+                   let uiImage = UIImage(data: data) {
+                    
+                    vm.baseImage = uiImage
+                    
+                    if let filter = project.selectedFilter {
+                        vm.selectedFilter = filter
+                        vm.loadSelectedFilter(baseImage: uiImage) { filtered in
+                            vm.finalImage = filtered
+                        }
+                    } else {
+                        vm.finalImage = uiImage
+                    }
+                }
             }
+
+
 
         
       

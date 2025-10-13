@@ -86,13 +86,13 @@ struct ProjectStorage {
         do {
             try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
             
-            // 1. Lưu JSON
+            // Lưu JSON
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
             let data = try JSONEncoder().encode(project)
             try data.write(to: jsonURL)
             print(" Saved JSON: \(jsonURL)")
             
-            // 2. Lưu ảnh JPG (nếu có)
+            // Lưu ảnh JPG (nếu có)
             if let img = previewImage,
                let imgData = img.jpegData(compressionQuality: 0.9) {
                 let imageURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
@@ -114,6 +114,7 @@ struct ProjectStorage {
                 .filter { $0.lastPathComponent.hasPrefix("project_") }
             
             return folders.compactMap { folderURL in
+                
                 let jsonURL = folderURL.appendingPathComponent("\(folderURL.lastPathComponent).json")
                 guard let data = try? Data(contentsOf: jsonURL),
                       var project = try? JSONDecoder().decode(MainModel.self, from: data) else {
@@ -174,7 +175,80 @@ struct ProjectStorage {
         }
     }
     
-
+    
+//    /// Lưu project + ảnh snapshot vào folder riêng
+//    static func saveProject(_ project: MainModel, previewImage: UIImage?) {
+//        let folderURL = projectFolder(for: project.id)
+//        do {
+//            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+//            
+//            // 1. Lưu JSON (metadata)
+//            let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
+//            let data = try JSONEncoder().encode(project)
+//            try data.write(to: jsonURL)
+//            print(" Saved JSON: \(jsonURL)")
+//            
+//            // 2. Lưu ảnh JPG (snapshot preview)
+//            if let img = previewImage,
+//               let imgData = img.jpegData(compressionQuality: 0.9) {
+//                let imageURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
+//                try imgData.write(to: imageURL)
+//                print(" Saved Image: \(imageURL)")
+//            }
+//        } catch {
+//            print(" Error saving project: \(error)")
+//        }
+//    }
+//
+//    /// Load tất cả project từ Documents
+//    static func loadAllProjects() -> [MainModel] {
+//        let documentsURL = getDocumentsDirectory()
+//        do {
+//            let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+//                .filter { $0.lastPathComponent.hasPrefix("project_") }
+//            
+//            return folders.compactMap { folderURL in
+//                let jsonURL = folderURL.appendingPathComponent("\(folderURL.lastPathComponent).json")
+//                guard let data = try? Data(contentsOf: jsonURL),
+//                      var project = try? JSONDecoder().decode(MainModel.self, from: data) else {
+//                    return nil
+//                }
+//                
+//                // Load ảnh preview nếu có
+//                let imageURL = folderURL.appendingPathComponent("\(folderURL.lastPathComponent).jpg")
+//                if let imgData = try? Data(contentsOf: imageURL),
+//                   let uiImage = UIImage(data: imgData) {
+//                    project.previewImage = uiImage
+//                }
+//                return project
+//            }
+//        } catch {
+//            print("❌ Error loading projects: \(error)")
+//            return []
+//        }
+//    }
+//
+//    /// Load 1 project cụ thể
+//    static func loadProject(id: UUID) -> MainModel? {
+//        let folderURL = projectFolder(for: id)
+//        let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+//        do {
+//            let data = try Data(contentsOf: jsonURL)
+//            var project = try JSONDecoder().decode(MainModel.self, from: data)
+//            
+//            // Load ảnh preview nếu có
+//            let imageURL = folderURL.appendingPathComponent("project_\(id).jpg")
+//            if let imgData = try? Data(contentsOf: imageURL),
+//               let uiImage = UIImage(data: imgData) {
+//                project.previewImage = uiImage
+//            }
+//            
+//            return project
+//        } catch {
+//            print("❌ Failed to load project: \(error)")
+//            return nil
+//        }
+//    }
     
     
     /// Liệt kê tất cả folder project

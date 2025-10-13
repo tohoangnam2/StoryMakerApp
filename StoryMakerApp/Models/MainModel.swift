@@ -25,11 +25,22 @@ struct MainModel: Identifiable, Codable {
     var frame: Frame? = nil
     var frameID: String? = nil
     
-    var previewImage: UIImage? = nil
+    var previewImageData: Data?
+    
+    var previewImage: UIImage? {
+            get {
+                guard let data = previewImageData else { return nil }
+                return UIImage(data: data)
+            }
+            set {
+                previewImageData = newValue?.jpegData(compressionQuality: 0.8)
+            }
+        }
     
     var originImage : String?
     
     var selectedFilter: String?
+    
 
     enum CodingKeys: String, CodingKey {
         case id, textLayers, frame, blur, shadow, opacity, lightness, saturation,selectedFilter

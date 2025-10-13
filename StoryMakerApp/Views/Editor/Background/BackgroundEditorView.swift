@@ -56,7 +56,8 @@ struct BackgroundEditorView: View {
                             editEnum = .none
                             isShowBackgroundPicker = true
                             showBackgroundEdit = false
-
+                            
+//                            vm.reloadProjectsAndCategories(for: project?.id)
                         }) {
                             Image("none")
                                 .foregroundColor(editEnum == .none ? .red : .black)

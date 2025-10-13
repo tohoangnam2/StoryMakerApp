@@ -69,7 +69,7 @@ struct HomeView: View {
                                                 vm.deleteProject(project)
                                             }) {
                                                 Image(systemName: "xmark.circle.fill")
-                                                    .foregroundColor(.white)
+                                                    .foregroundColor(.black)
                                                     .padding(6)
                                             }
                                         }
