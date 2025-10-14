@@ -44,41 +44,49 @@ struct HomeView: View {
                                 .frame(maxWidth: .infinity, alignment: .topLeading)
                                 .padding(.leading,25)
                         }
-                        ScrollView(.vertical, showsIndicators: false) {
-                            LazyVGrid(
-                                columns: Array(repeating: GridItem(.flexible()), count: 3),
-                                spacing: 16
-                            ) {
-                                ForEach(vm.mainprojects, id: \.id) { project in
-                                    if project.frame != nil {
-                                        ZStack(alignment: .topTrailing) {
-                                            NavigationLink(
-                                                destination: AddProjectView(projectID: project.id)
-                                                    .environmentObject(vm)
-                                            ) {
-                                                if let preview = project.previewImage {
-                                                    Image(uiImage: preview)
-                                                        .resizable()
-                                                        .scaledToFill()
-                                                        .frame(width:98,height:208)
-                                                        .cornerRadius(8)
-                                                        .clipped()
+                        ScrollViewReader { proxy in
+                            ScrollView(.vertical, showsIndicators: false) {
+                                LazyVGrid(
+                                    columns: Array(repeating: GridItem(.flexible()), count: 3),
+                                    spacing: 16
+                                ) {
+                                    ForEach(vm.mainprojects, id: \.id) { project in
+                                        if project.frame != nil {
+                                            ZStack(alignment: .topTrailing) {
+                                                NavigationLink(
+                                                    destination: AddProjectView(projectID: project.id)
+                                                        .environmentObject(vm)
+                                                ) {
+                                                    if let preview = project.previewImage {
+                                                        Image(uiImage: preview)
+                                                            .resizable()
+                                                            .scaledToFill()
+                                                            .frame(width:98,height:208)
+                                                            .cornerRadius(8)
+                                                            .clipped()
+                                                    }
+                                                }
+                                                Button(action: {
+                                                    vm.deleteProject(project)
+                                                }) {
+                                                    Image(systemName: "xmark.circle.fill")
+                                                        .foregroundColor(.black)
+                                                        .padding(6)
                                                 }
                                             }
-                                            Button(action: {
-                                                vm.deleteProject(project)
-                                            }) {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .foregroundColor(.black)
-                                                    .padding(6)
-                                            }
+                                            .id(project.id) //  gắn id để scrollTo
                                         }
                                     }
                                 }
-
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
-                            
+                            .onChange(of: vm.mainprojects.first?.id) { newID in
+                                if let id = newID {
+                                    withAnimation {
+                                        proxy.scrollTo(id, anchor: .top) //  scroll về đầu
+                                    }
+                                }
+                            }
                         }
                     }
                     Spacer()
@@ -96,12 +104,7 @@ struct HomeView: View {
                 }
             }
         }
-//        .onAppear {
-//            let projects = ProjectStorage.loadAllProjects()
-//            print(" Reloaded projects: \(projects.count)")
-//            projects.forEach { print("   id: \($0.id)") }
-//            vm.mainprojects = projects
-//        }
+        
         .onAppear {
             let projects = ProjectStorage.loadAllProjects()
             vm.mainprojects = projects

@@ -479,8 +479,27 @@ extension BackgroundEditorViewModel {
           }
       }
 
-
-
+    func restoreProject(_ project: MainModel) {
+        guard let url = project.frame?.backgroundURL,
+              let data = try? Data(contentsOf: url),
+              let uiImage = UIImage(data: data) else { return }
+        
+        self.baseImage = uiImage
+        self.defaultPreview = uiImage
+        
+        if let filter = project.selectedFilter {
+            self.selectedFilter = filter
+            self.loadSelectedFilter(baseImage: uiImage) { filtered in
+                self.finalImage = filtered
+            }
+        } else {
+            self.finalImage = uiImage
+        }
+        //  rebuild LUT previews
+        self.prepareAllPreviews()
+        self.updatePreview()
+        self.isImageLoaded = true
+    }
 }
 
 

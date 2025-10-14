@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct StoryMakerAppApp: App {
+    @AppStorage("seenOnboarding") var seenOnboarding: Bool = false
     @StateObject var vm = BackgroundEditorViewModel()
 
     var body: some Scene {

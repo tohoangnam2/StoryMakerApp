@@ -70,17 +70,13 @@ struct AddProjectView: View {
                         }) {
                             Image("home_back")
                         }
-
                         Spacer()
                         Button {
                             resetEditState()
                             showPreview = true
-                            
                         } label: {
                             Image("home_share")
                         }
-
-
                     }
                     .padding(.horizontal)
                     Spacer()
@@ -126,21 +122,15 @@ struct AddProjectView: View {
                                 )
                                 .environmentObject(vm)
                                 .onAppear {
-                                    vm.fetchCategories()
-                                    vm.mainprojects = ProjectStorage.loadAllProjects()
-                                    vm.prepareAllPreviews()
-                                    vm.updatePreview()
-                                    vm.isImageLoaded = true
-                                    
                                     self.project = project
                                     overlayVM.overlays = project.textLayers
                                     frame = project.frame
-
                                     if let url = project.frame?.backgroundURL,
                                        let data = try? Data(contentsOf: url),
                                        let uiImage = UIImage(data: data) {
                                         vm.baseImage = uiImage
-                                        // apply lại filter LUT nếu có
+//                                      vm.defaultPreview = uiImage
+                                        // apply lại filte  r LUT
                                         if let filter = project.selectedFilter {
                                             vm.selectedFilter = filter
                                             vm.loadSelectedFilter(baseImage: uiImage) { filtered in
@@ -148,11 +138,9 @@ struct AddProjectView: View {
                                             }
                                         } else {
                                             vm.finalImage = uiImage
-                                            
                                         }
                                     }
                                 }
-
                             } else {
                                 AddBackgroundsView(
                                     overlayVM: overlayVM,
@@ -412,7 +400,6 @@ struct AddProjectView: View {
                                         .padding(.horizontal,20)
                                         .background(.white)
                                 }
-                                
                             }
                         }
 
@@ -427,9 +414,7 @@ struct AddProjectView: View {
                         print("Project chưa chọn background, bỏ qua lưu")
                         return
                     }
-
                     // merge state từ vm.projectStates
-
                     if let snap = snapshotImage {
                         ProjectStorage.saveProject(current, previewImage: snap)
                         print("Saved snapshot onDisappear")
@@ -438,8 +423,6 @@ struct AddProjectView: View {
                         print("Saved filtered image onDisappear")
                     }
                 }
-
-
             }
         }
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
@@ -587,7 +570,6 @@ struct AddProjectView: View {
          currentProject.previewImage = snapshotImage ?? vm.finalImage
          currentProject.textLayers = overlayVM.overlays
          currentProject.selectedFilter = vm.selectedFilter
-        
 
          // Preview full flatten cho list
          if let snap = snapshotImage {
@@ -595,9 +577,7 @@ struct AddProjectView: View {
          } else if let filtered = vm.finalImage {
              currentProject.previewImage = filtered
          }
-
-
-
+        
         // lưu docs
         ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage)
 
