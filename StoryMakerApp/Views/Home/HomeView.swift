@@ -20,6 +20,8 @@ struct HomeView: View {
     
     @State private var selectedProjectID: UUID?
     
+    @Binding var isShowPremium: Bool
+
     var body: some View {
         NavigationView{
             ZStack{
@@ -27,15 +29,21 @@ struct HomeView: View {
                     VStack(){
                         VStack(spacing: 25){
                             HStack{
-                                NavigationLink(destination: SplashView()){
-                                    Image("home_ictabbar")
-                                }
+                                Image("home_ictabbar")
                                 Spacer()
                                 Text("Art story".uppercased())
                                     .font(.system(size: 18, weight: .bold, design: .default))
                                 Spacer()
-                                Image("home_ictabbar")
-                                    .opacity(0)
+                               
+                                Button(action: {
+                                    isShowPremium = true
+                                }, label: {
+                                    Image("home_premium")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 30, height: 30)
+                                        .padding(.trailing,18)
+                                })
                                 
                             }
                             .padding(.horizontal,20)
@@ -109,7 +117,10 @@ struct HomeView: View {
             let projects = ProjectStorage.loadAllProjects()
             vm.mainprojects = projects
         }
-
+        .fullScreenCover(isPresented: $isShowPremium) {
+            SubcriptionView()
+                .environmentObject(vm)
+        }
 
         .navigationBarBackButtonHidden(true)
         

@@ -113,75 +113,143 @@ struct TextView: View {
                 case .colorSolid:
                     VStack{
                         CustomSliderRowColor(title: "Opacity", valueOpacity:overlay.valueOpacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(TextView.solidColors, id: \.self) { color in
-                                    Circle()
-                                        .frame(width: 40, height: 40)
-                                        .foregroundColor(Color(color))
-                                        .onTapGesture {
-                                            overlay.colorSolid.wrappedValue = color
-                                            overlay.userGradient.wrappedValue = false
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal,showsIndicators: false) {
+                                HStack() {
+                                    ColorPickerFromImage(overlay: overlay)
 
-                                        }
+                                    ForEach(TextView.solidColors, id: \.self) { color in
+                                        Circle()
+                                            .frame(width: 40, height: 40)
+                                            .foregroundColor(Color(color))
+                                            .id(color)
+                                            .onTapGesture {
+                                                withAnimation{
+                                                    proxy.scrollTo(color, anchor: .leading)
+                                                    overlay.colorSolid.wrappedValue = color
+                                                    overlay.userGradient.wrappedValue = false
+                                                }
+                                            }
+                                            .overlay(
+                                                 Circle()
+                                                    .strokeBorder( overlay.colorSolid.wrappedValue == color ? Color.red: Color.clear,lineWidth: 3)
+                                            )
+                                    }
                                 }
+                                .padding(.horizontal)
+                                
                             }
-                            .padding(.horizontal)
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    withAnimation {
+                                        proxy.scrollTo(overlay.colorSolid.wrappedValue, anchor: .leading)
+                                    }
+                                }
+                                
+                            }
                             
                         }
+                       
                     }
-                    .padding(.top, 12)
+                    .padding(.leading, 8)
                     
                 case .gradient:
                     VStack {
                         CustomSliderRowColor(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack {
-                                ForEach(0..<TextView.gradientColors.count, id: \.self) { gradientIndex in
-                                    let first = Color(TextView.gradientColors[gradientIndex][0])
-                                    let second = Color(TextView.gradientColors[gradientIndex][1])
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [first, second]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 40, height: 40)
-                                        .onTapGesture {
-                                            overlay.colorGradient.wrappedValue = [
-                                                first.toHex() ?? "#FFFFFF",
-                                                second.toHex() ?? "#FFFFFF"
-                                            ]
-                                            overlay.userGradient.wrappedValue = true
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack {
+                                    ColorPickerFromImage(overlay: overlay)
 
-                                        }
+                                    
+                                    ForEach(0..<TextView.gradientColors.count, id: \.self) { gradientIndex in
+                                        let first = Color(TextView.gradientColors[gradientIndex][0])
+                                        let second = Color(TextView.gradientColors[gradientIndex][1])
+                                        Circle()
+                                            .fill(
+                                                LinearGradient(
+                                                    gradient: Gradient(colors: [first, second]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .frame(width: 40, height: 40)
+                                            .id(gradientIndex)
+                                            .onTapGesture {
+                                                withAnimation {
+                                                    proxy.scrollTo(gradientIndex, anchor: .leading)
+                                                    overlay.colorGradient.wrappedValue = [
+                                                        first.toHex() ?? "#FFFFFF",
+                                                        second.toHex() ?? "#FFFFFF"
+                                                    ]
+                                                    overlay.userGradient.wrappedValue = true
+                                                }
+                                            }
+                                            .overlay(
+                                                Circle()
+                                                    .stroke( overlay.colorGradient.wrappedValue == [
+                                                        first.toHex() ?? "#FFFFFF",
+                                                        second.toHex() ?? "#FFFFFF"
+                                                    ] ? Color.red: Color.clear,lineWidth: 3)
+                                            )
+                                            
+                                    }
                                 }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    withAnimation {
+                                        proxy.scrollTo(overlay.colorGradient.wrappedValue, anchor: .leading)
+                                    }
+                                }
+                                
+                            }
+
+
                         }
+                        .padding(.leading,12)
+                        
+
                     }
                     .padding(.top, 12)
                 case .stroke:
                     VStack {
                         CustomSliderRowStroke(title: "Stroke Width", value: overlay.strokeWidth, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         CustomSliderRowColor(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ColorPickerFromImage(overlay: overlay)
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ColorPickerFromImage(overlay: overlay)
 
-                                ForEach(TextView.solidColors, id: \.self) { color in
-                                    Circle()
-                                        .foregroundColor(Color(color))
-                                        .frame(width: 40, height: 40)
-                                        .onTapGesture {
-                                            overlay.colorSolid.wrappedValue = color
-                                        }
+                                    ForEach(TextView.solidColors, id: \.self) { color in
+                                        Circle()
+                                            .foregroundColor(Color(color))
+                                            .frame(width: 40, height: 40)
+                                            .id(color)
+                                            .onTapGesture {
+                                                withAnimation {
+                                                    proxy.scrollTo(color, anchor: .leading)
+                                                    overlay.colorSolid.wrappedValue = color
+                                                }
+                                            }
+                                            .overlay(
+                                                Circle()
+                                                    .stroke( overlay.colorSolid.wrappedValue == color ? Color.red: Color.clear,lineWidth: 3)
+                                            )
+                                    }
                                 }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    withAnimation {
+                                        proxy.scrollTo(overlay.colorGradient.wrappedValue, anchor: .leading)
+                                    }
+                                }
+                                
+                            }
+
                         }
                     }
                     .padding(.top, 12)

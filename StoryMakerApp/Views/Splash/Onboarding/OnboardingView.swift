@@ -43,7 +43,8 @@ struct OnboardingView: View {
 
                 default:
                     withAnimation(.spring()){
-                       SubcriptionView()
+                        
+                       EmptyView()
                     }
                 }
                

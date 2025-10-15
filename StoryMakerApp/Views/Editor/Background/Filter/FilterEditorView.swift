@@ -70,7 +70,7 @@ struct FilterEditorView: View {
                                 }
                                 
                                 withAnimation {
-                                    proxy.scrollTo(bg.id, anchor: .center)
+                                    proxy.scrollTo(bg.id, anchor: .leading)
                                 }
                             }
                             .overlay(
@@ -86,6 +86,21 @@ struct FilterEditorView: View {
                     }
                     .padding(.horizontal,12)
                 }
+                //scroll đến view ngay khi mở
+                .onAppear {
+                    if let selected = vm.selectedFilter,
+                       let bg = vm.allBackgrounds.first(where: { $0.image == selected }) {
+                        DispatchQueue.main.async {
+                            proxy.scrollTo(bg.id, anchor: .leading)
+                        }
+                    } else if vm.selectedFilter == nil,
+                              let defaultBG = vm.allBackgrounds.first(where: { $0.isDefault }) {
+                        DispatchQueue.main.async {
+                            proxy.scrollTo(defaultBG.id, anchor: .leading)
+                        }
+                    }
+                }
+
                 .onChange(of: vm.selectedCategory?.id) { newCategoryID in
                     guard let categoryID = newCategoryID else { return }
                     DispatchQueue.main.async {

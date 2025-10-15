@@ -81,6 +81,9 @@ struct BackGroundView: View {
                                     .padding(.all, 12)
                                     
                                 }
+                                .refreshable {
+                                    vm.fetch()
+                                }
 
                         } else {
                             VStack {
@@ -113,7 +116,8 @@ struct BackGroundView: View {
                             Spacer()
                         }
                     }
-                    .onAppear {
+                    
+                    .onAppear{
                         vm.fetch()
                     }
                     
@@ -134,7 +138,7 @@ struct CategoryTagView: View {
     @ObservedObject var vm: BackGroundViewModel
     
     var body: some View {
-        ScrollView(.horizontal) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 ForEach(vm.model?.config.category ?? [], id: \.id) { category in
                     Text(category.name)

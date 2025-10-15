@@ -9,9 +9,11 @@ import SwiftUI
 
 struct SubcriptionView: View {
     
+
     //countdown 3 ngay
     // Tổng số giây còn lại
     @State private var remainingTime: Int = 3 * 24 * 60 * 60 // 3 ngày
+    @Environment(\.presentationMode) var presentationMode
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -34,9 +36,20 @@ struct SubcriptionView: View {
                     .resizable()
                     .ignoresSafeArea(edges: .all)
                     .scaledToFill()
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+
+                }, label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 30))
+                        .position(x: 350, y: 40)
+                        .padding(15)
+                })
                     VStack(spacing:15){
                         Spacer()
                         VStack(spacing:29){
+                            
                             VStack(spacing: 10){
                                 
                                 Text("Hurry Up! Time is running out!")
@@ -113,11 +126,9 @@ struct SubcriptionView: View {
                             
                         }
                         VStack(spacing: 15){
-                            withAnimation(.spring){
-                                NavigationLink(destination: HomeView()){
-                                    Image("sub_btn")
-                                }
-                            }
+                            Image("sub_btn")
+                                
+                            
                             Text("Auto-renewable")
                                 .font(.system(size: 13, weight: .regular, design: .default))
                                 .foregroundColor(Color.bgSplashBtn)

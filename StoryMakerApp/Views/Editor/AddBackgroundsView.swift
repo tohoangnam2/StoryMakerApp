@@ -90,7 +90,10 @@ struct AddBackgroundsView: View {
                                     onOpenBackgroundEditor()
                                 } else {
                                     onTapOutside()
+                                    showBackgroundEdit = false
+
                                 }
+
                             }
                             .overlay(
                                 //Group không ảnh hưởng layout, chỉ gom nhiều view trong điều kiện.
@@ -167,6 +170,8 @@ struct AddBackgroundsView: View {
                                                 .onTapGesture(count: 2, perform: {
                                                     showTextField = true
                                                     isTextFieldFocused = true
+                                                    showBackgroundEdit = false
+
                                                 })
                                                 .gesture(
                                                     DragGesture(coordinateSpace: .named("canvas"))

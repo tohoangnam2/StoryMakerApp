@@ -506,6 +506,7 @@ struct AddProjectView: View {
         isTextFieldFocused = false
         isSelected = false
         overlayVM.deselectAll()
+        showBackgroundEdit = false
     }
 //    func exitExport(completion: @escaping () -> Void) {
 //        isExport = true

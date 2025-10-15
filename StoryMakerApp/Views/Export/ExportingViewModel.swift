@@ -120,20 +120,27 @@ class ExportingViewModel: ObservableObject {
             try imageData.write(to: fileURL)
             print(" Saved JPG to: \(fileURL)")
             
-            // Nếu muốn lưu vào Photo Library
+            //lưu vào Photo Library
             PHPhotoLibrary.requestAuthorization { status in
-                if status == .authorized || status == .limited {
-                    PHPhotoLibrary.shared().performChanges({
-                        PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: fileURL)
-                    }) { success, error in
-                        if success {
-                            print(" Saved to Photos")
-                        } else {
-                            print(" Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
+                        switch status {
+                        case .authorized, .limited:
+                            // Người dùng đã cho phép → lưu vào Photos
+                            PHPhotoLibrary.shared().performChanges({
+                                PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: fileURL)
+                            }) { success, error in
+                                if success {
+                                    print("Saved to Photos")
+                                } else {
+                                    print("Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
+                                }
+                            }
+                        case .denied, .restricted, .notDetermined:
+                            // Người dùng từ chối hoặc chưa cho phép → KHÔNG lưu
+                            print("User denied photo library access, skip saving to Photos")
+                        @unknown default:
+                            break
                         }
                     }
-                }
-            }
             
             DispatchQueue.main.async {
                 self.progress = 1.0

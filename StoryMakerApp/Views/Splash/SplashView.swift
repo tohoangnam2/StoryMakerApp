@@ -11,6 +11,10 @@ import SwiftUI
 
 struct SplashView: View {
     
+    @Binding var isShowPremium: Bool
+    
+    @Binding var hasShownGetStarted: Bool
+    
     var body: some View {
         NavigationView {
             ZStack{
@@ -32,18 +36,21 @@ struct SplashView: View {
                                 .foregroundStyle(.white)
                         }
                     }
+                   
                     VStack(spacing:19){
-                        NavigationLink {
-                            withAnimation(.spring()){
-                                OnboardingView()
-                                    .navigationBarBackButtonHidden(true)
+                        if hasShownGetStarted{
+                            NavigationLink {
+                                withAnimation(.spring()){
+                                    HomeView(isShowPremium: $isShowPremium)
+                                        .navigationBarBackButtonHidden(true)
+                                }
+                            } label: {
+                                Text("Get Started")
+                                    .font(.headline)
+                                    .foregroundColor(Color.bgSplashBtn)
+                                    .frame(width: 258,height: 47)
+                                    .background(Color.white.cornerRadius(57))
                             }
-                        } label: {
-                            Text("Get Started")
-                                .font(.headline)
-                                .foregroundColor(Color.bgSplashBtn)
-                                .frame(width: 258,height: 47)
-                                .background(Color.white.cornerRadius(57))
                         }
                         Text("Terms of Use  ·  Privacy Policy")
                             .font(.system(size: 12, weight: .medium, design: .default))
@@ -51,7 +58,9 @@ struct SplashView: View {
                     }
                 }
             }
+
         }
+        
         
     }
 }
