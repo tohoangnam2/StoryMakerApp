@@ -24,7 +24,9 @@ struct StoryMakerAppApp: App {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                 withAnimation {
                                     self.showSplash = false
-                                    self.isShowPremium = true
+                                    if seenOnboarding {
+                                        self.isShowPremium = true
+                                    }
 
                                 }
                             }
@@ -33,7 +35,7 @@ struct StoryMakerAppApp: App {
                     
                 } else {
                     if !seenOnboarding {
-                        OnboardingView()
+                        OnboardingView(isShowPremium: $isShowPremium, seenOnboarding: $seenOnboarding)
                             .transition(.move(edge: .leading))
                             .onDisappear {
                                 self.seenOnboarding = true

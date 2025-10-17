@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import SwiftUI
 
 
@@ -98,6 +99,18 @@ class BackgroundEditorViewModel: ObservableObject {
     
     @Published var project: MainModel = MainModel()
     
+    //network
+//    @Published var isOnline : Bool = false
+    @Published var isOnline: Bool = NetworkManager.shared.isOnline
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        NetworkManager.shared.$isOnline
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.isOnline, on: self)
+            .store(in: &cancellables)
+    }
+
     
 
     func createEmptyProject() -> MainModel {
@@ -163,19 +176,11 @@ class BackgroundEditorViewModel: ObservableObject {
         }
     }
 
-    
-
-    
-    
     //view default
     var defaultBackgroundItem: BackgroundItem? {
         guard let base = baseImage else { return nil }
         return BackgroundItem( image: "", isDefault: true, baseImage: base)
     }
-
-
-
-
 
     // Trong ViewModel
     func generatePreview(for bg: BackgroundItem) {
@@ -359,6 +364,19 @@ class BackgroundEditorViewModel: ObservableObject {
            self.selectedFilter = nil
            self.finalImage = self.baseImage
     }
+    func reset() {
+        baseImage = nil
+        finalImage = nil
+        defaultPreview = nil
+        selectedFilter = nil
+        selectedFilterImage = nil
+        previewImages.removeAll()
+        opacity = 1.0
+        // reset thêm các biến khác nếu cần
+        
+        
+    }
+    
 //    func reloadProjectsAndCategories(for projectID: UUID?) {
 //        // Load lại toàn bộ project từ storage
 //        self.mainprojects = ProjectStorage.loadAllProjects()
@@ -499,6 +517,61 @@ extension BackgroundEditorViewModel {
         self.prepareAllPreviews()
         self.updatePreview()
         self.isImageLoaded = true
+    }
+}
+extension BackgroundEditorViewModel {
+    func reloadProjectAssets(_ project: MainModel, overlayVM: OverlayTextViewModel) {
+        // reset state cũ
+        reset()
+        
+        // khôi phục text overlay
+        overlayVM.overlays = project.textLayers
+        
+        // khôi phục filter đã lưu
+        selectedFilter = project.selectedFilter
+        opacity = project.opacity
+        
+        // đường dẫn ảnh gốc
+        let folderURL = ProjectStorage.projectFolder(for: project.id)
+        let originalURL = folderURL.appendingPathComponent("original.jpg")
+        
+        // 1. Ưu tiên load offline từ original.jpg
+        if let data = try? Data(contentsOf: originalURL),
+           let uiImage = UIImage(data: data) {
+            print("✅ Offline: Load từ original.jpg")
+            baseImage = uiImage
+            applyFilterIfNeeded(uiImage)
+            return
+        }
+        
+        // 2. Nếu không có file gốc thì thử online từ backgroundURL
+        if let url = project.frame?.backgroundURL,
+           let data = try? Data(contentsOf: url),
+           let uiImage = UIImage(data: data) {
+            print("🌐 Online: Load từ backgroundURL")
+            baseImage = uiImage
+            applyFilterIfNeeded(uiImage)
+            return
+        }
+        
+        // 3. Fallback cuối cùng: preview từ JSON
+        if let preview = project.previewImage {
+            print("⚠️ Fallback: dùng previewImage từ JSON")
+            baseImage = preview
+            finalImage = preview
+        } else {
+            print("❌ Không có original.jpg, backgroundURL, hay previewImage")
+        }
+    }
+    
+    private func applyFilterIfNeeded(_ uiImage: UIImage) {
+        if let filter = selectedFilter {
+            loadSelectedFilter(baseImage: uiImage) { filtered in
+                self.finalImage = filtered
+            }
+        } else {
+            finalImage = uiImage
+        }
     }
 }
 

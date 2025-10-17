@@ -65,15 +65,26 @@ struct HomeView: View {
                                                     destination: AddProjectView(projectID: project.id)
                                                         .environmentObject(vm)
                                                 ) {
-                                                    if let preview = project.previewImage {
-                                                        Image(uiImage: preview)
+                                                    // Load preview trực tiếp từ file project_<id>.jpg
+                                                    let folderURL = ProjectStorage.projectFolder(for: project.id)
+                                                    let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
+                                                    
+                                                    if let data = try? Data(contentsOf: previewURL),
+                                                       let uiImage = UIImage(data: data) {
+                                                        Image(uiImage: uiImage)
                                                             .resizable()
                                                             .scaledToFill()
-                                                            .frame(width:98,height:208)
+                                                            .frame(width: 98, height: 208)
                                                             .cornerRadius(8)
                                                             .clipped()
+                                                    } else {
+                                                        // fallback nếu chưa có preview
+                                                        Color.gray
+                                                            .frame(width: 98, height: 208)
+                                                            .cornerRadius(8)
                                                     }
                                                 }
+                                                
                                                 Button(action: {
                                                     vm.deleteProject(project)
                                                 }) {
@@ -82,11 +93,12 @@ struct HomeView: View {
                                                         .padding(6)
                                                 }
                                             }
-                                            .id(project.id) //  gắn id để scrollTo
+                                            .id(project.id)
                                         }
                                     }
                                 }
-                                .padding(.horizontal)
+                                    .padding(.horizontal)
+
                             }
                             .onChange(of: vm.mainprojects.first?.id) { newID in
                                 if let id = newID {
@@ -125,57 +137,118 @@ struct HomeView: View {
         .navigationBarBackButtonHidden(true)
         
     }
-    func loadSavedProjects() {
-        let fileManager = FileManager.default
-        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-
-        do {
-            let files = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
-            let jsonFiles = files.filter { $0.pathExtension == "json" }
-
-            var loadedProjects: [MainModel] = []
-
-            for file in jsonFiles {
-                if let data = try? Data(contentsOf: file),
-                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
-                    loadedProjects.append(project)
+//    func loadSavedProjects() {
+//        let fileManager = FileManager.default
+//        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+//
+//        do {
+//            let files = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+//            let jsonFiles = files.filter { $0.pathExtension == "json" }
+//
+//            var loadedProjects: [MainModel] = []
+//
+//            for file in jsonFiles {
+//                if let data = try? Data(contentsOf: file),
+//                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
+//                    loadedProjects.append(project)
+//                }
+//            }
+//
+//            vm.mainprojects = loadedProjects
+//        } catch {
+//            print("Failed to load projects: \(error)")
+//        }
+//    }
+//    static func loadAllProjects() -> [MainModel] {
+//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+//        var loaded: [MainModel] = []
+//
+//        do {
+//            let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+//            for folder in folders where folder.lastPathComponent.hasPrefix("project_") {
+//                let jsonURL = folder.appendingPathComponent("\(folder.lastPathComponent).json")
+//                if FileManager.default.fileExists(atPath: jsonURL.path),
+//                   let data = try? Data(contentsOf: jsonURL),
+//                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
+//                    // load preview.jpg nếu có
+//                    let previewURL = folder.appendingPathComponent("\(folder.lastPathComponent).jpg")
+//                    if let imgData = try? Data(contentsOf: previewURL),
+//                       let uiImage = UIImage(data: imgData) {
+//                        var proj = project
+//                        proj.previewImage = uiImage
+//                        loaded.append(proj)
+//                    } else {
+//                        loaded.append(project)
+//                    }
+//                }
+//            }
+//        } catch {
+//            print("Failed to list projects: \(error)")
+//        }
+//        return loaded
+//    }
+//    static func loadAllProjects() -> [MainModel] {
+//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+//        var loaded: [MainModel] = []
+//
+//        do {
+//            let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+//            for folder in folders where folder.lastPathComponent.hasPrefix("project_") {
+//                let jsonURL = folder.appendingPathComponent("\(folder.lastPathComponent).json")
+//                if FileManager.default.fileExists(atPath: jsonURL.path),
+//                   let data = try? Data(contentsOf: jsonURL),
+//                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
+//                    //  Không cần load JPG rời nữa, previewImage sẽ tự decode từ base64
+//                    loaded.append(project)
+//                }
+//            }
+//        } catch {
+//            print(" Failed to list projects: \(error)")
+//        }
+//        return loaded
+//    }
+    func previewImageView(for project: MainModel, isOnline: Bool) -> some View {
+        if isOnline {
+            // ONLINE → load từ file project_<id>.jpg
+            let folderURL = ProjectStorage.projectFolder(for: project.id)
+            let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
+            if let data = try? Data(contentsOf: previewURL),
+               let uiImage = UIImage(data: data) {
+                return AnyView(
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 98, height: 208)
+                        .cornerRadius(8)
+                        .clipped()
+                )
+            }
+        } else {
+            // OFFLINE → load từ previewImagePath trong JSON
+            if let previewPath = project.previewImagePath {
+                let url = previewPath.hasPrefix("file://")
+                    ? URL(string: previewPath)!
+                    : URL(fileURLWithPath: previewPath)
+                if let data = try? Data(contentsOf: url),
+                   let uiImage = UIImage(data: data) {
+                    return AnyView(
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 98, height: 208)
+                            .cornerRadius(8)
+                            .clipped()
+                    )
                 }
             }
-
-            vm.mainprojects = loadedProjects
-        } catch {
-            print("Failed to load projects: \(error)")
         }
+        // fallback
+        return AnyView(
+            Color.gray
+                .frame(width: 98, height: 208)
+                .cornerRadius(8)
+        )
     }
-    static func loadAllProjects() -> [MainModel] {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        var loaded: [MainModel] = []
-
-        do {
-            let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
-            for folder in folders where folder.lastPathComponent.hasPrefix("project_") {
-                let jsonURL = folder.appendingPathComponent("\(folder.lastPathComponent).json")
-                if FileManager.default.fileExists(atPath: jsonURL.path),
-                   let data = try? Data(contentsOf: jsonURL),
-                   let project = try? JSONDecoder().decode(MainModel.self, from: data) {
-                    // load preview.jpg nếu có
-                    let previewURL = folder.appendingPathComponent("\(folder.lastPathComponent).jpg")
-                    if let imgData = try? Data(contentsOf: previewURL),
-                       let uiImage = UIImage(data: imgData) {
-                        var proj = project
-                        proj.previewImage = uiImage
-                        loaded.append(proj)
-                    } else {
-                        loaded.append(project)
-                    }
-                }
-            }
-        } catch {
-            print("Failed to list projects: \(error)")
-        }
-        return loaded
-    }
-
 
 
 

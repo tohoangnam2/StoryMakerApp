@@ -10,6 +10,8 @@ import SwiftUI
 struct OnboardingView: View {
     
     @State var onboardingState : Int = 0
+    @Binding var isShowPremium: Bool
+    @Binding var seenOnboarding: Bool
     let trainstion: AnyTransition = .asymmetric(insertion: .move(edge: .trailing),
                                                 removal: .move(edge: .leading))
     
@@ -43,11 +45,16 @@ struct OnboardingView: View {
 
                 default:
                     withAnimation(.spring()){
-                        
                        EmptyView()
                     }
                 }
                
+            }
+            .onChange(of: onboardingState) { value in
+                if value > 3 {
+                    seenOnboarding = true
+                    isShowPremium = true
+                }
             }
         }
       
@@ -310,6 +317,3 @@ struct TopCurvedShape: Shape {
     }
 }
 
-#Preview {
-    OnboardingView()
-}

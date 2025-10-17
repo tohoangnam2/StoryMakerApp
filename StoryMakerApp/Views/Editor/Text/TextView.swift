@@ -161,7 +161,6 @@ struct TextView: View {
                                 HStack {
                                     ColorPickerFromImage(overlay: overlay)
 
-                                    
                                     ForEach(0..<TextView.gradientColors.count, id: \.self) { gradientIndex in
                                         let first = Color(TextView.gradientColors[gradientIndex][0])
                                         let second = Color(TextView.gradientColors[gradientIndex][1])
@@ -187,7 +186,7 @@ struct TextView: View {
                                             }
                                             .overlay(
                                                 Circle()
-                                                    .stroke( overlay.colorGradient.wrappedValue == [
+                                                    .strokeBorder( overlay.colorGradient.wrappedValue == [
                                                         first.toHex() ?? "#FFFFFF",
                                                         second.toHex() ?? "#FFFFFF"
                                                     ] ? Color.red: Color.clear,lineWidth: 3)
@@ -200,19 +199,17 @@ struct TextView: View {
                             .onAppear {
                                 DispatchQueue.main.async {
                                     withAnimation {
-                                        proxy.scrollTo(overlay.colorGradient.wrappedValue, anchor: .leading)
+                                        if let targetIndex = TextView.gradientColors.firstIndex(where: { pair in
+                                            pair == overlay.colorGradient.wrappedValue
+                                        }) {
+                                            proxy.scrollTo(targetIndex, anchor: .leading)
+                                        }
                                     }
                                 }
-                                
                             }
-
-
                         }
-                        .padding(.leading,12)
-                        
-
                     }
-                    .padding(.top, 12)
+                    .padding(.leading, 8)
                 case .stroke:
                     VStack {
                         CustomSliderRowStroke(title: "Stroke Width", value: overlay.strokeWidth, sliderColor: .gray, thumbColor: .red.opacity(0.6))
@@ -235,7 +232,7 @@ struct TextView: View {
                                             }
                                             .overlay(
                                                 Circle()
-                                                    .stroke( overlay.colorSolid.wrappedValue == color ? Color.red: Color.clear,lineWidth: 3)
+                                                    .strokeBorder( overlay.colorSolid.wrappedValue == color ? Color.red: Color.clear,lineWidth: 3)
                                             )
                                     }
                                 }
@@ -244,7 +241,7 @@ struct TextView: View {
                             .onAppear {
                                 DispatchQueue.main.async {
                                     withAnimation {
-                                        proxy.scrollTo(overlay.colorGradient.wrappedValue, anchor: .leading)
+                                        proxy.scrollTo(overlay.colorSolid.wrappedValue, anchor: .leading)
                                     }
                                 }
                                 
@@ -252,7 +249,7 @@ struct TextView: View {
 
                         }
                     }
-                    .padding(.top, 12)
+                    .padding(.leading, 8)
                 case .align:
                     VStack{
                         CustomAlign(title: "Align", selectedAlign: overlay.selectedAlign)
@@ -266,25 +263,42 @@ struct TextView: View {
                         CustomSliderBackGround(title: "Corner", valueBG: overlay.cornerRadiusBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         CustomSliderRowBgOpacity(title: "Opacity", valueOpacity:overlay.opacityBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         
-                        ScrollView(.horizontal) {
-                            HStack {
-                                Image("cs1")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                ForEach(TextView.solidColors, id: \.self) { color in
-                                    Circle()
-                                        .foregroundColor(Color(color))
-                                        .frame(width: 40, height: 40)
-                                        .onTapGesture {
-                                            overlay.bgColor.wrappedValue = color
-                                        }
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ColorPickerFromImage(overlay: overlay)
+
+                                    ForEach(TextView.solidColors, id: \.self) { color in
+                                        Circle()
+                                            .foregroundColor(Color(color))
+                                            .frame(width: 40, height: 40)
+                                            .id(color)
+                                            .onTapGesture {
+                                                withAnimation {
+                                                    proxy.scrollTo(color, anchor: .leading)
+                                                    overlay.bgColor.wrappedValue = color
+
+                                                }
+                                            }
+                                            .overlay(
+                                                Circle()
+                                                    .strokeBorder(overlay.bgColor.wrappedValue == color ? Color.red : Color.clear, lineWidth: 3)
+                                            )
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    withAnimation {
+                                        proxy.scrollTo(overlay.bgColor.wrappedValue, anchor: .leading)
+                                    }
                                 }
                             }
-                            .padding(.horizontal)
                         }
                         
                     }
-                    .padding(.top, 12)
+                    .padding(.leading, 8)
                 case .shadow:
                     VStack{
                         CustomSliderShadow(title: "X", valueBG: overlay.offSetXSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
@@ -292,27 +306,46 @@ struct TextView: View {
                         CustomSliderShaDowBlur(title: "Blur", valueBG:overlay.blurSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         CustomSliderRowColor(title: "Opacity", valueOpacity:overlay.opacitySD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         
-                        
-                        ScrollView(.horizontal) {
-                            HStack {
-                                Image("cs1")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                ForEach(TextView.solidColors, id: \.self) { color in
-                                    Circle()
-                                        .foregroundColor(Color(color))
-                                        .frame(width: 40, height: 40)
-                                        .onTapGesture {
-                                            overlay.shawDowColor.wrappedValue = color
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ColorPickerFromImage(overlay: overlay)
+                                    
+                                    ForEach(TextView.solidColors, id: \.self) { color in
+                                        Circle()
+                                            .foregroundColor(Color(color))
+                                            .frame(width: 40, height: 40)
+                                            .id(color)
+                                            .onTapGesture {
+                                                withAnimation {
+                                                    proxy.scrollTo(color, anchor: .leading)
+                                                    overlay.shawDowColor.wrappedValue = color
 
-                                        }
+                                                }
+
+                                            }
+                                            .overlay(
+                                                Circle()
+                                                    .strokeBorder(overlay.shawDowColor.wrappedValue == color ? Color.red : Color.clear, lineWidth: 3)
+                                            )
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    withAnimation {
+                                        proxy.scrollTo(overlay.shawDowColor.wrappedValue, anchor: .leading)
+                                    }
                                 }
                             }
-                            .padding(.horizontal)
+                            
+
                         }
                         
+                        
                     }
-                    .padding(.top, 12)
+                    .padding(.leading, 8)
                 case nil:
                     ProgressView()
                 case .none:
@@ -604,8 +637,8 @@ struct CustomAlignCase: View {
 struct CustomSliderShadow: View {
     let title: String
     @Binding var valueBG: Double
-    var minValue: Double = -200
-    var maxValue: Double = 200
+    var minValue: Double = -5
+    var maxValue: Double = 5
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
@@ -666,7 +699,7 @@ struct CustomSliderBackGround: View {
 struct CustomSliderShaDowBlur: View {
     let title: String
     @Binding var valueBG: Double
-    var minValue: Double = 0
+    var minValue: Double = 2
     var maxValue: Double = 10
     var sliderColor: Color = .red
     var thumbColor: Color = .red

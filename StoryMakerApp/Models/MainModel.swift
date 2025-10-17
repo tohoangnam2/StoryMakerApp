@@ -24,26 +24,18 @@ struct MainModel: Identifiable, Codable {
     // Frame
     var frame: Frame? = nil
     var frameID: String? = nil
-    
-    var previewImageData: Data?
-    
-    var previewImage: UIImage? {
-            get {
-                guard let data = previewImageData else { return nil }
-                return UIImage(data: data)
-            }
-            set {
-                previewImageData = newValue?.jpegData(compressionQuality: 0.8)
-            }
-        }
-    
-    var originImage : String?
-    
     var selectedFilter: String?
+
+    // Preview và original path
+    var previewImagePath: String?
+    var originalImagePath: String?
+    
+    // Không encode UIImage trực tiếp
+    var previewImage: UIImage?
     
 
     enum CodingKeys: String, CodingKey {
-        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation,selectedFilter
+        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation,selectedFilter,previewImagePath,originalImagePath
     }
     
     init(id: UUID = UUID()) {

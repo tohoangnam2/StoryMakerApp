@@ -23,6 +23,7 @@
 		544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176E2E8FBF1600999A9B /* TestPreview.swift */; };
 		544C17762E8FBF1600999A9B /* TestPreview1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176F2E8FBF1600999A9B /* TestPreview1.swift */; };
 		5454444D2E7A6A780080D518 /* AddBackgroundsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */; };
+		545B40242EA22D1500C1CA05 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545B40232EA22D1200C1CA05 /* Network.swift */; };
 		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
 		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
 		546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */; };
@@ -72,6 +73,7 @@
 		544C176E2E8FBF1600999A9B /* TestPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview.swift; sourceTree = "<group>"; };
 		544C176F2E8FBF1600999A9B /* TestPreview1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview1.swift; sourceTree = "<group>"; };
 		5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBackgroundsView.swift; sourceTree = "<group>"; };
+		545B40232EA22D1200C1CA05 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
 		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
 		546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundViewModel.swift; sourceTree = "<group>"; };
@@ -248,6 +250,14 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		545B40222EA22CED00C1CA05 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				545B40232EA22D1200C1CA05 /* Network.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
 		5469689E2E6E8C2E00BD2B77 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,6 +293,7 @@
 				544C177D2E8FC80800999A9B /* Models */,
 				544C17782E8FBFC300999A9B /* Views */,
 				544C175E2E8FBF0600999A9B /* Extensions */,
+				545B40222EA22CED00C1CA05 /* Network */,
 				544C177F2E8FC8C500999A9B /* Utils */,
 				544C17832E8FC9C300999A9B /* Tests */,
 			);
@@ -444,6 +455,7 @@
 				543401112E83CF9A0047336A /* ProjectStorage.swift in Sources */,
 				546968B52E6E8C2E00BD2B77 /* TextView.swift in Sources */,
 				546968B72E6E8C2E00BD2B77 /* StoryMakerAppApp.swift in Sources */,
+				545B40242EA22D1500C1CA05 /* Network.swift in Sources */,
 				546968B82E6E8C2E00BD2B77 /* Test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
