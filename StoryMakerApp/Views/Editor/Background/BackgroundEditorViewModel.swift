@@ -264,11 +264,18 @@ class BackgroundEditorViewModel: ObservableObject {
 //    }
 
     func loadSelectedFilter(baseImage: UIImage, completion: @escaping (UIImage) -> Void) {
-        guard let filterPath = selectedFilter,
+        guard let filterPath = selectedFilter?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !filterPath.isEmpty,
+              filterPath.lowercased() != "none",
+              filterPath.contains("/lut/"), // ✅ chỉ chấp nhận LUT filter
               let url = URL(string: filterPath) else {
+            print("ℹ️ Filter không hợp lệ → dùng ảnh gốc")
+            self.finalImage = baseImage
             completion(baseImage)
             return
         }
+
+        print("🎨 Đang tải LUT filter từ:", filterPath)
 
         URLSession.shared.dataTask(with: url) { data, _, _ in
             if let data = data, let lutImage = UIImage(data: data) {
@@ -285,9 +292,16 @@ class BackgroundEditorViewModel: ObservableObject {
                         }
                     }
                 }
+            } else {
+                print("❌ Không tải được LUT filter → dùng ảnh gốc")
+                DispatchQueue.main.async {
+                    self.finalImage = baseImage
+                    completion(baseImage)
+                }
             }
         }.resume()
     }
+
 
     func applyFilter(to baseImage: UIImage, completion: ((UIImage) -> Void)? = nil) {
         guard let filterImage = selectedFilterImage else {
@@ -538,7 +552,7 @@ extension BackgroundEditorViewModel {
         // 1. Ưu tiên load offline từ original.jpg
         if let data = try? Data(contentsOf: originalURL),
            let uiImage = UIImage(data: data) {
-            print("✅ Offline: Load từ original.jpg")
+            print(" Offline: Load từ original.jpg")
             baseImage = uiImage
             applyFilterIfNeeded(uiImage)
             return
@@ -548,7 +562,7 @@ extension BackgroundEditorViewModel {
         if let url = project.frame?.backgroundURL,
            let data = try? Data(contentsOf: url),
            let uiImage = UIImage(data: data) {
-            print("🌐 Online: Load từ backgroundURL")
+            print(" Online: Load từ backgroundURL")
             baseImage = uiImage
             applyFilterIfNeeded(uiImage)
             return
@@ -556,11 +570,11 @@ extension BackgroundEditorViewModel {
         
         // 3. Fallback cuối cùng: preview từ JSON
         if let preview = project.previewImage {
-            print("⚠️ Fallback: dùng previewImage từ JSON")
+            print(" Fallback: dùng previewImage từ JSON")
             baseImage = preview
             finalImage = preview
         } else {
-            print("❌ Không có original.jpg, backgroundURL, hay previewImage")
+            print(" Không có original.jpg, backgroundURL, hay previewImage")
         }
     }
     

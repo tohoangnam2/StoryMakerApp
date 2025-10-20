@@ -128,6 +128,8 @@ struct HomeView: View {
         .onAppear {
             let projects = ProjectStorage.loadAllProjects()
             vm.mainprojects = projects
+            
+            
         }
         .fullScreenCover(isPresented: $isShowPremium) {
             SubcriptionView()

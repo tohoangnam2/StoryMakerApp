@@ -16,95 +16,174 @@ struct ProjectStorage {
         let folderURL = projectFolder(for: project.id)
         do {
             try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
-            
+
             var projectToSave = project
-            
-            // Lưu preview flatten
+
+            // Lưu preview
             if let img = previewImage,
                let imgData = img.jpegData(compressionQuality: 0.9) {
                 let previewFileName = "project_\(project.id).jpg"
                 let previewURL = folderURL.appendingPathComponent(previewFileName)
                 try imgData.write(to: previewURL)
-                projectToSave.previewImagePath = previewFileName   // chỉ lưu tên file
+                projectToSave.previewImagePath = previewFileName
             }
-            
-            // Đảm bảo luôn có original.jpg
+
+            // Lưu original
             let originalFileName = "original.jpg"
             let originalURL = folderURL.appendingPathComponent(originalFileName)
-            
-            if let base = baseImage,   // truyền vào baseImage khi gọi hàm
+            if let base = baseImage,
                let data = base.jpegData(compressionQuality: 1.0) {
                 try? data.write(to: originalURL)
-                projectToSave.originalImagePath = originalFileName
-            } else if FileManager.default.fileExists(atPath: originalURL.path) {
-                // Nếu file đã tồn tại từ trước thì vẫn giữ
-                projectToSave.originalImagePath = originalFileName
             }
-            
+            // Ép luôn lưu tên file vào JSON
+            projectToSave.originalImagePath = originalFileName
+
             // Lưu JSON
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
             let data = try JSONEncoder().encode(projectToSave)
             try data.write(to: jsonURL)
-            
-            print("✅ Saved JSON + preview + original.jpg")
+
+            print("Saved JSON + preview + original.jpg")
         } catch {
-            print("❌ Error saving project: \(error)")
+            print(" Error saving project: \(error)")
         }
     }
 
     /// Load tất cả project từ Documents
     static func loadAllProjects() -> [MainModel] {
         let documentsURL = getDocumentsDirectory()
+        
         do {
             let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
                 .filter { $0.lastPathComponent.hasPrefix("project_") }
             
             return folders.compactMap { folderURL in
                 let jsonURL = folderURL.appendingPathComponent("\(folderURL.lastPathComponent).json")
+                
                 guard let data = try? Data(contentsOf: jsonURL),
                       var project = try? JSONDecoder().decode(MainModel.self, from: data) else {
+                    print(" Failed to decode project at:", jsonURL.path)
                     return nil
                 }
                 
                 // Load preview từ relative path
                 if let previewName = project.previewImagePath {
-                    let url = folderURL.appendingPathComponent(previewName)
-                    if let imgData = try? Data(contentsOf: url),
+                    let previewURL = folderURL.appendingPathComponent(previewName)
+                    if let imgData = try? Data(contentsOf: previewURL),
                        let uiImage = UIImage(data: imgData) {
                         project.previewImage = uiImage
+                        print(" Loaded preview image:", previewName)
+                    } else {
+                        print(" Failed to load preview image:", previewName)
                     }
+                }
+                
+                // Kiểm tra ảnh gốc từ originalImagePath
+                if let originalName = project.originalImagePath {
+                    let originalURL = folderURL.appendingPathComponent(originalName)
+                    if FileManager.default.fileExists(atPath: originalURL.path) {
+                        print(" original.jpg exists for project:", project.id)
+                    } else {
+                        print(" original.jpg NOT FOUND for project:", project.id)
+                    }
+                } else {
+                    print(" originalImagePath is nil for project:", project.id)
                 }
                 
                 return project
             }
         } catch {
-            print(" Error loading projects: \(error)")
+            print(" Error loading projects from Documents:", error)
             return []
         }
     }
-
-    static func loadProject(id: UUID) -> MainModel? {
-        let folderURL = projectFolder(for: id)
+    func loadProject(id: UUID) -> MainModel? {
+        let folderURL = ProjectStorage.projectFolder(for: id)
         let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+
         do {
             let data = try Data(contentsOf: jsonURL)
             var project = try JSONDecoder().decode(MainModel.self, from: data)
-            
-            // Load preview từ relative path
-            if let previewName = project.previewImagePath {
-                let url = folderURL.appendingPathComponent(previewName)
-                if let imgData = try? Data(contentsOf: url),
+
+            //  Load ảnh gốc từ local
+            if let originalName = project.originalImagePath {
+                let originalURL = folderURL.appendingPathComponent(originalName)
+                if FileManager.default.fileExists(atPath: originalURL.path),
+                   let imgData = try? Data(contentsOf: originalURL),
                    let uiImage = UIImage(data: imgData) {
-                    project.previewImage = uiImage
+                    project.previewImage = uiImage   // hoặc gán vào vm.baseImage
+                    print(" Loaded original image from:", originalURL.path)
+                } else {
+                    print(" original.jpg not found at:", originalURL.path)
                 }
             }
-            
+
             return project
         } catch {
-            print(" Failed to load project: \(error)")
+            print(" Failed to load project:", error)
             return nil
         }
     }
+    func debugPrintProjectJSON(id: UUID) {
+        let folderURL = ProjectStorage.projectFolder(for: id)
+        let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+        print("📄 JSON path:", jsonURL.path)
+
+        do {
+            let data = try Data(contentsOf: jsonURL)
+            if let rawString = String(data: data, encoding: .utf8) {
+                print("📜 Raw JSON content:\n\(rawString)")
+            } else {
+                print("⚠️ Không đọc được JSON thành chuỗi UTF-8")
+            }
+        } catch {
+            print("❌ Lỗi đọc JSON:", error)
+        }
+    }
+
+
+//    static func loadProject(id: UUID) -> MainModel? {
+//        let folderURL = projectFolder(for: id)
+//        let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+//        print("JSON path:", jsonURL.path)
+//        
+//        do {
+//            let data = try Data(contentsOf: jsonURL)
+//            var project = try JSONDecoder().decode(MainModel.self, from: data)
+//            
+//            // Load preview từ relative path
+//            if let previewName = project.previewImagePath {
+//                let previewURL = folderURL.appendingPathComponent(previewName)
+//                if let imgData = try? Data(contentsOf: previewURL),
+//                   let uiImage = UIImage(data: imgData) {
+//                    project.previewImage = uiImage
+//                    print(" Loaded preview image:", previewName)
+//                } else {
+//                    print(" Failed to load preview image:", previewName)
+//                }
+//            }
+//            
+//            // Kiểm tra ảnh gốc có tồn tại không (không gán vào project)
+//            if let originalName = project.originalImagePath {
+//                let originalURL = folderURL.appendingPathComponent(originalName)
+//                if FileManager.default.fileExists(atPath: originalURL.path) {
+//                    print(" original.jpg exists at:", originalURL.path)
+//                } else {
+//                    print(" original.jpg NOT FOUND at:", originalURL.path)
+//                }
+//            } else {
+//                print(" originalImagePath is nil in JSON")
+//            }
+//            
+//            return project
+//        } catch {
+//            print(" Failed to load project: \(error)")
+//            return nil
+//        }
+//    }
+
+
+
 
     /// Liệt kê tất cả folder project
     static func listSavedProjects() -> [URL] {
@@ -133,3 +212,29 @@ extension OverlayTextViewModel {
         self.selectedOverlayID = nil
     }
 }
+//  Đặt ở cuối file ProjectStorage.swift hoặc EditorView.swift
+extension ProjectStorage {
+    static func loadRemoteImage(from urlString: String?, completion: @escaping (UIImage?) -> Void) {
+        guard let urlString = urlString,
+              let url = URL(string: urlString) else {
+            print("❌ URL không hợp lệ:", urlString ?? "nil")
+            completion(nil)
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let data = data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    print("✅ Frame image loaded from:", urlString)
+                    completion(image)
+                }
+            } else {
+                print("❌ Không tải được frame image từ:", urlString)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
+        }.resume()
+    }
+}
+

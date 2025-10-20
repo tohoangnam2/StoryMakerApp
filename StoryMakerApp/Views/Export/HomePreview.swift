@@ -76,7 +76,7 @@ struct HomePreview: View {
                                     onOpenBackgroundEditor: {},
                                     isShowBackgroundPicker: .constant(false),
                                     showBackgroundEdit: .constant(false),
-                                    filteredImage: vm.finalImage, project: $project,
+                                    filteredImage: $vm.finalImage, project: $project,
 
                                 )
                 .environmentObject(vm)

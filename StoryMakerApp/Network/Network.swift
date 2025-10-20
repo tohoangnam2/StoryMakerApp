@@ -20,7 +20,7 @@ class NetworkManager: ObservableObject {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
                 self?.isOnline = (path.status == .satisfied)
-                print("🌐 Network status changed: \(self?.isOnline == true ? "ONLINE" : "OFFLINE")")
+                print(" Network status changed: \(self?.isOnline == true ? "ONLINE" : "OFFLINE")")
             }
         }
         monitor.start(queue: queue)

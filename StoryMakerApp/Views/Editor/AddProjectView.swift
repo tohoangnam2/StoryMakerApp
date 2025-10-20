@@ -12,13 +12,9 @@ import SwiftUI
 struct AddProjectView: View {
     
     @State var project: MainModel?
-    
     @State var openedProjectID: UUID? = nil
     let projectID: UUID?
     var isNewProject: Bool = false
-    
-    
-    
     @StateObject private var overlayVM = OverlayTextViewModel()
     @EnvironmentObject var vm: BackgroundEditorViewModel
     @Environment(\.presentationMode) var presentationMode
@@ -33,9 +29,7 @@ struct AddProjectView: View {
     @State var isSelected : Bool = false
     @State var isEditingText = false
     @State var isClick : Bool = false
-    
     //bg text
-    
     //edit text
     
     @State var selectedEditText : OverlayTextEditEnum = .none
@@ -50,8 +44,6 @@ struct AddProjectView: View {
     @State var isExport = false
 
     var completion: ((UIImage) -> Void)? = nil
-
-    
     
     var body: some View {
         NavigationView {
@@ -96,7 +88,7 @@ struct AddProjectView: View {
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: vm.finalImage, project: $project
+                                    filteredImage: $vm.finalImage, project: $project
                                 )
                                 .environmentObject(vm),
                                 snapshot: $snapshotImage,
@@ -118,30 +110,33 @@ struct AddProjectView: View {
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: vm.finalImage, project: $project
+                                    filteredImage: $vm.finalImage, project: $project
                                 )
                                 .environmentObject(vm)
-                            //lưu path
                                 .onAppear {
+                                    let storage = ProjectStorage()
+                                    storage.debugPrintProjectJSON(id: project.id)
+
+                                    
                                     vm.reset()
                                     self.project = project
                                     overlayVM.overlays = project.textLayers
                                     frame = project.frame
-
+                                    
+                                    
                                     if let originalName = project.originalImagePath {
                                         let folderURL = ProjectStorage.projectFolder(for: project.id)
                                         let url = folderURL.appendingPathComponent(originalName)
-                                        print("📂 resolved path:", url.path)
-
                                         guard FileManager.default.fileExists(atPath: url.path) else {
-                                            print("⚠️ Không tìm thấy original:", url.path)
+                                            print(" Không tìm thấy original:", url.path)
                                             return
                                         }
 
                                         if let data = try? Data(contentsOf: url),
                                            let uiImage = UIImage(data: data) {
                                             vm.baseImage = uiImage
-                                            if let filter = project.selectedFilter {
+                                            if let filter = project.selectedFilter,
+                                               filter.contains("/lut/") {
                                                 vm.selectedFilter = filter
                                                 vm.loadSelectedFilter(baseImage: uiImage) { filtered in
                                                     vm.finalImage = filtered ?? uiImage
@@ -150,63 +145,11 @@ struct AddProjectView: View {
                                                 vm.finalImage = uiImage
                                             }
                                         }
-                                    } else {
-                                        print("⚠️ originalImagePath = nil trong JSON")
+                                    }
+                                    else {
+                                        print("originalImagePath = nil trong JSON")
                                     }
                                 }
-
-
-                            //luu absolutstring
-//                                .onAppear {
-//                                    vm.reset()
-//                                    self.project = project
-//                                    overlayVM.overlays = project.textLayers
-//                                    frame = project.frame
-//                                    
-//                                    let folderURL = ProjectStorage.projectFolder(for: project.id)
-//                                    let originalURL = folderURL.appendingPathComponent("original.jpg")
-//                                    
-//                                    if vm.isOnline {
-//                                        print(" Đang ONLINE → sẽ load từ original.jpg trong thư mục")
-//                                        if let data = try? Data(contentsOf: originalURL),
-//                                           let uiImage = UIImage(data: data) {
-//                                            vm.baseImage = uiImage
-//                                            if let filter = project.selectedFilter {
-//                                                vm.selectedFilter = filter
-//                                                vm.loadSelectedFilter(baseImage: uiImage) { filtered in
-//                                                    vm.finalImage = filtered ?? uiImage
-//                                                
-//                                                }
-//                                            } else {
-//                                                vm.finalImage = uiImage
-//                                            }
-//                                        } else {
-//                                            print(" Không tìm thấy original.jpg:", originalURL.path)
-//                                        }
-//                                    } else {
-//                                        print("Đang OFFLINE → sẽ load từ originalImagePath trong JSON")
-//                                        if let originalPath = project.originalImagePath {
-//                                            let url: URL
-//                                            if originalPath.hasPrefix("file://") {
-//                                                url = URL(string: originalPath)!
-//                                            } else {
-//                                                url = URL(fileURLWithPath: originalPath)
-//                                            }
-//                                            if let data = try? Data(contentsOf: url),
-//                                               let uiImage = UIImage(data: data) {
-//                                                vm.baseImage = uiImage
-//                                                if let filter = project.selectedFilter {
-//                                                    vm.selectedFilter = filter
-//                                                    vm.loadSelectedFilter(baseImage: uiImage) { filtered in
-//                                                        vm.finalImage = filtered ?? uiImage
-//                                                    }
-//                                                } else {
-//                                                    vm.finalImage = uiImage
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
                             } else {
                                 AddBackgroundsView(
                                     overlayVM: overlayVM,
@@ -219,15 +162,31 @@ struct AddProjectView: View {
                                         isShowBackgroundPicker = true
                                         let newProject = vm.createEmptyProject()
                                         self.project = newProject
+                                        self.frame = newProject.frame
                                     },
                                     onTapOutside: { resetEditState() },
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
                                     showBackgroundEdit: $showBackgroundEdit,
-                                    filteredImage: vm.finalImage, project: $project
+                                    filteredImage: $vm.finalImage, project: $project
                                 )
                                 .environmentObject(vm)
-                                
+                                .onAppear{
+                                    // Nếu frame có URL online
+                                    if let url = frame?.backgroundURL {
+                                        URLSession.shared.dataTask(with: url) { data, _, _ in
+                                            if let data = data, let uiImage = UIImage(data: data) {
+                                                DispatchQueue.main.async {
+                                                    vm.baseImage = uiImage
+                                                    vm.finalImage = uiImage
+                                                    vm.defaultPreview = uiImage
+                                                    vm.prepareAllPreviews()
+                                                    vm.isImageLoaded = true
+                                                }
+                                            }
+                                        }.resume()
+                                    }
+                                }
                             }
                         }
                     if showBackgroundEdit {
@@ -575,24 +534,7 @@ struct AddProjectView: View {
         overlayVM.deselectAll()
         showBackgroundEdit = false
     }
-//    func exitExport(completion: @escaping () -> Void) {
-//        isExport = true
-//        resetEditState()
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//            triggerSnapshot = true
-//        }
-//
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-//            if let snap = snapshotImage,
-//               let index = vm.mainprojects.firstIndex(where: { $0.id == project?.id }) {
-//                vm.mainprojects[index].previewImage = snap
-//                print("Snapshot captured: \(snap)")
-//            } else {
-//                print("Snapshot still nil")
-//            }
-//            completion()
-//        }
-//    }
+
     func exitExport(completion: @escaping () -> Void) {
         isExport = true
         resetEditState()
@@ -638,6 +580,7 @@ struct AddProjectView: View {
          currentProject.previewImage = snapshotImage ?? vm.finalImage
          currentProject.textLayers = overlayVM.overlays
          currentProject.selectedFilter = vm.selectedFilter
+        
 
          // Preview full flatten cho list
          if let snap = snapshotImage {
@@ -645,16 +588,8 @@ struct AddProjectView: View {
          } else if let filtered = vm.finalImage {
              currentProject.previewImage = filtered
          }
-        // Đảm bảo luôn có original.jpg trong thư mục project
-          let folderURL = ProjectStorage.projectFolder(for: currentProject.id)
-          let originalURL = folderURL.appendingPathComponent("original.jpg")
-          if let baseImage = vm.baseImage,   // ảnh gốc hiện tại
-             let data = baseImage.jpegData(compressionQuality: 1.0) {
-              try? data.write(to: originalURL)
-              currentProject.originalImagePath = "original.jpg"   // luôn set relative path
-          }
         // lưu docs
-        ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage)
+        ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage,baseImage: vm.baseImage)
 
         // Update vào RAM
         if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
