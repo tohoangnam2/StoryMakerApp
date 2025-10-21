@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FilterEditorView: View {
     
-    @EnvironmentObject var vm: BackgroundEditorViewModel
+    @ObservedObject var vm: BackgroundEditorViewModel
     @Binding var project: MainModel
     
     var body: some View {

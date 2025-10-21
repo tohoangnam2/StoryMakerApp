@@ -11,7 +11,6 @@ struct StoryMakerAppApp: App {
     @AppStorage("seenOnboarding") var seenOnboarding: Bool = false
     @AppStorage("hasShownGetStarted") var hasShownGetStarted: Bool = false
     @State private var showSplash: Bool = true
-    @StateObject var vm = BackgroundEditorViewModel()
     @State var isShowPremium: Bool = false
 
     var body: some Scene {
@@ -42,14 +41,12 @@ struct StoryMakerAppApp: App {
                                 self.hasShownGetStarted = true
                             }
                     } else {
-                        HomeView(isShowPremium: $isShowPremium)
+                        HomeView(vm: BackgroundEditorViewModel(), isShowPremium: $isShowPremium)
                     }
                 }
             }
-            .environmentObject(vm)
             .fullScreenCover(isPresented: $isShowPremium) {
                 SubcriptionView()
-                    .environmentObject(vm)
             }
 
         }

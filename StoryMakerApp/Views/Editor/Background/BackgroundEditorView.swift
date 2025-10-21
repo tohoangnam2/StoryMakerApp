@@ -10,7 +10,7 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 struct BackgroundEditorView: View {
-    @EnvironmentObject var vm: BackgroundEditorViewModel
+    @ObservedObject var vm: BackgroundEditorViewModel
     @Environment(\.dismiss) private var dismiss
 
 
@@ -88,14 +88,14 @@ struct BackgroundEditorView: View {
                     case .none:
                         EmptyView()
                     case .filter:
-                        FilterEditorView( project: Binding(
+                        FilterEditorView( vm: vm, project: Binding(
                             get: { project! },
                             set: { project = $0 }
                         ))
                     case .brightness:
                         if let _ = project {
                             BrightNessBGView(
-                                project: Binding(
+                                vm: vm, project: Binding(
                                     get: { project! },
                                     set: { project = $0 }
                                 )

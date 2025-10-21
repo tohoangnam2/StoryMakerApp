@@ -41,7 +41,7 @@ struct SplashView: View {
                         if hasShownGetStarted{
                             NavigationLink {
                                 withAnimation(.spring()){
-                                    HomeView(isShowPremium: $isShowPremium)
+                                    HomeView(vm: BackgroundEditorViewModel(), isShowPremium: $isShowPremium)
                                         .navigationBarBackButtonHidden(true)
                                 }
                             } label: {

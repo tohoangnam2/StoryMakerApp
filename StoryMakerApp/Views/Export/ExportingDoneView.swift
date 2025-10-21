@@ -42,7 +42,7 @@ struct ExportingDoneView: View {
     //export
     @Binding var triggerSnapshot : Bool
     
-    @EnvironmentObject var vm: BackgroundEditorViewModel
+    @ObservedObject var vm: BackgroundEditorViewModel
     
     let filteredImage: UIImage?
     

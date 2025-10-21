@@ -43,7 +43,7 @@ struct HomePreview: View {
     @Binding  var snapshotImage: UIImage?
     @Binding var triggerSnapshot : Bool
 
-    @EnvironmentObject var vm: BackgroundEditorViewModel
+    @ObservedObject var vm: BackgroundEditorViewModel
 
     let filteredImage: UIImage?
 
@@ -76,7 +76,7 @@ struct HomePreview: View {
                                     onOpenBackgroundEditor: {},
                                     isShowBackgroundPicker: .constant(false),
                                     showBackgroundEdit: .constant(false),
-                                    filteredImage: $vm.finalImage, project: $project,
+                                    filteredImage: vm.finalImage, project: $project,
 
                                 )
                 .environmentObject(vm)
@@ -145,7 +145,7 @@ struct HomePreview: View {
                 onOpenBackgroundEditor: { showBackgroundEdit = true },
                 isShowBackgroundPicker: $isShowBackgroundPicker,
                 showBackgroundEdit: $showBackgroundEdit,
-                triggerSnapshot: $triggerSnapshot, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
+                triggerSnapshot: $triggerSnapshot, vm: vm, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
             )
             .environmentObject(vm)
         }

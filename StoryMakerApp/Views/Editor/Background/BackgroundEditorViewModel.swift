@@ -4,6 +4,9 @@ import SwiftUI
 
 
 class BackgroundEditorViewModel: ObservableObject {
+    
+
+    
     @Published var categories: [CategoryBG] = []
     @Published var backgrounds: [BackgroundItem] = []
     @Published var selectedCategory: CategoryBG? = nil {
@@ -17,12 +20,7 @@ class BackgroundEditorViewModel: ObservableObject {
     
     @Published var selectedBackground: BackgroundModel? = nil
     
-    
-//    @Published var opacity: Double = UserDefaults.standard.object(forKey: "opacity") as? Double ?? 1 {
-//        didSet {
-//            UserDefaults.standard.set(opacity, forKey: "opacity")
-//        }
-//    }
+
     @Published var valueOpacity : Double = 1
     @Published var opacity : Double = 1
     @Published var lightness : Double = 0
@@ -30,32 +28,6 @@ class BackgroundEditorViewModel: ObservableObject {
 
     @Published var blur : Double = 0
     @Published var shadow : Double = 0
-
-
-
-//    @Published var lightness: Double = UserDefaults.standard.object(forKey: "lightness") as? Double ?? 0 {
-//        didSet {
-//            UserDefaults.standard.set(lightness, forKey: "lightness")
-//        }
-//    }
-//
-//    @Published var saturation: Double = UserDefaults.standard.object(forKey: "saturation") as? Double ?? 1 {
-//        didSet {
-//            UserDefaults.standard.set(saturation, forKey: "saturation")
-//        }
-//    }
-//
-//    @Published var blur: Double = UserDefaults.standard.object(forKey: "blur") as? Double ?? 0 {
-//        didSet {
-//            UserDefaults.standard.set(blur, forKey: "blur")
-//        }
-//    }
-//    @Published var shadow: Double = UserDefaults.standard.object(forKey: "shadow") as? Double ?? 0 {
-//        didSet {
-//            UserDefaults.standard.set(shadow, forKey: "shadow")
-//        }
-//    }
-
     
     @Published var selectedFilter: String? = nil
     @Published var selectedFilterImage: UIImage? = nil
@@ -111,34 +83,17 @@ class BackgroundEditorViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    
-
     func createEmptyProject() -> MainModel {
-           let newProject = MainModel(id: UUID())
-           
-           ProjectStorage.saveProject(newProject, previewImage: nil)
-           self.mainprojects.insert(newProject, at: 0)
-           return newProject
-       }
-    
+        let newProject = MainModel(id: UUID())
+        ProjectStorage.saveProject(newProject, previewImage: nil)
 
-//      func applyAdjustments(for bgID: String) {
-//          if let saved = adjustments[bgID] {
-//              // load lại chỉnh sửa cũ
-//              opacity = saved.opacity
-//              lightness = saved.lightness
-//              saturation = saved.saturation
-//              blur = saved.blur
-//              shadow = saved.shadow
-//          } else {
-//              // nếu chưa có → set default
-//              resetAdjustments()
-//          }
-//      }
-//
-//      func saveAdjustments(for bgID: String) {
-//          adjustments[bgID] = (opacity, lightness, saturation, blur, shadow)
-//      }
+        DispatchQueue.main.async {
+            self.mainprojects.insert(newProject, at: 0)
+        }
+
+        return newProject
+    }
+
 
       func resetAdjustments() {
           opacity = 1
