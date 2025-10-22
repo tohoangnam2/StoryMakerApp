@@ -15,9 +15,9 @@ struct BrightNessBGView: View {
     
     var body: some View {
         VStack{
-            CustomSliderBG(title: "Lightness", valueOpacity: $project.lightness, minValue: -0.4, maxValue: 0.3, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-            CustomSliderBG(title: "Saturation", valueOpacity: $project.saturation, minValue: 0.1, maxValue: 2.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-            CustomSliderBG(title: "Blur", valueOpacity: $project.blur, minValue: 0.1, maxValue: 2.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+            CustomSliderBG(title: "Lightness", valueOpacity: $vm.lightness, minValue: -0.4, maxValue: 0.3, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+            CustomSliderBG(title: "Saturation", valueOpacity: $vm.saturation, minValue: 0.1, maxValue: 2.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+            CustomSliderBG(title: "Blur", valueOpacity: $vm.blur, minValue: 0.1, maxValue: 2.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
         }
         .padding(.top,5)
     }

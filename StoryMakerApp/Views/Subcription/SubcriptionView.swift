@@ -40,12 +40,14 @@ struct SubcriptionView: View {
                     presentationMode.wrappedValue.dismiss()
 
                 }, label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 30))
-                        .position(x: 350, y: 40)
-                        .padding(15)
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 30))
+                            .padding()
+                            .padding(.top, 20)
                 })
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                
                     VStack(spacing:15){
                         Spacer()
                         VStack(spacing:29){

@@ -25,7 +25,6 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var opacity : Double = 1
     @Published var lightness : Double = 0
     @Published var saturation : Double = 1
-
     @Published var blur : Double = 0
     @Published var shadow : Double = 0
     
@@ -182,55 +181,20 @@ class BackgroundEditorViewModel: ObservableObject {
             }
         }
     }
-
-
-
     
-//    func loadSelectedFilter(baseImage: UIImage? = nil, completion: ((UIImage) -> Void)? = nil) {
-//        guard let urlString = selectedFilter, let url = URL(string: urlString) else { return }
-//        URLSession.shared.dataTask(with: url) { data, _, _ in
-//            if let data = data, let image = UIImage(data: data) {
-//                DispatchQueue.main.async {
-//                    self.selectedFilterImage = image
-//                    // Nếu có ảnh gốc thì apply luôn filter
-//                    if let base = baseImage {
-//                        self.applyFilter(to: base) { filtered in
-//                            completion?(filtered) // trả về UIImage đã filter xong
-//                        }
-//                    }   
-//                }
-//            }
-//        }.resume()
-//    }
-//
-//
-//
-//
-//    func applyFilter(to baseImage: UIImage, completion: ((UIImage) -> Void)? = nil) {
-//        guard let filterImage = selectedFilterImage else { return }
-//        DispatchQueue.global().async {
-//            if let newImage = baseImage.applyingLUT(lutImage: filterImage, dimension: 64) {
-//                DispatchQueue.main.async {
-//                    self.finalImage = newImage
-//                    completion?(newImage) // trả về cho preview
-//                }
-//            }
-//        }
-//    }
-
     func loadSelectedFilter(baseImage: UIImage, completion: @escaping (UIImage) -> Void) {
         guard let filterPath = selectedFilter?.trimmingCharacters(in: .whitespacesAndNewlines),
               !filterPath.isEmpty,
               filterPath.lowercased() != "none",
-              filterPath.contains("/lut/"), // ✅ chỉ chấp nhận LUT filter
+              filterPath.contains("/lut/"), //  chỉ chấp nhận LUT filter
               let url = URL(string: filterPath) else {
-            print("ℹ️ Filter không hợp lệ → dùng ảnh gốc")
+            print(" Filter không hợp lệ → dùng ảnh gốc")
             self.finalImage = baseImage
             completion(baseImage)
             return
         }
 
-        print("🎨 Đang tải LUT filter từ:", filterPath)
+        print("Đang tải LUT filter từ:", filterPath)
 
         URLSession.shared.dataTask(with: url) { data, _, _ in
             if let data = data, let lutImage = UIImage(data: data) {
@@ -248,7 +212,7 @@ class BackgroundEditorViewModel: ObservableObject {
                     }
                 }
             } else {
-                print("❌ Không tải được LUT filter → dùng ảnh gốc")
+                print(" Không tải được LUT filter → dùng ảnh gốc")
                 DispatchQueue.main.async {
                     self.finalImage = baseImage
                     completion(baseImage)
@@ -338,52 +302,9 @@ class BackgroundEditorViewModel: ObservableObject {
         finalImage = nil
         defaultPreview = nil
         selectedFilter = nil
-        selectedFilterImage = nil
-        previewImages.removeAll()
-        opacity = 1.0
-        // reset thêm các biến khác nếu cần
-        
-        
+        isImageLoaded = false
     }
-    
-//    func reloadProjectsAndCategories(for projectID: UUID?) {
-//        // Load lại toàn bộ project từ storage
-//        self.mainprojects = ProjectStorage.loadAllProjects()
-//        
-//        // Fetch lại categories
-//        self.fetchCategories()
-//        
-//        // Nếu có project cụ thể
-//        if let id = projectID,
-//           let project = self.mainprojects.first(where: { $0.id == id }) {
-//            
-//            // Nếu project đã có filter thì apply lại
-//            if let filter = project.selectedFilter,
-//               let url = project.frame?.backgroundURL,
-//               let data = try? Data(contentsOf: url),
-//               let uiImage = UIImage(data: data) {
-//                
-//                self.baseImage = uiImage
-//                self.selectedFilter = filter
-//                self.loadSelectedFilter(baseImage: uiImage) { filtered in
-//                    self.finalImage = filtered
-//                }
-//            } else if let url = project.frame?.backgroundURL,
-//                      let data = try? Data(contentsOf: url),
-//                      let uiImage = UIImage(data: data) {
-//                // Nếu chưa có filter thì set default
-//                self.baseImage = uiImage
-//                self.selectedFilter = nil
-//                self.finalImage = uiImage
-//            }
-//        } else {
-//            // Nếu không có project thì reset về default
-//            self.selectedFilter = nil
-//            self.finalImage = self.baseImage
-//        }
-//    }
 
-    
     // Lấy backgrounds theo categoryId
     func fetchBackgrounds(for categoryId: String) {
         // Nếu cache có rồi thì dùng luôn
@@ -488,60 +409,6 @@ extension BackgroundEditorViewModel {
         self.isImageLoaded = true
     }
 }
-extension BackgroundEditorViewModel {
-    func reloadProjectAssets(_ project: MainModel, overlayVM: OverlayTextViewModel) {
-        // reset state cũ
-        reset()
-        
-        // khôi phục text overlay
-        overlayVM.overlays = project.textLayers
-        
-        // khôi phục filter đã lưu
-        selectedFilter = project.selectedFilter
-        opacity = project.opacity
-        
-        // đường dẫn ảnh gốc
-        let folderURL = ProjectStorage.projectFolder(for: project.id)
-        let originalURL = folderURL.appendingPathComponent("original.jpg")
-        
-        // 1. Ưu tiên load offline từ original.jpg
-        if let data = try? Data(contentsOf: originalURL),
-           let uiImage = UIImage(data: data) {
-            print(" Offline: Load từ original.jpg")
-            baseImage = uiImage
-            applyFilterIfNeeded(uiImage)
-            return
-        }
-        
-        // 2. Nếu không có file gốc thì thử online từ backgroundURL
-        if let url = project.frame?.backgroundURL,
-           let data = try? Data(contentsOf: url),
-           let uiImage = UIImage(data: data) {
-            print(" Online: Load từ backgroundURL")
-            baseImage = uiImage
-            applyFilterIfNeeded(uiImage)
-            return
-        }
-        
-        // 3. Fallback cuối cùng: preview từ JSON
-        if let preview = project.previewImage {
-            print(" Fallback: dùng previewImage từ JSON")
-            baseImage = preview
-            finalImage = preview
-        } else {
-            print(" Không có original.jpg, backgroundURL, hay previewImage")
-        }
-    }
-    
-    private func applyFilterIfNeeded(_ uiImage: UIImage) {
-        if let filter = selectedFilter {
-            loadSelectedFilter(baseImage: uiImage) { filtered in
-                self.finalImage = filtered
-            }
-        } else {
-            finalImage = uiImage
-        }
-    }
-}
+
 
 

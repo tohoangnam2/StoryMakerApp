@@ -75,11 +75,10 @@ struct HomePreview: View {
                                     onTapOutside: {},
                                     onOpenBackgroundEditor: {},
                                     isShowBackgroundPicker: .constant(false),
-                                    showBackgroundEdit: .constant(false),
+                                    showBackgroundEdit: .constant(false), vm: vm,
                                     filteredImage: vm.finalImage, project: $project,
 
                                 )
-                .environmentObject(vm)
             , snapshot: $snapshotImage, trigger: $triggerSnapshot)
             .allowsHitTesting(false)
             .padding(.horizontal,20)

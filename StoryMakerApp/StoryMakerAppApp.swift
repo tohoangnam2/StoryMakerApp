@@ -20,7 +20,7 @@ struct StoryMakerAppApp: App {
                     SplashView(isShowPremium: $isShowPremium, hasShownGetStarted: $hasShownGetStarted)
                         .transition(.move(edge: .leading))
                         .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                 withAnimation {
                                     self.showSplash = false
                                     if seenOnboarding {

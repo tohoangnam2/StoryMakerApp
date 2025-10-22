@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    
-    @ObservedObject var vm : BackgroundEditorViewModel
+    @StateObject var vm: BackgroundEditorViewModel = BackgroundEditorViewModel()
+
 
     @State var mockDataImage: [UIImage] = [
         UIImage(imageLiteralResourceName: "home_mockdata"),
@@ -62,9 +62,8 @@ struct HomeView: View {
                                         if project.frame != nil {
                                             ZStack(alignment: .topTrailing) {
                                                 NavigationLink(
-                                                    destination: AddProjectView(projectID: project.id)
+                                                    destination: AddProjectView(projectID: project.id,vm:vm)
                                                 ) {
-                                                    // Load preview trực tiếp từ file project_<id>.jpg
                                                     let folderURL = ProjectStorage.projectFolder(for: project.id)
                                                     let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
                                                     
@@ -77,24 +76,37 @@ struct HomeView: View {
                                                             .cornerRadius(8)
                                                             .clipped()
                                                     } else {
-                                                        // fallback nếu chưa có preview
                                                         Color.gray
                                                             .frame(width: 98, height: 208)
                                                             .cornerRadius(8)
                                                     }
                                                 }
                                                 
-                                                Button(action: {
-                                                    vm.deleteProject(project)
-                                                }) {
-                                                    Image(systemName: "xmark.circle.fill")
-                                                        .foregroundColor(.black)
+                                                Menu {
+                                                    Button(role: .destructive) {
+                                                        vm.deleteProject(project)
+                                                    } label: {
+                                                        Label("Delete", systemImage: "trash")
+                                                        
+                                                    }
+                                                    Button {
+                                                        selectedProjectID = project.id   //  trigger link ẩn
+                                                    } label: {
+                                                        Label("Edit", systemImage: "pencil")
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "ellipsis.circle")
+                                                        .foregroundColor(.white)
                                                         .padding(6)
                                                 }
+                                                
+                                                
+                                                
                                             }
                                             .id(project.id)
                                         }
                                     }
+                                    
                                 }
                                     .padding(.horizontal)
 
@@ -107,11 +119,13 @@ struct HomeView: View {
                                 }
                             }
                         }
+                        // NavigationLink ẩn
                     }
+                    
                     Spacer()
                     VStack(spacing:15){
                         withAnimation(.spring){
-                            NavigationLink(destination: AddProjectView(project : nil, projectID: nil)
+                            NavigationLink(destination: AddProjectView(project : nil, projectID: nil,vm:vm)
                                ) {
                                 Image("home_icBtn")
                             }
@@ -121,7 +135,9 @@ struct HomeView: View {
                     }
                     .padding(.top)
                 }
+                
             }
+            
         }
         
         .onAppear {

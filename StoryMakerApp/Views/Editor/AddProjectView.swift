@@ -18,7 +18,7 @@ struct AddProjectView: View {
     @StateObject private var overlayVM = OverlayTextViewModel()
     
     
-    @StateObject var vm: BackgroundEditorViewModel = BackgroundEditorViewModel()
+    @ObservedObject var vm : BackgroundEditorViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int? = nil
     @State  var isShowBackgroundPicker = false
@@ -89,98 +89,102 @@ struct AddProjectView: View {
                                     onTapOutside: {},
                                     onOpenBackgroundEditor: { showBackgroundEdit = true },
                                     isShowBackgroundPicker: $isShowBackgroundPicker,
-                                    showBackgroundEdit: $showBackgroundEdit,
+                                    showBackgroundEdit: $showBackgroundEdit, vm: vm,
                                     filteredImage: vm.finalImage, project: $project
                                 ),
                                 snapshot: $snapshotImage,
                                 trigger: $triggerSnapshot,
                             )
                         }
-                            Group {
-                                if let project = vm.mainprojects.first(where: { $0.id == projectID })  {
-                                    // mở lại project đã lưu
-                                    AddBackgroundsView(
-                                        overlayVM: overlayVM,
-                                        frame: frame,
-                                        showTextField: $showTextField,
-                                        isTextFieldFocused: $isTextFieldFocused,
-                                        isSelected: $isSelected,
-                                        isEditingText: $isEditingText,
-                                        onAddTap: { isShowBackgroundPicker = true },
-                                        onTapOutside: { resetEditState() },
-                                        onOpenBackgroundEditor: { showBackgroundEdit = true },
-                                        isShowBackgroundPicker: $isShowBackgroundPicker,
-                                        showBackgroundEdit: $showBackgroundEdit,vm: vm,
-                                        filteredImage:vm.finalImage, project: $project
-                                    )
-                                    .onAppear {
-//                                        let storage = ProjectStorage()
-//                                        storage.debugPrintProjectJSON(id: project.id)
-                                        
-                                        vm.reset()
-                                        self.project = project
-                                        overlayVM.overlays = project.textLayers
-                                        frame = project.frame
-                                        
-                                        
-                                        if let originalName = project.originalImagePath {
-                                            let folderURL = ProjectStorage.projectFolder(for: project.id)
-                                            let url = folderURL.appendingPathComponent(originalName)
-                                            guard FileManager.default.fileExists(atPath: url.path) else {
-                                                print(" Không tìm thấy original:", url.path)
-                                                return
-                                            }
-                                            
-                                            if let data = try? Data(contentsOf: url),
-                                               let uiImage = UIImage(data: data) {
-                                                vm.baseImage = uiImage
-                                                if let filter = project.selectedFilter,
-                                                   filter.contains("/lut/") {
-                                                    vm.selectedFilter = filter
-                                                    vm.loadSelectedFilter(baseImage: uiImage) { filtered in
-                                                        vm.finalImage = filtered ?? uiImage
-                                                    }
-                                                } else {
-                                                    vm.finalImage = uiImage
+                        Group {
+                            if let existingProject = vm.mainprojects.first(where: { $0.id == projectID }) {
+                                // Mở lại project đã lưu
+                                
+                                AddBackgroundsView(
+                                    overlayVM: overlayVM,
+                                    frame: project?.frame,
+                                    showTextField: $showTextField,
+                                    isTextFieldFocused: $isTextFieldFocused,
+                                    isSelected: $isSelected,
+                                    isEditingText: $isEditingText,
+                                    onAddTap: { isShowBackgroundPicker = true },
+                                    onTapOutside: { resetEditState() },
+                                    onOpenBackgroundEditor: { showBackgroundEdit = true },
+                                    isShowBackgroundPicker: $isShowBackgroundPicker,
+                                    showBackgroundEdit: $showBackgroundEdit,
+                                    vm: vm,
+                                    filteredImage: vm.finalImage,
+                                    project: $project
+                                )
+                                .onAppear {
+//                                    vm.reset()
+                                    self.project = existingProject
+                                    overlayVM.overlays = existingProject.textLayers
+                                    frame = existingProject.frame
+                                    
+                                    vm.blur = existingProject.blur
+                                    vm.opacity = existingProject.opacity
+                                    vm.lightness = existingProject.lightness
+                                    vm.saturation = existingProject.saturation
+                                    
+                                    if let originalName = existingProject.originalImagePath {
+                                        let folderURL = ProjectStorage.projectFolder(for: existingProject.id)
+                                        let url = folderURL.appendingPathComponent(originalName)
+
+                                        guard FileManager.default.fileExists(atPath: url.path) else {
+                                            print("Không tìm thấy original:", url.path)
+                                            return
+                                        }
+
+                                        if let data = try? Data(contentsOf: url),
+                                           let uiImage = UIImage(data: data) {
+                                            vm.baseImage = uiImage
+
+                                            // Apply filter nếu có
+                                            if let filter = existingProject.selectedFilter,
+                                               filter.contains("/lut/") {
+                                                vm.selectedFilter = filter
+                                                vm.loadSelectedFilter(baseImage: uiImage) { filtered in
+                                                    vm.finalImage = filtered ?? uiImage
                                                 }
+                                            } else {
+                                                vm.finalImage = uiImage
                                             }
                                         }
-                                        else {
-                                            print("originalImagePath = nil trong JSON")
-                                        }
+                                    } else {
+                                        print("originalImagePath = nil trong JSON")
                                     }
                                 }
-                                else {
-                                    AddBackgroundsView(
-                                        overlayVM: overlayVM,
-                                        frame: frame,
-                                        showTextField: $showTextField,
-                                        isTextFieldFocused: $isTextFieldFocused,
-                                        isSelected: $isSelected,
-                                        isEditingText: $isEditingText,
-                                        onAddTap: {
-                                            isShowBackgroundPicker = true
-
-                                        },
-                                        onTapOutside: { resetEditState() },
-                                        onOpenBackgroundEditor: { showBackgroundEdit = true },
-                                        isShowBackgroundPicker: $isShowBackgroundPicker,
-                                        showBackgroundEdit: $showBackgroundEdit,vm: vm,
-                                        filteredImage: vm.finalImage,
-                                        project: $project
-                                    )
-                                    .onAppear {
-                                        if project == nil {
-                                            let newProject = vm.createEmptyProject()
-                                            self.project = newProject
-                                            self.frame = newProject.frame
-                                            print(" Project mới được tạo khi view xuất hiện")
-                                        }
+                            } else {
+                                // Tạo mới project
+                                AddBackgroundsView(
+                                    overlayVM: overlayVM,
+                                    frame: project?.frame,
+                                    showTextField: $showTextField,
+                                    isTextFieldFocused: $isTextFieldFocused,
+                                    isSelected: $isSelected,
+                                    isEditingText: $isEditingText,
+                                    onAddTap: {
+                                        isShowBackgroundPicker = true
+                                    },
+                                    onTapOutside: { resetEditState() },
+                                    onOpenBackgroundEditor: { showBackgroundEdit = true },
+                                    isShowBackgroundPicker: $isShowBackgroundPicker,
+                                    showBackgroundEdit: $showBackgroundEdit,
+                                    vm: vm,
+                                    filteredImage: vm.finalImage,
+                                    project: $project
+                                )
+                                .onAppear {
+                                    if project == nil {
+                                        let newProject = vm.createEmptyProject()
+                                        self.project = newProject
+                                        self.frame = newProject.frame
+                                        print("Project mới được tạo khi view xuất hiện")
                                     }
-
                                 }
-
                             }
+                        }
                     if showBackgroundEdit {
                         BackgroundEditorView(vm: vm, overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected, project: $project)
                                     .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
@@ -443,32 +447,31 @@ struct AddProjectView: View {
                 }
             }
         }
+        
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView() { picked in
+                
                 if let newFrame = picked {
                     self.frame = newFrame
                     vm.currentProject = project
                 }
+                
                 if vm.currentFrameID != picked?.backgroundID {
                     vm.currentFrameID = picked?.backgroundID
-
-//                    overlayVM.overlays.removeAll()
-//                    overlayVM.addOverlay("")
                     vm.finalImage = nil
-                    
-//                    vm.opacity = 1.0
-//                    vm.selectedFilterImage = nil
-//                    vm.selectedFilter = nil
-//                    vm.previewImages.removeAll()
-
                     if let url = picked?.backgroundURL,
                        let data = try? Data(contentsOf: url),
                        let uiImage = UIImage(data: data) {
                         
-                        // Gán baseImage
                         vm.baseImage = uiImage
                         vm.defaultPreview = uiImage
-                        vm.finalImage = uiImage
+                        vm.prepareAllPreviews()
+                        vm.updatePreview()
+                        vm.isImageLoaded = true
+                        // Gán baseImage
+//                        vm.baseImage = uiImage
+//                        vm.defaultPreview = uiImage
+//                        vm.finalImage = uiImage
 
                         //  Lưu project ngay lần đầu chọn background
                         if var current = self.project {
@@ -497,8 +500,6 @@ struct AddProjectView: View {
         }
         .onChange(of: frame?.id) { _ in
             if selectedTab == 1 {
-//                overlayVM.overlays.removeAll()
-//                overlayVM.addOverlay("")
                 showTextField = false
             }
         }
@@ -557,44 +558,44 @@ struct AddProjectView: View {
     }
 
 
-//    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {        
-//        guard var currentProject = project else {
-//            completion()
-//            return
-//        }
-//        // data vm
-//        // Lưu state
-//         currentProject.frame      = frame
-//         currentProject.blur       = project?.blur ?? 0
-//         currentProject.shadow     = project?.shadow ?? 0
-//         currentProject.opacity    = project?.opacity ?? 1
-//         currentProject.lightness  = project?.lightness ?? 0
-//         currentProject.saturation = project?.saturation ?? 1
-//         currentProject.previewImage = snapshotImage ?? vm.finalImage
-//         currentProject.textLayers = overlayVM.overlays
-//         currentProject.selectedFilter = vm.selectedFilter
-//        
-//
-//         // Preview full flatten cho list
-//         if let snap = snapshotImage {
-//             currentProject.previewImage = snap
-//         } else if let filtered = vm.finalImage {
-//             currentProject.previewImage = filtered
-//         }
-//        // lưu docs
-//        ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage,baseImage: vm.baseImage)
-//
-//        // Update vào RAM
-//        if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-//            vm.mainprojects[index] = currentProject
-//            vm.mainprojects = Array(vm.mainprojects) // ép SwiftUI publish lại
-//        } else {
-//            vm.mainprojects.insert(currentProject, at: 0)
-//        }
-//        self.project = currentProject
-//        
-//        completion()
-//    }
+    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {        
+        guard var currentProject = project else {
+            completion()
+            return
+        }
+        // data vm
+        // Lưu state
+        currentProject.frame      = frame
+        currentProject.blur       = vm.blur
+        currentProject.shadow     = vm.shadow
+        currentProject.opacity    = vm.opacity
+        currentProject.lightness  = vm.lightness
+        currentProject.saturation = vm.saturation
+        currentProject.previewImage = snapshotImage ?? vm.finalImage
+        currentProject.textLayers = overlayVM.overlays
+        currentProject.selectedFilter = vm.selectedFilter
+        
+
+         // Preview full flatten cho list
+         if let snap = snapshotImage {
+             currentProject.previewImage = snap
+         } else if let filtered = vm.finalImage {
+             currentProject.previewImage = filtered
+         }
+        // lưu docs
+        ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage,baseImage: vm.baseImage)
+
+        // Update vào RAM
+        if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
+            vm.mainprojects[index] = currentProject
+            vm.mainprojects = Array(vm.mainprojects) // ép SwiftUI publish lại
+        } else {
+            vm.mainprojects.insert(currentProject, at: 0)
+        }
+        self.project = currentProject
+        
+        completion()
+    }
     
     // Helper để tạo nút icon
     @ViewBuilder
