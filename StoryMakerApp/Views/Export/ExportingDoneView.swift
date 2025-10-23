@@ -73,7 +73,9 @@ struct ExportingDoneView: View {
             Image(uiImage: snapshotImage)
                 .resizable()
                 .scaledToFill()
-                .padding(.horizontal,40)
+                .frame(width: UIScreen.main.bounds.width - 80, height: 560)
+                .clipped()
+                .padding(.horizontal,20)
             VStack{
                 Text("Photo saved to gallery")
                     .font(.system(size: 16, weight: .medium))

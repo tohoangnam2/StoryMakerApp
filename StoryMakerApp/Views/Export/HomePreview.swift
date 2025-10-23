@@ -50,83 +50,87 @@ struct HomePreview: View {
     @Binding var project: MainModel?
 
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: { dismiss() }) {
+        ZStack{
+            VStack {
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image("home_back")
+                    }
+                    Spacer()
+                    Text("Preview")
+                        .font(.system(size: 16, weight: .medium))
+                    Spacer()
                     Image("home_back")
+                        .opacity(0)
                 }
-                Spacer()
-                Text("Preview")
-                    .font(.system(size: 16, weight: .medium))
-                Spacer()
-                Image("home_back").opacity(0)
-            }
-            .padding()
-            
-            SnapshotContainer(content:
-                                AddBackgroundsView(
-                                    overlayVM: overlayVM,
-                                    frame: frame,
-                                    showTextField: .constant(false),
-                                    isTextFieldFocused: $fakeFocus,
-                                    isSelected: .constant(false),
-                                    isEditingText: .constant(false),
-                                    onAddTap: {},
-                                    onTapOutside: {},
-                                    onOpenBackgroundEditor: {},
-                                    isShowBackgroundPicker: .constant(false),
-                                    showBackgroundEdit: .constant(false), vm: vm,
-                                    filteredImage: vm.finalImage, project: $project,
+                .padding()
 
-                                )
-            , snapshot: $snapshotImage, trigger: $triggerSnapshot)
-            .allowsHitTesting(false)
-            .padding(.horizontal,20)
+                if let project = project {
+                    let folderURL = ProjectStorage.projectFolder(for: project.id)
+                    let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
 
-            
+                    if let data = try? Data(contentsOf: previewURL),
+                       let uiImage = UIImage(data: data) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: UIScreen.main.bounds.width - 40, height: 660)
+                            .clipped()
+                            .padding(.horizontal,20)
+                    } else {
+                        Color.gray
+                            .frame(width: UIScreen.main.bounds.width - 40, height: 660)
+                            .cornerRadius(8)
+                    }
+                }
 
-            ZStack {
-                RoundedRectangle(cornerRadius: 60)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+
+
+
+                ZStack {
+                    RoundedRectangle(cornerRadius: 60)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .frame(height: 50)
+                        .frame(height: 50)
 
-                Button(action: {
-                    triggerSnapshot = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        if let image = snapshotImage {
-                            // Nếu chưa có project thì tạo mới
-                            var currentProject = project ?? MainModel(id: UUID())
-                            currentProject.previewImage = image
+                    Button(action: {
+                        triggerSnapshot = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            if let image = snapshotImage {
+                                // Nếu chưa có project thì tạo mới
+                                var currentProject = project ?? MainModel(id: UUID())
+                                currentProject.previewImage = image
 
-                            // Update RAM
-                            if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-                                vm.mainprojects[index] = currentProject
+                                // Update RAM
+                                if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
+                                    vm.mainprojects[index] = currentProject
+                                } else {
+                                    vm.mainprojects.insert(currentProject, at: 0)
+                                }
+                                    // Export JPG ra thư mục + Photos
+                                    exportingVM.startExporting(projectID: currentProject.id, image: image)
+                                
                             } else {
-                                vm.mainprojects.insert(currentProject, at: 0)
+                                print(" Snapshot chưa kịp tạo")
                             }
-                                // Export JPG ra thư mục + Photos
-                                exportingVM.startExporting(projectID: currentProject.id, image: image)
-                            
-                        } else {
-                            print(" Snapshot chưa kịp tạo")
+                        }
+                    }) {
+                        HStack {
+                            Text("Export Photo")
+                                .foregroundColor(.white)
+                            Image("ic_right")
                         }
                     }
-                }) {
-                    HStack {
-                        Text("Export Photo")
-                            .foregroundColor(.white)
-                        Image("ic_right")
-                    }
-                }
 
+                }
+                .padding(.horizontal, 80)
             }
-            .padding(.horizontal, 80)
+
         }
         .fullScreenCover(isPresented: $exportingVM.isExporting) {
             ExportingView(exportingVM: exportingVM)

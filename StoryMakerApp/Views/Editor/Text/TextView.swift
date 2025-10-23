@@ -10,59 +10,59 @@ import SwiftUI
 struct TextView: View {
     
     @ObservedObject var overlayVM: OverlayTextViewModel
-
+    
     var selectedEditText: OverlayTextEditEnum
     
     static let solidColors: [String] = [
-             "#000000",
-            "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
-            "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
-            "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
-            "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
-            "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
-            "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
-            "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
-            "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
-            "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
+        "#000000",
+        "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
+        "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
+        "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
+        "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
+        "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
+        "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
+        "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
+        "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
+        "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
     
     static let gradientColors: [[String]] = [
-          
-            ["#234E52", "#285E61"],
-            ["#2C7A7B", "#319795"],
-            ["#38B2AC", "#4FD1C5"],
-            ["#81E6D9", "#B2F5EA"],
-            ["#E6FFFA", "#2A4365"],
-            ["#2C5282", "#2B6CB0"],
-            ["#4299E1", "#63B3ED"],
-            ["#90CDF4", "#BEE3F8"],
-            ["#EBF8FF", "#3C366B"],
-            ["#434190", "#4C51BF"],
-            ["#5A67D8", "#667EEA"],
-            ["#7F9CF5", "#A3BFFA"],
-            ["#C3DAFE", "#EBF4FF"],
-            ["#44337A", "#553C9A"],
-            ["#6B46C1", "#805AD5"],
-            ["#9F7AEA", "#B794F4"],
-            ["#D6BCFA", "#E9D8FD"],
-            ["#FAF5FF", "#702459"],
-            ["#97266D", "#B83280"],
-            ["#D53F8C", "#ED64A6"],
-            ["#F687B3", "#FBB6CE"],
-            ]
+        
+        ["#234E52", "#285E61"],
+        ["#2C7A7B", "#319795"],
+        ["#38B2AC", "#4FD1C5"],
+        ["#81E6D9", "#B2F5EA"],
+        ["#E6FFFA", "#2A4365"],
+        ["#2C5282", "#2B6CB0"],
+        ["#4299E1", "#63B3ED"],
+        ["#90CDF4", "#BEE3F8"],
+        ["#EBF8FF", "#3C366B"],
+        ["#434190", "#4C51BF"],
+        ["#5A67D8", "#667EEA"],
+        ["#7F9CF5", "#A3BFFA"],
+        ["#C3DAFE", "#EBF4FF"],
+        ["#44337A", "#553C9A"],
+        ["#6B46C1", "#805AD5"],
+        ["#9F7AEA", "#B794F4"],
+        ["#D6BCFA", "#E9D8FD"],
+        ["#FAF5FF", "#702459"],
+        ["#97266D", "#B83280"],
+        ["#D53F8C", "#ED64A6"],
+        ["#F687B3", "#FBB6CE"],
+    ]
     
     static let bgColors: [String] = [
-             "#000000",
-            "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
-            "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
-            "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
-            "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
-            "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
-            "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
-            "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
-            "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
-            "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
+        "#000000",
+        "#742A2A", "#9B2C2C", "#C53030", "#E53E3E", "#F56565", "#FC8181", "#FEB2B2", "#FED7D7", "#FFF5F5",
+        "#7B341E", "#9C4221", "#C05621", "#DD6B20", "#ED8936", "#F6AD55", "#FBD38D", "#FEEBC8", "#FFFAF0",
+        "#744210", "#975A16", "#B7791F", "#D69E2E", "#ECC94B", "#F6E05E", "#FAF089", "#FEFCBF", "#FFFFF0",
+        "#22543D", "#276749", "#2F855A", "#38A169", "#48BB78", "#68D391", "#9AE6B4", "#C6F6D5", "#F0FFF4",
+        "#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA",
+        "#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF",
+        "#3C366B", "#434190", "#4C51BF", "#5A67D8", "#667EEA", "#7F9CF5", "#A3BFFA", "#C3DAFE", "#EBF4FF",
+        "#44337A", "#553C9A", "#6B46C1", "#805AD5", "#9F7AEA", "#B794F4", "#D6BCFA", "#E9D8FD", "#FAF5FF",
+        "#702459", "#97266D", "#B83280", "#D53F8C", "#ED64A6", "#F687B3", "#FBB6CE", "#FED7E2"]
     
-
+    
     var body: some View {
         VStack{
             if let overlay = $overlayVM.overlays.first(where: { $0.id == overlayVM.selectedOverlayID }) {
@@ -117,21 +117,18 @@ struct TextView: View {
                             ScrollView(.horizontal,showsIndicators: false) {
                                 HStack() {
                                     ColorPickerFromImage(overlay: overlay)
-
+                                    
                                     ForEach(TextView.solidColors, id: \.self) { color in
                                         Circle()
                                             .frame(width: 40, height: 40)
                                             .foregroundColor(Color(color))
                                             .id(color)
                                             .onTapGesture {
-                                                withAnimation{
-                                                    proxy.scrollTo(color, anchor: .leading)
-                                                    overlay.colorSolid.wrappedValue = color
-                                                    overlay.userGradient.wrappedValue = false
-                                                }
+                                                overlay.userGradient.wrappedValue = false
+                                                overlay.colorSolid.wrappedValue = color
                                             }
                                             .overlay(
-                                                 Circle()
+                                                Circle()
                                                     .strokeBorder( overlay.colorSolid.wrappedValue == color ? Color.red: Color.clear,lineWidth: 3)
                                             )
                                     }
@@ -140,16 +137,19 @@ struct TextView: View {
                                 
                             }
                             .onAppear {
-                                DispatchQueue.main.async {
-                                    withAnimation {
-                                        proxy.scrollTo(overlay.colorSolid.wrappedValue, anchor: .leading)
-                                    }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    proxy.scrollTo(overlay.colorSolid.wrappedValue, anchor: .center)
                                 }
                                 
                             }
+                            .onChange(of: overlay.colorSolid.wrappedValue) { newColor in
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    proxy.scrollTo(newColor, anchor: .center)
+                                }
+                            }
                             
                         }
-                       
+                        
                     }
                     .padding(.leading, 8)
                     
@@ -160,7 +160,7 @@ struct TextView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack {
                                     ColorPickerFromImage(overlay: overlay)
-
+                                    
                                     ForEach(0..<TextView.gradientColors.count, id: \.self) { gradientIndex in
                                         let first = Color(TextView.gradientColors[gradientIndex][0])
                                         let second = Color(TextView.gradientColors[gradientIndex][1])
@@ -175,14 +175,11 @@ struct TextView: View {
                                             .frame(width: 40, height: 40)
                                             .id(gradientIndex)
                                             .onTapGesture {
-                                                withAnimation {
-                                                    proxy.scrollTo(gradientIndex, anchor: .leading)
-                                                    overlay.colorGradient.wrappedValue = [
-                                                        first.toHex() ?? "#FFFFFF",
-                                                        second.toHex() ?? "#FFFFFF"
-                                                    ]
-                                                    overlay.userGradient.wrappedValue = true
-                                                }
+                                                overlay.colorGradient.wrappedValue = [
+                                                    first.toHex() ?? "#FFFFFF",
+                                                    second.toHex() ?? "#FFFFFF"
+                                                ]
+                                                overlay.userGradient.wrappedValue = true
                                             }
                                             .overlay(
                                                 Circle()
@@ -191,22 +188,31 @@ struct TextView: View {
                                                         second.toHex() ?? "#FFFFFF"
                                                     ] ? Color.red: Color.clear,lineWidth: 3)
                                             )
-                                            
+                                        
                                     }
                                 }
                                 .padding(.horizontal)
                             }
                             .onAppear {
-                                DispatchQueue.main.async {
-                                    withAnimation {
-                                        if let targetIndex = TextView.gradientColors.firstIndex(where: { pair in
-                                            pair == overlay.colorGradient.wrappedValue
-                                        }) {
-                                            proxy.scrollTo(targetIndex, anchor: .leading)
-                                        }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    if let targetIndex = TextView.gradientColors.firstIndex(where: { pair in
+                                        pair == overlay.colorGradient.wrappedValue
+                                    }) {
+                                        proxy.scrollTo(targetIndex, anchor: .center)
                                     }
                                 }
                             }
+                            .onChange(of: overlay.colorGradient.wrappedValue) { newColor in
+                                if let targetIndex = TextView.gradientColors.firstIndex(where: { pair in
+                                    pair == newColor
+                                }) {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        proxy.scrollTo(targetIndex, anchor: .center)
+                                    }
+                                }
+                            }
+
+                            
                         }
                     }
                     .padding(.leading, 8)
@@ -218,17 +224,14 @@ struct TextView: View {
                             ScrollView(.horizontal) {
                                 HStack {
                                     ColorPickerFromImage(overlay: overlay)
-
+                                    
                                     ForEach(TextView.solidColors, id: \.self) { color in
                                         Circle()
                                             .foregroundColor(Color(color))
                                             .frame(width: 40, height: 40)
                                             .id(color)
                                             .onTapGesture {
-                                                withAnimation {
-                                                    proxy.scrollTo(color, anchor: .leading)
-                                                    overlay.colorSolid.wrappedValue = color
-                                                }
+                                                overlay.colorSolid.wrappedValue = color
                                             }
                                             .overlay(
                                                 Circle()
@@ -239,14 +242,17 @@ struct TextView: View {
                                 .padding(.horizontal)
                             }
                             .onAppear {
-                                DispatchQueue.main.async {
-                                    withAnimation {
-                                        proxy.scrollTo(overlay.colorSolid.wrappedValue, anchor: .leading)
-                                    }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    proxy.scrollTo(overlay.colorSolid.wrappedValue, anchor: .center)
                                 }
                                 
                             }
-
+                            .onChange(of: overlay.colorSolid.wrappedValue) { newColor in
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    proxy.scrollTo(newColor, anchor: .center)
+                                }
+                            }
+                            
                         }
                     }
                     .padding(.leading, 8)
@@ -267,18 +273,14 @@ struct TextView: View {
                             ScrollView(.horizontal) {
                                 HStack {
                                     ColorPickerFromImage(overlay: overlay)
-
+                                    
                                     ForEach(TextView.solidColors, id: \.self) { color in
                                         Circle()
                                             .foregroundColor(Color(color))
                                             .frame(width: 40, height: 40)
                                             .id(color)
                                             .onTapGesture {
-                                                withAnimation {
-                                                    proxy.scrollTo(color, anchor: .leading)
-                                                    overlay.bgColor.wrappedValue = color
-
-                                                }
+                                                overlay.bgColor.wrappedValue = color
                                             }
                                             .overlay(
                                                 Circle()
@@ -289,12 +291,16 @@ struct TextView: View {
                                 .padding(.horizontal)
                             }
                             .onAppear {
-                                DispatchQueue.main.async {
-                                    withAnimation {
-                                        proxy.scrollTo(overlay.bgColor.wrappedValue, anchor: .leading)
-                                    }
+                                DispatchQueue.main.asyncAfter(deadline: .now()+0.05) {
+                                    proxy.scrollTo(overlay.bgColor.wrappedValue, anchor: .center)
                                 }
                             }
+                            .onChange(of: overlay.bgColor.wrappedValue) { newColor in
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    proxy.scrollTo(newColor, anchor: .center)
+                                }
+                            }
+                            
                         }
                         
                     }
@@ -317,12 +323,7 @@ struct TextView: View {
                                             .frame(width: 40, height: 40)
                                             .id(color)
                                             .onTapGesture {
-                                                withAnimation {
-                                                    proxy.scrollTo(color, anchor: .leading)
-                                                    overlay.shawDowColor.wrappedValue = color
-
-                                                }
-
+                                                overlay.shawDowColor.wrappedValue = color
                                             }
                                             .overlay(
                                                 Circle()
@@ -333,14 +334,17 @@ struct TextView: View {
                                 .padding(.horizontal)
                             }
                             .onAppear {
-                                DispatchQueue.main.async {
-                                    withAnimation {
-                                        proxy.scrollTo(overlay.shawDowColor.wrappedValue, anchor: .leading)
-                                    }
+                                DispatchQueue.main.asyncAfter(deadline: .now()+0.05) {
+                                    proxy.scrollTo(overlay.shawDowColor.wrappedValue, anchor: .center)
+                                }
+                            }
+                            .onChange(of: overlay.shawDowColor.wrappedValue) { newColor in
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    proxy.scrollTo(newColor, anchor: .center)
                                 }
                             }
                             
-
+                            
                         }
                         
                         
@@ -352,9 +356,9 @@ struct TextView: View {
                     Text("8 Family Picker")
                 }
             }
-//            else{
-//                Text("Không có overlay nào được chọn")
-//            }
+            //            else{
+            //                Text("Không có overlay nào được chọn")
+            //            }
         }
         .background(.white)
         .padding(.top,5)
@@ -371,7 +375,7 @@ struct CustomSliderRow: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -385,7 +389,7 @@ struct CustomSliderRow: View {
                              trackColor: .gray,
                              thumbColor: .red)
                 .frame(height: 25)
-
+                
                 Text("\(Int(value))")
             }
         }
@@ -399,7 +403,7 @@ struct CustomSliderRowLineHeight: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -413,7 +417,7 @@ struct CustomSliderRowLineHeight: View {
                              trackColor: .gray,
                              thumbColor: .red)
                 .frame(height: 25)
-
+                
                 Text("\(Int(value))")
             }
         }
@@ -427,7 +431,7 @@ struct CustomSliderRowLetter: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -441,7 +445,7 @@ struct CustomSliderRowLetter: View {
                              trackColor: .gray,
                              thumbColor: .red)
                 .frame(height: 25)
-
+                
                 Text("\(Int(value))")
             }
         }
@@ -458,19 +462,19 @@ struct CustomSliderRowColor: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.system(size: 12))
             HStack {
                 CustomUISlider(
-                                valueOpacity: $valueOpacity,
-                                minValue: 0.3,
-                                maxValue: 1.0,
-                                trackColor: .gray,
-                                thumbColor: .red // màu thumb
-                 )
+                    valueOpacity: $valueOpacity,
+                    minValue: 0.3,
+                    maxValue: 1.0,
+                    trackColor: .gray,
+                    thumbColor: .red // màu thumb
+                )
                 .frame(height: 25)
                 
                 Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
@@ -489,20 +493,20 @@ struct CustomSliderRowBgOpacity: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.system(size: 12))
             HStack {
                 CustomUISlider(
-                                valueOpacity: $valueOpacity,
-                                minValue: 0,
-                                maxValue: 1,
-                                trackColor: .gray,
-                                thumbColor: .red // màu thumb
-                            )
-                            .frame(height: 25)
+                    valueOpacity: $valueOpacity,
+                    minValue: 0,
+                    maxValue: 1,
+                    trackColor: .gray,
+                    thumbColor: .red // màu thumb
+                )
+                .frame(height: 25)
                 
                 Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
             }
@@ -519,13 +523,13 @@ struct CustomSliderRowBgOpacity: View {
 struct CustomSliderRowStroke: View {
     let title: String
     @Binding var value: Double
-
+    
     var minValue: Double = 0
     var maxValue: Double = 30
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -537,7 +541,7 @@ struct CustomSliderRowStroke: View {
                              trackColor: .gray,
                              thumbColor: .red)
                 .frame(height: 25)
-
+                
                 Text("\(Int(value))")
             }
         }
@@ -553,35 +557,35 @@ struct CustomAlign: View {
     
     var body: some View {
         
-            HStack {
-                Text(title)
-                    .font(.system(size: 12))
-                Spacer()
-                HStack(spacing: 8) {
-                    Button(action: {
-                        selectedAlign = .left
-                    }) {
-                        Image("align_left")
-                            .background(selectedAlign == .left ? Color.black.opacity(0.65) : Color.clear)
-                            .frame(width: 30, height: 30)
-                    }
-                    Button(action: {
-                        selectedAlign = .center
-                    }) {
-                        Image("align_left")
-                            .background(selectedAlign == .center ? Color.black.opacity(0.65) : Color.clear)
-                            .frame(width: 30, height: 30)
-                    }
-                    Button(action: {
-                        selectedAlign = .right
-                    }) {
-                        Image("align_right")
-                            .background(selectedAlign == .right ? Color.black.opacity(0.65) : Color.clear)
-                            .frame(width: 30, height: 30)
-                    }
+        HStack {
+            Text(title)
+                .font(.system(size: 12))
+            Spacer()
+            HStack(spacing: 8) {
+                Button(action: {
+                    selectedAlign = .left
+                }) {
+                    Image("align_left")
+                        .background(selectedAlign == .left ? Color.black.opacity(0.65) : Color.clear)
+                        .frame(width: 30, height: 30)
+                }
+                Button(action: {
+                    selectedAlign = .center
+                }) {
+                    Image("align_left")
+                        .background(selectedAlign == .center ? Color.black.opacity(0.65) : Color.clear)
+                        .frame(width: 30, height: 30)
+                }
+                Button(action: {
+                    selectedAlign = .right
+                }) {
+                    Image("align_right")
+                        .background(selectedAlign == .right ? Color.black.opacity(0.65) : Color.clear)
+                        .frame(width: 30, height: 30)
                 }
             }
-            .padding(.horizontal)
+        }
+        .padding(.horizontal)
     }
 }
 
@@ -589,46 +593,46 @@ struct CustomAlignCase: View {
     var title: String
     @Binding var selectedAlignCase : AlignCaseEnum
     var body: some View {
-            HStack {
-                Text(title)
-                    .font(.system(size: 12))
-                Spacer()
-                HStack() {
-                    Button(action: {
-                        selectedAlignCase = .up
-                    }) {
-                        Text("UP")
-                            .font(.system(size: 14))
-                            .foregroundColor(selectedAlignCase == .up ? .white : .black)
-                            .padding(5)
-                            .background(selectedAlignCase == .up ? Color.black : Color.clear)
-
-                    }
+        HStack {
+            Text(title)
+                .font(.system(size: 12))
+            Spacer()
+            HStack() {
+                Button(action: {
+                    selectedAlignCase = .up
+                }) {
+                    Text("UP")
+                        .font(.system(size: 14))
+                        .foregroundColor(selectedAlignCase == .up ? .white : .black)
+                        .padding(5)
+                        .background(selectedAlignCase == .up ? Color.black : Color.clear)
                     
-                    Button(action: {
-                        selectedAlignCase = .cap
-                    }) {
-                        Text("Cap")
-                            .font(.system(size: 14))
-                            .foregroundColor(selectedAlignCase == .cap ? .white : .black)
-                            .padding(5)
-                            .background(selectedAlignCase == .cap ? Color.black : Color.clear)
-
-                    }
+                }
+                
+                Button(action: {
+                    selectedAlignCase = .cap
+                }) {
+                    Text("Cap")
+                        .font(.system(size: 14))
+                        .foregroundColor(selectedAlignCase == .cap ? .white : .black)
+                        .padding(5)
+                        .background(selectedAlignCase == .cap ? Color.black : Color.clear)
                     
-                    Button(action: {
-                        selectedAlignCase = .low
-                    }) {
-                        Text("low")
-                            .font(.system(size: 14))
-                            .foregroundColor(selectedAlignCase == .low ? .white : .black)
-                            .padding(5)
-                            .background(selectedAlignCase == .low ? Color.black : Color.clear)
-                    }
+                }
+                
+                Button(action: {
+                    selectedAlignCase = .low
+                }) {
+                    Text("low")
+                        .font(.system(size: 14))
+                        .foregroundColor(selectedAlignCase == .low ? .white : .black)
+                        .padding(5)
+                        .background(selectedAlignCase == .low ? Color.black : Color.clear)
                 }
             }
-            .padding(.horizontal)
-     
+        }
+        .padding(.horizontal)
+        
     }
 }
 
@@ -642,7 +646,7 @@ struct CustomSliderShadow: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -656,7 +660,7 @@ struct CustomSliderShadow: View {
                              trackColor: .gray,
                              thumbColor: .red)
                 .frame(height: 25)
-
+                
                 Text("\(Int(valueBG))")
             }
         }
@@ -672,7 +676,7 @@ struct CustomSliderBackGround: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -686,7 +690,7 @@ struct CustomSliderBackGround: View {
                              trackColor: .gray,
                              thumbColor: .red)
                 .frame(height: 25)
-
+                
                 Text("\(Int(valueBG))")
             }
         }
@@ -704,7 +708,7 @@ struct CustomSliderShaDowBlur: View {
     var sliderColor: Color = .red
     var thumbColor: Color = .red
     var trackHeight: CGFloat = 3
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -717,7 +721,7 @@ struct CustomSliderShaDowBlur: View {
                              maxValue: maxValue,
                              trackColor: .gray,
                              thumbColor: .red)
-                    .frame(height: 25)
+                .frame(height: 25)
                 Text("\(Int(valueBG))")
             }
         }
@@ -827,7 +831,7 @@ extension Color {
         hex = hex.replacingOccurrences(of: "#", with: "")
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
-
+        
         let a, r, g, b: UInt64
         switch hex.count {
         case 3: // RGB, e.g. "f00"
@@ -848,7 +852,7 @@ extension Color {
         default:
             (a, r, g, b) = (255, 0, 0, 0)
         }
-
+        
         self.init(.sRGB,
                   red: Double(r) / 255,
                   green: Double(g) / 255,
