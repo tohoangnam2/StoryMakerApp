@@ -45,6 +45,8 @@ struct AddProjectView: View {
     @State var isExport = false
 
     var completion: ((UIImage) -> Void)? = nil
+    @State private var isInitialized = false
+
     
     var body: some View {
         NavigationView {
@@ -105,6 +107,8 @@ struct AddProjectView: View {
                                 project: $project
                             )
                             .onAppear {
+                                guard !isInitialized else { return } //  chỉ chạy 1 lần duy nhất khi mở
+                                   isInitialized = true
                                 self.project = existingProject
                                 overlayVM.overlays = existingProject.textLayers
                                 frame = existingProject.frame
@@ -132,6 +136,7 @@ struct AddProjectView: View {
                                             vm.finalImage = uiImage
                                         }
                                     }
+                                    
                                 }
                             }
 
@@ -508,26 +513,24 @@ struct AddProjectView: View {
     func exitExport(completion: @escaping () -> Void) {
         isExport = true
         resetEditState()
-
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             triggerSnapshot = true
-            
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             if let snap = snapshotImage,
                var current = project {
                 //  Lưu ảnh full flatten cho thumbnail
+                current.selectedFilter = vm.selectedFilter
+                
                 current.previewImage = snap
                 ProjectStorage.saveProject(current,previewImage: snap)
-
                 if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
                     vm.mainprojects[index] = current
                     vm.mainprojects = Array(vm.mainprojects)
                 }
                 self.project = current
                 print("Snapshot captured: \(snap)")
-                
             } else {
                 print("Snapshot still nil")
             }
@@ -540,8 +543,8 @@ struct AddProjectView: View {
             completion()
             return
         }
-        // data vm
-        // Lưu state
+
+        currentProject.textLayers = overlayVM.overlays
         currentProject.frame      = frame
         currentProject.blur       = vm.blur
         currentProject.shadow     = vm.shadow
@@ -549,18 +552,18 @@ struct AddProjectView: View {
         currentProject.lightness  = vm.lightness
         currentProject.saturation = vm.saturation
         currentProject.previewImage = snapshotImage ?? vm.finalImage
-        currentProject.textLayers = overlayVM.overlays
         currentProject.selectedFilter = vm.selectedFilter
-        
-
+      
          // Preview full flatten cho list
          if let snap = snapshotImage {
              currentProject.previewImage = snap
          } else if let filtered = vm.finalImage {
              currentProject.previewImage = filtered
          }
+        
         // lưu docs
         ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage,baseImage: vm.baseImage)
+
 
         // Update vào RAM
         if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
@@ -568,8 +571,11 @@ struct AddProjectView: View {
             vm.mainprojects = Array(vm.mainprojects) // ép SwiftUI publish lại
         } else {
             vm.mainprojects.insert(currentProject, at: 0)
+
         }
+        
         self.project = currentProject
+        
         
         completion()
     }

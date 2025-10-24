@@ -48,9 +48,11 @@ struct HomePreview: View {
     let filteredImage: UIImage?
 
     @Binding var project: MainModel?
+    
 
     var body: some View {
-        ZStack{
+        ZStack(){
+          
             VStack {
                 HStack {
                     Button(action: { dismiss() }) {
@@ -63,8 +65,7 @@ struct HomePreview: View {
                     Image("home_back")
                         .opacity(0)
                 }
-                .padding()
-
+                .padding(.top,exportingVM.isDone ? 30 : 0)
                 if let project = project {
                     let folderURL = ProjectStorage.projectFolder(for: project.id)
                     let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
@@ -74,86 +75,200 @@ struct HomePreview: View {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFill()
-                            .frame(width: UIScreen.main.bounds.width - 40, height: 660)
+                            .frame(width: UIScreen.main.bounds.width - 40)
                             .clipped()
                             .padding(.horizontal,20)
-                    } else {
-                        Color.gray
-                            .frame(width: UIScreen.main.bounds.width - 40, height: 660)
-                            .cornerRadius(8)
                     }
                 }
-
-
-
-
-                ZStack {
-                    RoundedRectangle(cornerRadius: 60)
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(height: 50)
-
-                    Button(action: {
-                        triggerSnapshot = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            if let image = snapshotImage {
-                                // Nếu chưa có project thì tạo mới
-                                var currentProject = project ?? MainModel(id: UUID())
-                                currentProject.previewImage = image
-
-                                // Update RAM
-                                if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-                                    vm.mainprojects[index] = currentProject
-                                } else {
-                                    vm.mainprojects.insert(currentProject, at: 0)
+                if exportingVM.isDone {
+                    VStack{
+                        Text("Photo saved to gallery")
+                            .font(.system(size: 16, weight: .medium))
+                        Text("Share photo to")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.gray)
+                    }
+                    HStack (spacing: 20){
+                        //story
+                        VStack{
+                            Button(action: {
+                                shareToStory()
+                            })
+                            {
+                                ZStack {
+                                    Rectangle()
+                                        .fill(
+                                            Color.preBg
+                                        )
+                                        .frame(width:50,height: 50)
+                                        .cornerRadius(10)
+                                    Image("pre_story")
                                 }
-                                    // Export JPG ra thư mục + Photos
-                                    exportingVM.startExporting(projectID: currentProject.id, image: image)
-                                
-                            } else {
-                                print(" Snapshot chưa kịp tạo")
+                            }
+                            
+                            Text("Story")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        //feed
+                        VStack{
+                            Button(action: {
+                                shareToReels()
+                            })
+                            {
+                                ZStack {
+                                    Rectangle()
+                                        .fill(
+                                            Color.preBg
+                                        )
+                                        .frame(width:50,height: 50)
+                                        .cornerRadius(10)
+                                    Image("pre_feed")
+                                }
+                            }
+                            Text("Feed")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        
+                        // Others
+                        VStack {
+                            ShareLink(
+                                item: Image(uiImage: snapshotImage!),
+                                preview: SharePreview("My Photo", image: Image(uiImage: snapshotImage!))
+                            ) {
+                                ZStack {
+                                    Rectangle()
+                                        .fill(Color.preBg)
+                                        .frame(width: 50, height: 50)
+                                        .cornerRadius(10)
+                                    Image("pre_none")
+                                }
+                            }
+                            Text("Others")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                    }
+                    .padding(.horizontal,55)
+                    .padding(.bottom,40)
+                }else {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 60)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(height: 50)
+
+                        Button(action: {
+                            triggerSnapshot = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                if let image = snapshotImage {
+                                    // Nếu chưa có project thì tạo mới
+                                    var currentProject = project ?? MainModel(id: UUID())
+                                    currentProject.previewImage = image
+
+                                    // Update RAM
+                                    if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
+                                        vm.mainprojects[index] = currentProject
+                                    } else {
+                                        vm.mainprojects.insert(currentProject, at: 0)
+                                    }
+                                        // Export JPG ra thư mục + Photos
+                                        exportingVM.startExporting(projectID: currentProject.id, image: image)
+                                    
+                                } else {
+                                    print(" Snapshot chưa kịp tạo")
+                                }
+                            }
+                        }) {
+                            HStack {
+                                Text("Export Photo")
+                                    .foregroundColor(.white)
+                                Image("ic_right")
                             }
                         }
-                    }) {
-                        HStack {
-                            Text("Export Photo")
-                                .foregroundColor(.white)
-                            Image("ic_right")
-                        }
+
                     }
-
+                    .padding(.horizontal, 80)
+                    
                 }
-                .padding(.horizontal, 80)
             }
-
+            
         }
         .fullScreenCover(isPresented: $exportingVM.isExporting) {
             ExportingView(exportingVM: exportingVM)
         }
-        .fullScreenCover(isPresented: $exportingVM.isDone) {
-            ExportingDoneView(
-                exportingVM: exportingVM, overlayVM: overlayVM,
-                frame: frame,
-                showTextField: $showTextField,
-                isTextFieldFocused: $isTextFieldFocused,
-                isSelected: $isSelected,
-                isEditingText: $isEditingText,
-                onAddTap: { isShowBackgroundPicker = true },
-                onTapOutside: { },
-                onOpenBackgroundEditor: { showBackgroundEdit = true },
-                isShowBackgroundPicker: $isShowBackgroundPicker,
-                showBackgroundEdit: $showBackgroundEdit,
-                triggerSnapshot: $triggerSnapshot, vm: vm, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
-            )
-            .environmentObject(vm)
-        }
-        
+//        .fullScreenCover(isPresented: $exportingVM.isDone) {
+//            ExportingDoneView(
+//                exportingVM: exportingVM, overlayVM: overlayVM,
+//                frame: frame,
+//                showTextField: $showTextField,
+//                isTextFieldFocused: $isTextFieldFocused,
+//                isSelected: $isSelected,
+//                isEditingText: $isEditingText,
+//                onAddTap: { isShowBackgroundPicker = true },
+//                onTapOutside: { },
+//                onOpenBackgroundEditor: { showBackgroundEdit = true },
+//                isShowBackgroundPicker: $isShowBackgroundPicker,
+//                showBackgroundEdit: $showBackgroundEdit,
+//                triggerSnapshot: $triggerSnapshot, vm: vm, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
+//            )
+//            .environmentObject(vm)
+//        }
     }
+    func shareToStory() {
+        
+        guard let instagramURL = URL(string: "instagram-stories://share?source_application=a.StoryMakerApp"),
+                     UIApplication.shared.canOpenURL(instagramURL) else {
+                   return
+               }
+               
+               guard
+                let imageData = snapshotImage!.pngData() else {
+                   return
+               }
+               
+               let pasteboardItems: [String: Any] = [
+                   "com.instagram.sharedSticker.backgroundImage": imageData
+               ]
+               
+               let pasteboardOptions: [UIPasteboard.OptionsKey: Any] = [
+                   .expirationDate: Date().addingTimeInterval(60)
+               ]
+               
+               UIPasteboard.general.setItems([pasteboardItems], options: pasteboardOptions)
+               
+               UIApplication.shared.open(instagramURL, options: [:], completionHandler: nil)
+    }
+    
+    func shareToReels() {
+        if let urlScheme = URL(string: "instagram-reels://share?source_application=a.StoryMakerApp"), UIApplication.shared.canOpenURL(urlScheme) {
+            guard
+                let imageData = snapshotImage!.pngData() else {
+                return
+            }
+            
+            let pasteboardItems: [String: Any] = [
+                "com.instagram.sharedSticker.backgroundImage": imageData
+            ]
+                   
+               // Set pasteboard options
+            let pasteboardOptions: [UIPasteboard.OptionsKey: Any] = [
+                .expirationDate: Date().addingTimeInterval(60)
+            ]
+               // Attach the pasteboard items
+               UIPasteboard.general.setItems([pasteboardItems], options: pasteboardOptions)
+
+            UIApplication.shared.open(urlScheme, options: [:], completionHandler: nil)
+
+           } else {
+               // Handle error cases
+           }
+
+        }
+    
 }
 
 

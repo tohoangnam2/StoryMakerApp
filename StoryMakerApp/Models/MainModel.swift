@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct MainModel: Identifiable, Codable {
     var id: UUID
     var textLayers: [OverlayTextModel] = []

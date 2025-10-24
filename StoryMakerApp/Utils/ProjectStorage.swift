@@ -48,7 +48,6 @@ struct ProjectStorage {
             print(" Error saving project: \(error)")
         }
     }
-
     /// Load tất cả project từ Documents
     static func loadAllProjects() -> [MainModel] {
         let documentsURL = getDocumentsDirectory()
@@ -124,6 +123,7 @@ struct ProjectStorage {
             return nil
         }
     }
+    
     func debugPrintProjectJSON(id: UUID) {
         let folderURL = ProjectStorage.projectFolder(for: id)
         let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
@@ -212,29 +212,5 @@ extension OverlayTextViewModel {
         self.selectedOverlayID = nil
     }
 }
-//  Đặt ở cuối file ProjectStorage.swift hoặc EditorView.swift
-extension ProjectStorage {
-    static func loadRemoteImage(from urlString: String?, completion: @escaping (UIImage?) -> Void) {
-        guard let urlString = urlString,
-              let url = URL(string: urlString) else {
-            print("❌ URL không hợp lệ:", urlString ?? "nil")
-            completion(nil)
-            return
-        }
 
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            if let data = data, let image = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    print("✅ Frame image loaded from:", urlString)
-                    completion(image)
-                }
-            } else {
-                print("❌ Không tải được frame image từ:", urlString)
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
-            }
-        }.resume()
-    }
-}
 

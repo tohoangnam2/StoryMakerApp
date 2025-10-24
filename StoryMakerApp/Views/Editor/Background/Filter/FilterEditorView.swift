@@ -64,6 +64,7 @@ struct FilterEditorView: View {
                                         }
                                     }
                                 }
+                                  
                                 // Lưu vị trí filter đã chọn cho category hiện tại
                                 if let categoryID = vm.selectedCategory?.id {
                                     vm.lastSelectedFilterPosition[categoryID] = bg.id

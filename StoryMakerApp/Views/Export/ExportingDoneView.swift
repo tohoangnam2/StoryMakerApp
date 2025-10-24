@@ -15,45 +15,28 @@ struct ExportingDoneView: View {
     //    let snapshotImage: UIImage
     @ObservedObject var exportingVM: ExportingViewModel
     @Environment(\.dismiss) var dismiss
-    
-    
     @ObservedObject var overlayVM: OverlayTextViewModel
-    
-    
     let frame: Frame?
-    
     @Binding var showTextField: Bool
     @FocusState.Binding var isTextFieldFocused: Bool
     @Binding var isSelected : Bool
     @Binding var isEditingText : Bool
+    
     let onAddTap: () -> Void
-    
     let onTapOutside: () -> Void
-    
     let onOpenBackgroundEditor: () -> Void
-    
     @Binding var isShowBackgroundPicker: Bool
     @Binding var showBackgroundEdit: Bool
-    
-    
     @State private var isImageLoaded = false
-    
-    
     //export
     @Binding var triggerSnapshot : Bool
-    
     @ObservedObject var vm: BackgroundEditorViewModel
-    
     let filteredImage: UIImage?
-    
     //others share
     
     @State private var showShareSheet = false
     @State private var shareItems: [Any] = []
-    
     let snapshotImage: UIImage
-    
-    
     
     var body: some View {
         VStack(spacing: 10){
@@ -76,6 +59,7 @@ struct ExportingDoneView: View {
                 .frame(width: UIScreen.main.bounds.width - 80, height: 560)
                 .clipped()
                 .padding(.horizontal,20)
+            
             VStack{
                 Text("Photo saved to gallery")
                     .font(.system(size: 16, weight: .medium))

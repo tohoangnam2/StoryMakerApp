@@ -54,7 +54,7 @@ struct AddBackgroundsView: View {
                                 .contentShape(Rectangle())
                                 .id(project.id)
                                 .onAppear {
-                                    vm.reset()
+//                                    vm.reset()
                                     DispatchQueue.main.async {
                                         if vm.finalImage == nil {
                                             if let url = frame.backgroundURL,
@@ -187,7 +187,6 @@ struct AddBackgroundsView: View {
                                                             }
                                                     )
                                                     .padding()
-                                                    
                                                     .background(
                                                         Group{
                                                             GeometryReader {textGeo in

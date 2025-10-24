@@ -8,25 +8,17 @@
 import SwiftUI
 
 struct HomeView: View {
+    
     @StateObject var vm: BackgroundEditorViewModel = BackgroundEditorViewModel()
-
-
-    @State var mockDataImage: [UIImage] = [
-        UIImage(imageLiteralResourceName: "home_mockdata"),
-        UIImage(imageLiteralResourceName: "home_mockdata"),
-        UIImage(imageLiteralResourceName: "home_mockdata")
-        
-    ]
-    
     @State private var selectedProjectID: UUID?
-    
     @Binding var isShowPremium: Bool
 
     var body: some View {
         NavigationView{
             ZStack{
-                VStack(){
-                    VStack(){
+                VStack{
+                    VStack{
+                        //view tabbar
                         VStack(spacing: 25){
                             HStack{
                                 Image("home_ictabbar")
@@ -52,6 +44,8 @@ struct HomeView: View {
                                 .frame(maxWidth: .infinity, alignment: .topLeading)
                                 .padding(.leading,25)
                         }
+                        
+                        //view preview
                         ScrollViewReader { proxy in
                             ScrollView(.vertical, showsIndicators: false) {
                                 LazyVGrid(
@@ -119,27 +113,28 @@ struct HomeView: View {
                                 }
                             }
                         }
-                        // NavigationLink ẩn
                     }
-                    
                     Spacer()
-                    VStack(spacing:15){
-                        withAnimation(.spring){
-                            NavigationLink(destination: AddProjectView(project : nil, projectID: nil,vm:vm)
-                               ) {
-                                Image("home_icBtn")
-                            }
-                        }
-                        Text("Add new Project")
-                            .font(.system(size: 16, weight: .medium, design: .default))
-                    }
-                    .padding(.top)
                 }
-                
             }
-            
+
+            //view add
+            .overlay(
+                VStack(spacing:15){
+                    withAnimation(.spring){
+                        NavigationLink(destination: AddProjectView(project : nil, projectID: nil,vm:vm)
+                        ) {
+                            Image("home_icBtn")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 65, height: 65)
+                        }
+                    }
+                   
+                }
+                ,alignment: .bottom
+             )
         }
-        
         .onAppear {
             let projects = ProjectStorage.loadAllProjects()
             vm.mainprojects = projects
@@ -147,9 +142,7 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $isShowPremium) {
             SubcriptionView()
         }
-
         .navigationBarBackButtonHidden(true)
-        
     }
 
 }

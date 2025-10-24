@@ -85,15 +85,15 @@ class OverlayTextViewModel: ObservableObject {
         }
     }
     
-    func activateGesture(for id: UUID, type: OverlayGestureType) {
-        for index in overlays.indices {
-            if overlays[index].id == id {
-                overlays[index].activeGesture = type
-            } else {
-                overlays[index].activeGesture = .none
-            }
-        }
-    }
+//    func activateGesture(for id: UUID, type: OverlayGestureType) {
+//        for index in overlays.indices {
+//            if overlays[index].id == id {
+//                overlays[index].activeGesture = type
+//            } else {
+//                overlays[index].activeGesture = .none
+//            }
+//        }
+//    }
 
 
     //save preview
