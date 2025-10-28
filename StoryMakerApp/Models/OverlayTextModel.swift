@@ -21,9 +21,25 @@ struct OverlayTextModel: Identifiable , Codable {
     var text: String
     var offset: CGSize = .zero
     var endset: CGSize = .zero
+    var initialOffset: CGSize = .zero
+    var startOffset: CGSize = .zero
+    var lastTranslation: CGSize = .zero
+    var targetOffset: CGSize = .zero
+    var displayOffset: CGSize = .zero
+    var didApplyThreshold = false
+    var appliedStartOffset = false
+    var dragStartOffset: CGSize? = nil
     
+    var isDragging: Bool = false
+    
+    //new move
+    var position: CGSize = .zero
+    var dragOffset: CGSize = .zero
+
+    var velocity: CGSize = .zero
+    
+
     //rotate
-    
     // 1. Biến trạng thái để lưu góc xoay
     var currentRotation: Double = 0
     

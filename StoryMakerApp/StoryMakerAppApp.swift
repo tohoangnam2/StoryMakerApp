@@ -15,6 +15,7 @@ struct StoryMakerAppApp: App {
 
     var body: some Scene {
         WindowGroup {
+//            MovableText()
             ZStack {
                 if showSplash {
                     SplashView(isShowPremium: $isShowPremium, hasShownGetStarted: $hasShownGetStarted)
@@ -48,7 +49,6 @@ struct StoryMakerAppApp: App {
             .fullScreenCover(isPresented: $isShowPremium) {
                 SubcriptionView()
             }
-
         }
     }
 }
