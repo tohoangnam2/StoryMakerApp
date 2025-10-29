@@ -22,6 +22,7 @@ struct SplashView: View {
                                startPoint: .topLeading,
                                endPoint: .bottomTrailing)
                 .edgesIgnoringSafeArea(.all)
+                
                 VStack(spacing:200) {
                     Spacer()
                     VStack(spacing: 28){
@@ -37,25 +38,23 @@ struct SplashView: View {
                         }
                     }
                     .padding(.bottom,50)
-                   
-                    VStack(spacing:19){
-                            NavigationLink {
-                                HomeView(vm: BackgroundEditorViewModel(), isShowPremium: $isShowPremium)
-                                    .navigationBarBackButtonHidden(true)
-                                    .onAppear {
-                                        hasShownGetStarted = true
-                                    }
-                            } label: {
-                                Text("Get Started")
-                                    .font(.headline)
-                                    .foregroundColor(Color.bgSplashBtn)
-                                    .frame(width: 258,height: 47)
-                                    .background(Color.white.cornerRadius(57))
-                            }
-                            .opacity(hasShownGetStarted ? 0 : 1)
-                            .disabled(hasShownGetStarted)
-                        
-                     
+                    
+                VStack(spacing:19){
+                        NavigationLink {
+                            HomeView(vm: BackgroundEditorViewModel(), isShowPremium: $isShowPremium)
+                                .navigationBarBackButtonHidden(true)
+                                .onAppear {
+                                    hasShownGetStarted = true
+                                }
+                        } label: {
+                            Text("Get Started")
+                                .font(.headline)
+                                .foregroundColor(Color.bgSplashBtn)
+                                .frame(width: 258,height: 47)
+                                .background(Color.white.cornerRadius(57))
+                        }
+                        .opacity(hasShownGetStarted ? 0 : 1)
+                        .disabled(hasShownGetStarted)
 
                         Text("Terms of Use  ·  Privacy Policy")
                             .font(.system(size: 12, weight: .medium, design: .default))
@@ -64,7 +63,7 @@ struct SplashView: View {
                     
                 }
             }
-
+            
         }
         
         

@@ -12,26 +12,30 @@ struct MovableText: View {
     @State private var dragOffset: CGSize = .zero    // offset tạm khi drag
     
     var body: some View {
-        Text("move text test")
-            .padding()
-            .background(Color.yellow.opacity(0.3))
-            .cornerRadius(8)
-            .offset(x: position.width + dragOffset.width,
-                    y: position.height + dragOffset.height)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        // delta = current finger - start finger
-                        dragOffset = value.translation
-                        
-                    }
-                    .onEnded { value in
-                        // cộng offset tạm vào vị trí tuyệt đối
-                        position.width += value.translation.width
-                        position.height += value.translation.height
-                        dragOffset = .zero
-                    }
-            )
+        ZStack{
+            Image("bg_onb_1")
+            Text("move text test")
+                .padding()
+                .background(Color.yellow.opacity(0.3))
+                .cornerRadius(8)
+                .offset(x: position.width + dragOffset.width,
+                        y: position.height + dragOffset.height)
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            // delta = current finger - start finger
+                            dragOffset = value.translation
+                            
+                        }
+                        .onEnded { value in
+                            // cộng offset tạm vào vị trí tuyệt đối
+                            position.width += value.translation.width
+                            position.height += value.translation.height
+                            dragOffset = .zero
+                        }
+                )
+        }
+   
     }
 }
 

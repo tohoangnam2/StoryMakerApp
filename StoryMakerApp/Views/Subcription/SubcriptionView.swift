@@ -17,18 +17,17 @@ struct SubcriptionView: View {
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
-    // Hàm chia ra days, hours, minutes
-    func getTimeComponents(seconds: Int) -> (days: Int, hours: Int, minutes: Int) {
-        let days = seconds / (24 * 3600)
-        let hours = (seconds % (24 * 3600)) / 3600
-        let minutes = (seconds % 3600) / 60
+    func getTimeComponents(times: Int) -> (days: Int, hours: Int, minutes: Int) {
+        let days = times / (24 * 3600)
+        let hours = (times % (24 * 3600)) / 3600
+        let minutes = (times % 3600) / 60
         return (days, hours, minutes)
     }
     
     
     var body: some View {
         
-        let time = getTimeComponents(seconds: remainingTime)
+        let time = getTimeComponents(times: remainingTime)
         
         NavigationView{
             ZStack{
@@ -95,6 +94,7 @@ struct SubcriptionView: View {
                                         }
                                     }
                                 }
+                                
                                 .onReceive(timer) { _ in
                                     if remainingTime > 0 {
                                         remainingTime -= 1

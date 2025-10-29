@@ -52,36 +52,37 @@ struct AddProjectView: View {
         NavigationView {
             ZStack{
                 VStack{
-                    HStack{
-                        Button(action: {
+                    //top bar
+                HStack{
+                    Button(action: {
+                        exitExport {
+                            saveCurrentProject(project: project,
+                                                overlayVM: overlayVM,
+                                                vm: vm) {
+                                print("x : \(snapshotImage)")
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                        }
+                    }) {
+                        Image("home_back")
+                    }
+                    Spacer()
+                    Button {
+                        if frame != nil {
                             exitExport {
                                 saveCurrentProject(project: project,
-                                                   overlayVM: overlayVM,
-                                                   vm: vm) {
+                                                    overlayVM: overlayVM,
+                                                    vm: vm) {
                                     print("x : \(snapshotImage)")
-                                    presentationMode.wrappedValue.dismiss()
+                                    
+                                    showPreview = true
                                 }
                             }
-                        }) {
-                            Image("home_back")
                         }
-                        Spacer()
-                        Button {
-                            if frame != nil {
-                                exitExport {
-                                    saveCurrentProject(project: project,
-                                                       overlayVM: overlayVM,
-                                                       vm: vm) {
-                                        print("x : \(snapshotImage)")
-                                        
-                                        showPreview = true
-                                    }
-                                }
-                            }
-                        } label: {
-                            Image("home_share")
-                        }
+                    } label: {
+                        Image("home_share")
                     }
+                }
                     .padding(.horizontal)
                     Spacer()
                     
@@ -118,6 +119,7 @@ struct AddProjectView: View {
                                 vm.lightness = existingProject.lightness
                                 vm.saturation = existingProject.saturation
 
+                                //load ảnh gốc và load vào baseimg
                                 if let originalName = existingProject.originalImagePath {
                                     let folderURL = ProjectStorage.projectFolder(for: existingProject.id)
                                     let url = folderURL.appendingPathComponent(originalName)
@@ -167,246 +169,239 @@ struct AddProjectView: View {
                         }
                     }
                         .modifier(SnapshotWrapper(isExport: isExport, snapshot: $snapshotImage, trigger: $triggerSnapshot))
-                        
+                    
+                    //view editor
                     if showBackgroundEdit {
                         BackgroundEditorView(vm: vm, overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected, project: $project)
-                                    .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
-                                    .transition(.move(edge: .bottom).combined(with: .opacity)) // trượt từ dưới lên + fade
-                                    .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit) // animate khi state thay đổi
+                            .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
+                            .transition(.move(edge: .bottom).combined(with: .opacity)) // trượt từ dưới lên + fade
+                            .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit) // animate khi state thay đổi
                     }
-                        else {
-                            if  selectedEditText != .none {
-                                VStack(spacing: 0) {
-                                    VStack {
-                                        HStack {
-                                            Button(action: {}) {
-                                                Image("img_edit1_keyboard")
+                    else {
+                        if  selectedEditText != .none {
+                            VStack(spacing: 0) {
+                                VStack {
+                                    HStack {
+                                        Button(action: {}) {
+                                            Image("img_edit1_keyboard")
+                                        }
+                                        Spacer()
+                                        Text(selectedEditText.title)
+                                            .font(.system(size: 16, weight: .medium))
+                                        Spacer()
+                                        Button(action: {
+                                            selectedEditText = .none
+                                        }) {
+                                            Image("img_bg_check")
+                                        }
+                                        .background(.white)
+                                    }
+                                    .padding(.top, 10)
+                                    .padding(.horizontal)
+                                    HStack(spacing: 20) {
+                                        iconButton("img_edit1_text", .fontSize)
+                                        iconButton("img_edit1_size", .fontFamily)
+                                        iconButton("img_edit1_color", .colorSolid)
+                                        iconButton("img_edit1_gradient", .gradient)
+                                        iconButton("img_edit1_stroke", .stroke)
+                                        iconButton("img_edit1_align", .align)
+                                        iconButton("img_edit1_shadow", .shadow)
+                                        iconButton("img_edit1_bg", .background)
+                                    }
+                                    .padding(10)
+                                    .padding(.horizontal, 12)
+                                    .background(Color.gray.opacity(0.2).cornerRadius(70))
+
+                                }
+                                ZStack {
+                                    if selectedEditText != .none {
+                                        Group {
+                                            switch selectedEditText {
+                                            case .fontSize:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .fontSize)
+                                            case .fontFamily:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .fontFamily)
+                                            case .colorSolid:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .colorSolid)
+                                            case .gradient:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .gradient)
+                                            case .stroke:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .stroke)
+                                            case .align:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .align)
+                                            case .shadow:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .shadow)
+                                            case .background:
+                                                TextView(overlayVM: overlayVM, selectedEditText: .background)
+                                            case .none:
+                                                EmptyView()
                                             }
-                                            Spacer()
-                                            Text(selectedEditText.title)
-                                                .font(.system(size: 16, weight: .medium))
+                                        }
+                                        .transition(.asymmetric(
+                                            insertion: .move(edge: .bottom).combined(with: .opacity),
+                                            removal: .move(edge: .bottom).combined(with: .opacity)
+                                        ))
+                                        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: selectedEditText)
+
+                                    }
+                                }
+                                .id(selectedEditText)
+                            }
+                            .background(Color.white)
+                        }
+                        else {
+                            if !isTextFieldFocused  {
+                                if !isSelected {
+                                        HStack {
                                             Spacer()
                                             Button(action: {
-                                                selectedEditText = .none
+                                                guard frame != nil else { return }
+                                                let newOverlay = overlayVM.addOverlay("")
+                                                overlayVM.selectOverlay(newOverlay.id)
+                                                isTextFieldFocused = true
+                                                showTextField = true
+                                                isSelected = true
+                                                
                                             }) {
-                                                Image("img_bg_check")
+                                                VStack {
+                                                    Image("home_tabbartext")
+                                                    Text("Add Text")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
                                             }
-                                            .background(.white)
+                                            Spacer()
+                                            Button(action: {
+                                                isShowBackgroundPicker = true
+                                            }) {
+                                                VStack {
+                                                    Image("home_tabbarbg")
+                                                    Text("Background")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
                                         }
-                                        .padding(.top, 10)
-                                        .padding(.horizontal)
-                                        HStack(spacing: 20) {
-                                            iconButton("img_edit1_text", .fontSize)
-                                            iconButton("img_edit1_size", .fontFamily)
-                                            iconButton("img_edit1_color", .colorSolid)
-                                            iconButton("img_edit1_gradient", .gradient)
-                                            iconButton("img_edit1_stroke", .stroke)
-                                            iconButton("img_edit1_align", .align)
-                                            iconButton("img_edit1_shadow", .shadow)
-                                            iconButton("img_edit1_bg", .background)
+                                        .padding(.top)
+                                        .background(ignoresSafeAreaEdges: .bottom)
+                                                                            
+                                } else {
+                                    ScrollView(.horizontal,showsIndicators: false){
+                                        HStack (spacing: 16) {
+                                            Spacer().frame(width: 16)
+                                            Button(action: {
+                                                selectedEditText = .fontSize
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_text")
+                                                    Text("Edit")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .fontFamily
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_size")
+                                                    Text("Size")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .colorSolid
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_color")
+                                                    Text("Color")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .gradient
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_gradient")
+                                                    Text("Gradient")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .stroke
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_stroke")
+                                                    Text("Stroke")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .align
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_align")
+                                                    Text("Align")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .shadow
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_shadow")
+                                                    Text("Shadow")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer()
+                                            Button(action: {
+                                                selectedEditText = .background
+                                            }) {
+                                                VStack {
+                                                    Image("img_edit1_bg")
+                                                    Text("BackGround")
+                                                }
+                                                .foregroundColor(.black.opacity(0.8))
+                                            }
+                                            Spacer().frame(width: 16)
                                         }
-                                        .padding(10)
-                                        .padding(.horizontal, 12)
-                                        .background(Color.gray.opacity(0.2).cornerRadius(70))
-
+                                        .padding(.top)
+                                        .background(ignoresSafeAreaEdges: .bottom)
+                                        .background(.white)
                                     }
-                                    ZStack {
-                                        switch selectedEditText {
-                                        case .fontSize:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .fontSize)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom))) // fade + trượt từ dưới lên
-
-                                        case .fontFamily:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .fontFamily)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .colorSolid:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .colorSolid)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .gradient:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .gradient)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .stroke:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .stroke)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .align:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .align)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .shadow:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .shadow)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .background:
-                                            TextView(overlayVM: overlayVM, selectedEditText: .background)
-                                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-
-                                        case .none:
-                                            EmptyView()
-                                        }
-                                    }
-                                    .id(selectedEditText)
-                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
-                                    .animation(.easeInOut(duration: 0.35), value: selectedEditText)
+                                    .background(.white)
                                 }
-                                .background(Color.white)
                             }
                             else {
-                                if !isTextFieldFocused  {
-                                    if !isSelected {
-                                            HStack {
-                                                Spacer()
-                                                Button(action: {
-                                                    guard frame != nil else { return }
-                                                    let newOverlay = overlayVM.addOverlay("")
-                                                    overlayVM.selectOverlay(newOverlay.id)
-                                                    isTextFieldFocused = true
-                                                    showTextField = true
-                                                    isSelected = true
-                                                    
-                                                }) {
-                                                    VStack {
-                                                        Image("home_tabbartext")
-                                                        Text("Add Text")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    isShowBackgroundPicker = true
-                                                }) {
-                                                    VStack {
-                                                        Image("home_tabbarbg")
-                                                        Text("Background")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                            }
-                                            .padding(.top)
-                                            .background(ignoresSafeAreaEdges: .bottom)
-                                                                                
-                                    } else {
-                                        ScrollView(.horizontal,showsIndicators: false){
-                                            HStack (spacing: 16) {
-                                                Spacer().frame(width: 16)
-                                                Button(action: {
-                                                    selectedEditText = .fontSize
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_text")
-                                                        Text("Edit")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .fontFamily
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_size")
-                                                        Text("Size")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .colorSolid
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_color")
-                                                        Text("Color")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .gradient
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_gradient")
-                                                        Text("Gradient")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .stroke
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_stroke")
-                                                        Text("Stroke")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .align
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_align")
-                                                        Text("Align")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .shadow
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_shadow")
-                                                        Text("Shadow")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer()
-                                                Button(action: {
-                                                    selectedEditText = .background
-                                                }) {
-                                                    VStack {
-                                                        Image("img_edit1_bg")
-                                                        Text("BackGround")
-                                                    }
-                                                    .foregroundColor(.black.opacity(0.8))
-                                                }
-                                                Spacer().frame(width: 16)
-                                            }
-                                            .padding(.top)
-                                            .background(ignoresSafeAreaEdges: .bottom)
-                                            .background(.white)
+                                    HStack {
+                                        Button(action: {
+                                        }) {
+                                            Image("img_textEdit")
+                                                .opacity(0)
+                                        }
+                                        Spacer()
+                                        Text("Text Edit")
+                                            .font(.system(size: 16, weight: .medium, design: .default))
+                                        Spacer()
+                                        Button(action: {
+                                            showTextField = false
+                                            isTextFieldFocused = false
+                                            isSelected = true
+                                        }) {
+                                            Image("img_bg_check")
                                         }
                                         .background(.white)
                                     }
-                                }
-                                else {
-                                        HStack {
-                                            Button(action: {
-                                            }) {
-                                                Image("img_textEdit")
-                                                    .opacity(0)
-                                            }
-                                            Spacer()
-                                            Text("Text Edit")
-                                                .font(.system(size: 16, weight: .medium, design: .default))
-                                            Spacer()
-                                            Button(action: {
-                                                showTextField = false
-                                                isTextFieldFocused = false
-                                                isSelected = true
-                                            }) {
-                                                Image("img_bg_check")
-                                            }
-                                            .background(.white)
-                                        }
-                                        .padding(.top, 8)
-                                        .padding(.horizontal,20)
-                                        .background(.white)
-                                }
+                                    .padding(.top, 8)
+                                    .padding(.horizontal,20)
+                                    .background(.white)
                             }
                         }
+                    }
                 }
                 }
                 .onDisappear {
@@ -593,44 +588,45 @@ struct AddProjectView: View {
 //bọc lại chuẩn view con luôn
 
 //snapshoot view con
-struct SnapshotContainer<Content: View>: UIViewRepresentable {
-    let content: Content
-    @Binding var snapshot: UIImage?
-    @Binding var trigger: Bool
+    struct SnapshotContainer<Content: View>: UIViewRepresentable {
+        let content: Content
+        @Binding var snapshot: UIImage?
+        @Binding var trigger: Bool
 
-    func makeUIView(context: Context) -> UIView {
-        let container = UIView()
-        let hosting = UIHostingController(rootView: content)
-        hosting.view.backgroundColor = .clear
-        hosting.view.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(hosting.view)
+        func makeUIView(context: Context) -> UIView {
+            let container = UIView()
+            let hosting = UIHostingController(rootView: content)
+            hosting.view.backgroundColor = .clear
+            hosting.view.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(hosting.view)
 
-        NSLayoutConstraint.activate([
-            hosting.view.topAnchor.constraint(equalTo: container.topAnchor),
-            hosting.view.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            hosting.view.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            hosting.view.bottomAnchor.constraint(equalTo: container.bottomAnchor)
-        ])
+            NSLayoutConstraint.activate([
+                hosting.view.topAnchor.constraint(equalTo: container.topAnchor),
+                hosting.view.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                hosting.view.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+                hosting.view.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+            ])
 
-        return container
-    }
+            return container
+        }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
-        if trigger {
-            DispatchQueue.main.async {
-                let renderer = UIGraphicsImageRenderer(bounds: uiView.bounds)
-                let image = renderer.image { _ in
-                    uiView.drawHierarchy(in: uiView.bounds, afterScreenUpdates: true)
+        func updateUIView(_ uiView: UIView, context: Context) {
+            if trigger {
+                DispatchQueue.main.async {
+                    let renderer = UIGraphicsImageRenderer(bounds: uiView.bounds)
+                    let image = renderer.image { _ in
+                        uiView.drawHierarchy(in: uiView.bounds, afterScreenUpdates: true)
+                    }
+                    snapshot = image
+                    trigger = false
                 }
-                snapshot = image
-                trigger = false
             }
         }
     }
-}
 struct SnapshotWrapper: ViewModifier {
     let isExport: Bool
     @Binding var snapshot: UIImage?
+    //kH hanh dong chup
     @Binding var trigger: Bool
 
     func body(content: Content) -> some View {
@@ -640,6 +636,7 @@ struct SnapshotWrapper: ViewModifier {
                                   snapshot: $snapshot,
                                   trigger: $trigger)
             } else {
+                //kothi hien thi bthg
                 content
             }
         }

@@ -8,14 +8,15 @@ import SwiftUI
 
 @main
 struct StoryMakerAppApp: App {
+    
+    // luu trang trang thai same userdefault
     @AppStorage("seenOnboarding") var seenOnboarding: Bool = false
     @AppStorage("hasShownGetStarted") var hasShownGetStarted: Bool = false
     @State private var showSplash: Bool = true
     @State var isShowPremium: Bool = false
-
+    
     var body: some Scene {
         WindowGroup {
-//            MovableText()
             ZStack {
                 if showSplash {
                     SplashView(isShowPremium: $isShowPremium, hasShownGetStarted: $hasShownGetStarted)
@@ -27,12 +28,9 @@ struct StoryMakerAppApp: App {
                                     if seenOnboarding {
                                         self.isShowPremium = true
                                     }
-
                                 }
                             }
-                            
                         }
-                    
                 } else {
                     if !seenOnboarding {
                         OnboardingView(isShowPremium: $isShowPremium, seenOnboarding: $seenOnboarding)

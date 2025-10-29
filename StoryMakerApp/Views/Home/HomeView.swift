@@ -12,6 +12,9 @@ struct HomeView: View {
     @StateObject var vm: BackgroundEditorViewModel = BackgroundEditorViewModel()
     @State private var selectedProjectID: UUID?
     @Binding var isShowPremium: Bool
+    
+    @State var isShowProject: Bool = false
+
 
     var body: some View {
         NavigationView{
@@ -55,14 +58,14 @@ struct HomeView: View {
                                     ForEach(vm.mainprojects, id: \.id) { project in
                                         if project.frame != nil {
                                             ZStack(alignment: .topTrailing) {
-                                                NavigationLink(
-                                                    destination: AddProjectView(projectID: project.id,vm:vm)
-                                                ) {
+                                                Button(action: {
+                                                    selectedProjectID = project.id
+                                                }, label: {
                                                     let folderURL = ProjectStorage.projectFolder(for: project.id)
                                                     let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
                                                     
                                                     if let data = try? Data(contentsOf: previewURL),
-                                                       let uiImage = UIImage(data: data) {
+                                                        let uiImage = UIImage(data: data) {
                                                         Image(uiImage: uiImage)
                                                             .resizable()
                                                             .scaledToFill()
@@ -74,17 +77,15 @@ struct HomeView: View {
                                                             .frame(width: 98, height: 208)
                                                             .cornerRadius(8)
                                                     }
-                                                }
-                                                
+                                                })
                                                 Menu {
                                                     Button(role: .destructive) {
                                                         vm.deleteProject(project)
                                                     } label: {
                                                         Label("Delete", systemImage: "trash")
-                                                        
                                                     }
                                                     Button {
-                                                        selectedProjectID = project.id   //  trigger link ẩn
+                                                        selectedProjectID = project.id
                                                     } label: {
                                                         Label("Edit", systemImage: "pencil")
                                                     }
@@ -94,25 +95,30 @@ struct HomeView: View {
                                                         .padding(6)
                                                 }
                                                 
-                                                
-                                                
+                                                NavigationLink(
+                                                    destination: AddProjectView(projectID: project.id, vm: vm),
+                                                    tag: project.id,
+                                                    selection: $selectedProjectID
+                                                ) {
+                                                    EmptyView()
+                                                }
                                             }
                                             .id(project.id)
                                         }
                                     }
-                                    
                                 }
                                     .padding(.horizontal)
-
                             }
                             .onChange(of: vm.mainprojects.first?.id) { newID in
                                 if let id = newID {
                                     withAnimation {
-                                        proxy.scrollTo(id, anchor: .top) //  scroll về đầu
+                                        proxy.scrollTo(id, anchor: .top)
                                     }
                                 }
                             }
                         }
+                        
+                        
                     }
                     Spacer()
                 }

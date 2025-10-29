@@ -65,7 +65,7 @@ struct HomePreview: View {
                     Image("home_back")
                         .opacity(0)
                 }
-                .padding(.top,exportingVM.isDone ? 30 : 0)
+                //main view
                 if let project = project {
                     let folderURL = ProjectStorage.projectFolder(for: project.id)
                     let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
@@ -74,12 +74,15 @@ struct HomePreview: View {
                        let uiImage = UIImage(data: data) {
                         Image(uiImage: uiImage)
                             .resizable()
-                            .scaledToFill()
-                            .frame(width: UIScreen.main.bounds.width - 40)
+                            .scaledToFit()
                             .clipped()
-                            .padding(.horizontal,20)
+                            .padding(.horizontal, 20)
+                            .scaleEffect(exportingVM.isDone ? 0.95 : 1.0, anchor: .center)
+                            .animation(.easeInOut(duration: 0.3), value: exportingVM.isDone)
                     }
                 }
+                
+                //view share
                 if exportingVM.isDone {
                     VStack{
                         Text("Photo saved to gallery")
@@ -148,8 +151,9 @@ struct HomePreview: View {
                         }
                     }
                     .padding(.horizontal,55)
-                    .padding(.bottom,40)
-                }else {
+                }
+                //view export
+                else {
                     ZStack {
                         RoundedRectangle(cornerRadius: 60)
                             .fill(
@@ -200,23 +204,6 @@ struct HomePreview: View {
         .fullScreenCover(isPresented: $exportingVM.isExporting) {
             ExportingView(exportingVM: exportingVM)
         }
-//        .fullScreenCover(isPresented: $exportingVM.isDone) {
-//            ExportingDoneView(
-//                exportingVM: exportingVM, overlayVM: overlayVM,
-//                frame: frame,
-//                showTextField: $showTextField,
-//                isTextFieldFocused: $isTextFieldFocused,
-//                isSelected: $isSelected,
-//                isEditingText: $isEditingText,
-//                onAddTap: { isShowBackgroundPicker = true },
-//                onTapOutside: { },
-//                onOpenBackgroundEditor: { showBackgroundEdit = true },
-//                isShowBackgroundPicker: $isShowBackgroundPicker,
-//                showBackgroundEdit: $showBackgroundEdit,
-//                triggerSnapshot: $triggerSnapshot, vm: vm, filteredImage: vm.finalImage, snapshotImage: snapshotImage!
-//            )
-//            .environmentObject(vm)
-//        }
     }
     func shareToStory() {
         

@@ -63,14 +63,14 @@ struct OnboardingView: View {
 
 extension OnboardingView {
     private var firstOnboarding: some View {
-        VStack{
-            Image("bg_onb_1")
+        ZStack{
+            Image("bg_ob_1")
                 .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
-                .frame(height: 556)
             VStack {
                 Spacer()
-                
                 VStack(spacing: 45) {
                     VStack(spacing: 7) {
                         Text("Template")
@@ -99,26 +99,18 @@ extension OnboardingView {
                             .font(.footnote)
                             .foregroundColor(Color.bgSplashBtn)
                     }
-                    
                 }
-                .frame(maxWidth: .infinity)
-                .background(
-                    TopCurvedShape()
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -4)
-                        .frame(height: 332)
-                    
-                )
             }
         }
     }
     
     private var secondOnboarding: some View {
-        VStack{
-            Image("bg_onb_2")
+        ZStack{
+            Image("bg_ob_2")
                 .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
-                .frame(height: 556)
             VStack {
                 Spacer()
                 
@@ -153,42 +145,17 @@ extension OnboardingView {
                     }
                     
                 }
-                .frame(maxWidth: .infinity)
-                .background(
-                    TopCurvedShape()
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -4) // drop shadow
-                        .frame(height: 332)
-                    
-                )
             }
         }
     }
     
     private var threeOnboarding: some View {
-        VStack{
-            ZStack {
-                Image("bg_onb_3")
-                    .resizable()
-                    .scaledToFill()
-                    .edgesIgnoringSafeArea(.all)
-
-                ZStack {
-                    Image("bg_onb_3_1")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 200)
-                        .background(
-                            Image("bg_onb_bg_3")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 250, height: 250)
-                        )
-                        .offset(y: -16)
-                        .offset(x: 13)
-                   
-                }
-            }
+        ZStack{
+            Image("bg_ob_3")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
             VStack {
                 Spacer()
                 
@@ -206,7 +173,7 @@ extension OnboardingView {
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 75)
                     }
-                    VStack(){
+                    VStack(spacing:19){
                         Button(action: {
                             self.onboardingState += 1
 
@@ -221,28 +188,18 @@ extension OnboardingView {
                             .font(.footnote)
                             .foregroundColor(Color.bgSplashBtn)
                     }
-                    .padding(.bottom,10)
-
-                    
                 }
-                .frame(maxWidth: .infinity)
-                .background(
-                    TopCurvedShape()
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -4)
-                        .frame(height: 332)
-                    
-                )
             }
         }
     }
     
     private var fourOnboarding: some View {
-        VStack{
-            Image("bg_onb_4")
+        ZStack{
+            Image("bg_ob_4")
                 .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
-                .frame(height: 556)
             VStack {
                 Spacer()
                 
@@ -277,14 +234,7 @@ extension OnboardingView {
                     }
                     
                 }
-                .frame(maxWidth: .infinity)
-                .background(
-                    TopCurvedShape()
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -4) // drop shadow
-                        .frame(height: 332)
-                    
-                )
+             
             }
         }
     }
@@ -294,26 +244,4 @@ extension OnboardingView {
     
 }
 
-
-struct TopCurvedShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        
-        // bắt đầu từ góc trái trên
-        path.move(to: CGPoint(x: 0, y: 40))
-        
-        // vẽ đường cong (control point)
-        path.addQuadCurve(
-            to: CGPoint(x: rect.width, y: 40),
-            control: CGPoint(x: rect.width/2, y: -40) // điểm điều khiển cong
-        )
-        
-        // vẽ xuống dưới
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
-        path.addLine(to: CGPoint(x: 0, y: rect.height))
-        path.closeSubpath()
-        
-        return path
-    }
-}
 
