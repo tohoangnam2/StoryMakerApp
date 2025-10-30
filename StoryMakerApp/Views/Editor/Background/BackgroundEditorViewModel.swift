@@ -7,18 +7,8 @@ class BackgroundEditorViewModel: ObservableObject {
     
     @Published var categories: [CategoryBG] = []
     @Published var backgrounds: [BackgroundItem] = []
-    @Published var selectedCategory: CategoryBG? = nil {
-        didSet {
-            if let id = selectedCategory?.id {
-                fetchBackgrounds(for: id)
-            }
-        }
-    }
-    
-    
+
     @Published var selectedBackground: BackgroundModel? = nil
-    
-    
     @Published var valueOpacity : Double = 1
     @Published var opacity : Double = 1
     @Published var lightness : Double = 0
@@ -26,31 +16,22 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var blur : Double = 0
     @Published var shadow : Double = 0
     
-    @Published var selectedFilter: String? = nil
-    @Published var selectedFilterImage: UIImage? = nil
-    @Published var finalImage: UIImage? = nil
-    @Published var baseImage: UIImage?
-    
+  
     //preview filter
     @Published var previewImages: [String: UIImage] = [:]
     @Published var categoryPreviews: [String: [BackgroundItem]] = [:]
     @Published var previewCache: [String: [String: UIImage]] = [:]
-    // previewCache[backgroundID] = [lutURL: previewImage]
     
     //change bg -> rs frame
     @Published var currentFrameID: String?
-    
     @Published var defaultPreview: UIImage? = nil
-    
     @Published var allBackgrounds: [BackgroundItem] = []
-    
+
     //position
     @Published var scrollOffsets: [String: CGFloat] = [:] // key = categoryId
-    
     @Published var lastSelectedFilterPosition: [String: UUID] = [:]
     
     // dùng khi ko cần click vào preview
-    private let context = CIContext()
     
     // lưu project
     @Published var projects: [Frame] = []  // lưu danh sách project
@@ -60,17 +41,140 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var currentProject: MainModel?   // project đang edit
     @Published var project: MainModel = MainModel()
     
+   
+    
+    @Published var baseImage: UIImage? {
+        didSet {
+            guard let _ = baseImage else { return }
+            generateThumbnails()
+            applySelectedFilter(animated: false)
+        }
+    }
+
+    @Published var filteredImage: UIImage?
+    @Published var selectedFilter: FilterType = .none
+    @Published var thumbnails: [FilterType: UIImage] = [:]
+    
+
+    private let context = CIContext()
+    private let processingQueue = DispatchQueue(label: "FilterProcessingQueue", qos: .userInitiated)
+    private let thumbnailCache = NSCache<NSString, UIImage>() // ⚡ Cache cho preview
+
     //network
-    //    @Published var isOnline : Bool = false
     @Published var isOnline: Bool = NetworkManager.shared.isOnline
     private var cancellables = Set<AnyCancellable>()
-    
+
     init() {
         NetworkManager.shared.$isOnline
             .receive(on: DispatchQueue.main)
             .assign(to: \.isOnline, on: self)
             .store(in: &cancellables)
     }
+
+
+    // MARK: - Filter Preview Cache
+    func generateThumbnails() {
+        guard let base = baseImage else { return }
+        let thumbnail = base.resized(to: CGSize(width: 150, height: 150))
+        for filter in FilterType.allCases {
+            processingQueue.async {
+                let key = filter.rawValue as NSString
+                if let cached = self.thumbnailCache.object(forKey: key) {
+                    DispatchQueue.main.async { self.thumbnails[filter] = cached }
+                    return
+                }
+
+                let result = self.applyFilter(filter, to: thumbnail)
+                if let result {
+                    self.thumbnailCache.setObject(result, forKey: key)
+                    DispatchQueue.main.async {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            self.thumbnails[filter] = result
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Main Filter Apply
+    func applySelectedFilter(animated: Bool = true) {
+        guard let baseImage = baseImage else { return }
+
+        // Giữ lại ảnh hiện tại để không bị trắng nháy
+        let previousImage = filteredImage ?? baseImage
+        let currentFilter = selectedFilter
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let output = self.applyFilter(currentFilter, to: baseImage) else { return }
+
+            DispatchQueue.main.async {
+                // Crossfade nhẹ giữa 2 ảnh thay vì nháy
+                withAnimation(animated ? .easeInOut(duration: 0.25) : nil) {
+                    self.filteredImage = output
+                }
+            }
+        }
+    }
+
+    // MARK: - Core Image Logic
+    private func applyFilter(_ filterType: FilterType, to image: UIImage) -> UIImage? {
+        guard let ciImage = CIImage(image: image) else { return nil }
+
+        switch filterType {
+        case .none:
+            return image
+
+        case .colorAbsolute:
+            guard let secondImage = UIImage(named: "example2"),
+                  let ciImage2 = CIImage(image: secondImage)
+            else { return image }
+            let filter = CIFilter.colorAbsoluteDifference()
+            filter.inputImage = ciImage
+            filter.inputImage2 = ciImage2
+            return render(filter.outputImage)
+
+        default:
+            guard let filter = CIFilter(name: filterType.rawValue) else { return nil }
+            filter.setValue(ciImage, forKey: kCIInputImageKey)
+            if filterType == .sepia {
+                filter.setValue(0.8, forKey: kCIInputIntensityKey)
+            }
+            return render(filter.outputImage)
+        }
+    }
+
+    private func render(_ output: CIImage?) -> UIImage? {
+        guard let output = output,
+              let cgimg = context.createCGImage(output, from: output.extent)
+        else { return nil }
+        return UIImage(cgImage: cgimg)
+    }
+    
+    func updatePreviewForNewBaseImage(_ newImage: UIImage) {
+        // 1. Cập nhật baseImage
+        self.baseImage = newImage
+        self.defaultPreview = newImage
+
+        // 2. Reset ảnh hiện tại
+        self.filteredImage = newImage
+
+        // 🧠 3. Xóa cache filter cũ (rất quan trọng!)
+        self.thumbnails.removeAll()
+        self.generateThumbnails() // tái tạo từ base mới
+
+        // 4. Áp lại filter đang chọn (nếu có)
+        if selectedFilter != .none {
+            applySelectedFilter(animated: false)
+        } else {
+            self.filteredImage = newImage
+        }
+
+        // 5. Báo UI biết đã load xong ảnh
+        self.isImageLoaded = true
+    }
+
+
     
     func createEmptyProject() -> MainModel {
         let newProject = MainModel(id: UUID())
@@ -82,290 +186,11 @@ class BackgroundEditorViewModel: ObservableObject {
         
         return newProject
     }
-    
-    
-    func resetAdjustments() {
-        opacity = 1
-        lightness = 0
-        saturation = 1
-        blur = 0
-        shadow = 0
-    }
-    
-    //func update preview
-    func updatePreview() {
-        guard let base = baseImage else { return }
-        var ciImage = CIImage(image: base)
-        
-        // Lightness + Saturation
-        let colorControls = CIFilter.colorControls()
-        colorControls.inputImage = ciImage
-        colorControls.brightness = Float(lightness)   // -1...1
-        colorControls.saturation = Float(saturation) // 0...2
-        ciImage = colorControls.outputImage
-        
-        // Blur
-        if blur > 0 {
-            let blurFilter = CIFilter.gaussianBlur()
-            blurFilter.inputImage = ciImage
-            blurFilter.radius = Float(blur * 10) // scale cho rõ
-            ciImage = blurFilter.outputImage
-        }
-        
-        guard let output = ciImage,
-              let cgimg = context.createCGImage(output, from: output.extent) else { return }
-        
-        DispatchQueue.main.async {
-            self.finalImage = UIImage(cgImage: cgimg)
-        }
-    }
-    
-    //view default
-    var defaultBackgroundItem: BackgroundItem? {
-        guard let base = baseImage else { return nil }
-        return BackgroundItem( image: "", isDefault: true, baseImage: base)
-    }
-    
-    // Trong ViewModel
-    func generatePreview(for bg: BackgroundItem) {
-        guard let base = baseImage, let url = URL(string: bg.image) else { return }
-        
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data, let lutImage = UIImage(data: data) {
-                DispatchQueue.global().async {
-                    if let preview = base.applyingLUT(lutImage: lutImage, dimension: 64) {
-                        DispatchQueue.main.async {
-                            self.previewImages[bg.image] = preview
-                        }
-                    }
-                }
-            }
-        }.resume()
-    }
-    
-    // Khi baseImage đã load xong, generate tất cả preview
-    func generateAllPreviews() {
-        guard let _ = baseImage else { return }
-        for bg in backgrounds {
-            generatePreview(for: bg)
-        }
-    }
-    
-    //tải lut trước
-    func preloadLUTs() {
-        guard let base = baseImage else { return }
-        for bg in backgrounds {
-            if let url = URL(string: bg.image) {
-                URLSession.shared.dataTask(with: url) { data, _, _ in
-                    if let data = data, let filterImage = UIImage(data: data) {
-                        // Apply filter ngay với base
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            if let preview = base.applyingLUT(lutImage: filterImage, dimension: 64) {
-                                DispatchQueue.main.async {
-                                    self.previewImages[bg.image] = preview
-                                }
-                            }
-                        }
-                    }
-                }.resume()
-            }
-        }
-    }
-    
-    func loadSelectedFilter(baseImage: UIImage, completion: @escaping (UIImage) -> Void) {
-        guard let filterPath = selectedFilter?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !filterPath.isEmpty,
-              filterPath.lowercased() != "none",
-              filterPath.contains("/lut/"), //  chỉ chấp nhận LUT filter
-              let url = URL(string: filterPath) else {
-            print(" Filter không hợp lệ → dùng ảnh gốc")
-            self.finalImage = baseImage
-            completion(baseImage)
-            return
-        }
-        
-        print("Đang tải LUT filter từ:", filterPath)
-        
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data, let lutImage = UIImage(data: data) {
-                DispatchQueue.global().async {
-                    if let newImage = baseImage.applyingLUT(lutImage: lutImage, dimension: 64) {
-                        DispatchQueue.main.async {
-                            self.finalImage = newImage
-                            completion(newImage)
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.finalImage = baseImage
-                            completion(baseImage)
-                        }
-                    }
-                }
-            } else {
-                print(" Không tải được LUT filter → dùng ảnh gốc")
-                DispatchQueue.main.async {
-                    self.finalImage = baseImage
-                    completion(baseImage)
-                }
-            }
-        }.resume()
-    }
-    
-    
-    func applyFilter(to baseImage: UIImage, completion: ((UIImage) -> Void)? = nil) {
-        guard let filterImage = selectedFilterImage else {
-            // Nếu chưa có filter thì finalImage = base
-            DispatchQueue.main.async {
-                self.finalImage = baseImage
-                completion?(baseImage)
-            }
-            return
-        }
-        
-        DispatchQueue.global().async {
-            if let newImage = baseImage.applyingLUT(lutImage: filterImage, dimension: 64) {
-                DispatchQueue.main.async {
-                    self.finalImage = newImage
-                    completion?(newImage)
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self.finalImage = baseImage
-                    completion?(baseImage)
-                }
-            }
-        }
-    }
-    
-    
-    
-    
-    
-    func loadUIImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            var result: UIImage? = nil
-            if let data = data {
-                result = UIImage(data: data)
-            }
-            DispatchQueue.main.async {
-                completion(result)
-            }
-        }.resume()
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    func fetchCategories() {
-        guard let url = URL(string: "https://api.fleet-tech.net/story/get_lut") else { return }
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data {
-                if let decoded = try? JSONDecoder().decode(CategoryResponse.self, from: data) {
-                    DispatchQueue.main.async {
-                        self.categories = decoded.data
-                        if self.selectedCategory == nil, let first = self.categories.first {
-                            self.selectedCategory = first
-                        }
-                    }
-                }
-            }
-        }.resume()
-    }
-    func reloadProjectsAndCategories() {
-        // Load lại toàn bộ project từ storage
-        self.mainprojects = ProjectStorage.loadAllProjects()
-        
-        // Fetch lại categories (nếu có API hoặc local data)
-        self.fetchCategories()
-        
-        // Reset filter khi đổi background
-        self.selectedFilter = nil
-        self.finalImage = self.baseImage
-    }
-    func reset() {
-        baseImage = nil
-        finalImage = nil
-        defaultPreview = nil
-        selectedFilter = nil
-        isImageLoaded = false
-    }
-    
-    // Lấy backgrounds theo categoryId
-    func fetchBackgrounds(for categoryId: String) {
-        // Nếu cache có rồi thì dùng luôn
-        if let cached = categoryPreviews[categoryId] {
-            self.backgrounds = cached
-            self.prepareAllPreviews()
-            return
-        }
-        
-        guard let url = URL(string: "https://api.fleet-tech.net/story/get_lut_detail?id=\(categoryId)") else { return }
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data {
-                if let decoded = try? JSONDecoder().decode(BackgroundResponse.self, from: data) {
-                    DispatchQueue.main.async {
-                        let items = decoded.data.map { BackgroundItem(image: $0) }
-                        self.backgrounds = items
-                        self.categoryPreviews[categoryId] = items // lưu cache
-                        
-                        self.prepareAllPreviews()
-                    }
-                }
-            }
-        }.resume()
-    }
-    
 }
 
 
 
 extension BackgroundEditorViewModel {
-    
-    // Gọi khi mở chế độ edit filter để preload tất cả preview
-    func prepareAllPreviews() {
-        guard let base = baseImage,
-              let bgID = currentFrameID else { return }
-        
-        allBackgrounds = [defaultBackgroundItem].compactMap { $0 } + backgrounds
-        
-        // Nếu cache đã tồn tại cho bgID thì gán ra trước
-        if let cached = previewCache[bgID] {
-            previewImages = cached
-        }
-        
-        for bg in backgrounds {
-            // Nếu đã có preview cho bg này thì bỏ qua
-            if let cachedPreview = previewCache[bgID]?[bg.image] {
-                previewImages[bg.image] = cachedPreview
-                continue
-            }
-            
-            // Chưa có preview -> mới load LUT và render
-            guard let url = URL(string: bg.image) else { continue }
-            URLSession.shared.dataTask(with: url) { data, _, _ in
-                if let data = data, let lutImage = UIImage(data: data) {
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        if let preview = base.applyingLUT(lutImage: lutImage, dimension: 64) {
-                            DispatchQueue.main.async {
-                                self.previewImages[bg.image] = preview
-                                if self.previewCache[bgID] == nil {
-                                    self.previewCache[bgID] = [:]
-                                }
-                                self.previewCache[bgID]?[bg.image] = preview
-                            }
-                        }
-                        
-                    }
-                }
-            }.resume()
-        }
-    }
-    
     
     func deleteProject(_ project: MainModel) {
         // 1. Xoá trong docs
@@ -376,28 +201,7 @@ extension BackgroundEditorViewModel {
             mainprojects.remove(at: index)
         }
     }
-    
-//    func restoreProject(_ project: MainModel) {
-//        guard let url = project.frame?.backgroundURL,
-//              let data = try? Data(contentsOf: url),
-//              let uiImage = UIImage(data: data) else { return }
-//        
-//        self.baseImage = uiImage
-//        self.defaultPreview = uiImage
-//        
-//        if let filter = project.selectedFilter {
-//            self.selectedFilter = filter
-//            self.loadSelectedFilter(baseImage: uiImage) { filtered in
-//                self.finalImage = filtered
-//            }
-//        } else {
-//            self.finalImage = uiImage
-//        }
-//        //  rebuild LUT previews
-//        self.prepareAllPreviews()
-//        self.updatePreview()
-//        self.isImageLoaded = true
-//    }
+
 }
 
 

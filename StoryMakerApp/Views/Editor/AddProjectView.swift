@@ -93,7 +93,7 @@ struct AddProjectView: View {
                         if let existingProject = vm.mainprojects.first(where: { $0.id == projectID }) {
                             AddBackgroundsView(
                                 overlayVM: overlayVM,
-                                frame: existingProject.frame,
+                                frame: frame,
                                 showTextField: $showTextField,
                                 isTextFieldFocused: $isTextFieldFocused,
                                 isSelected: $isSelected,
@@ -104,12 +104,13 @@ struct AddProjectView: View {
                                 isShowBackgroundPicker: $isShowBackgroundPicker,
                                 showBackgroundEdit: $showBackgroundEdit,
                                 vm: vm,
-                                filteredImage: vm.finalImage,
+                                filteredImage: vm.filteredImage, // dùng filteredImage thay cho finalImage
                                 project: $project
                             )
                             .onAppear {
-                                guard !isInitialized else { return } //  chỉ chạy 1 lần duy nhất khi mở
-                                   isInitialized = true
+                                guard !isInitialized else { return }
+                                isInitialized = true
+
                                 self.project = existingProject
                                 overlayVM.overlays = existingProject.textLayers
                                 frame = existingProject.frame
@@ -119,28 +120,29 @@ struct AddProjectView: View {
                                 vm.lightness = existingProject.lightness
                                 vm.saturation = existingProject.saturation
 
-                                //load ảnh gốc và load vào baseimg
                                 if let originalName = existingProject.originalImagePath {
                                     let folderURL = ProjectStorage.projectFolder(for: existingProject.id)
                                     let url = folderURL.appendingPathComponent(originalName)
-                                    guard FileManager.default.fileExists(atPath: url.path) else { return }
+                                    if FileManager.default.fileExists(atPath: url.path),
+                                       let data = try? Data(contentsOf: url),
+                                       let uiImage = UIImage(data: data) {
 
-                                    if let data = try? Data(contentsOf: url),
-                                        let uiImage = UIImage(data: data) {
                                         vm.baseImage = uiImage
-                                        if let filter = existingProject.selectedFilter,
-                                            filter.contains("/lut/") {
+
+                                        if let filterRaw = existingProject.selectedFilter,
+                                           let filter = FilterType(rawValue: filterRaw) {
                                             vm.selectedFilter = filter
-                                            vm.loadSelectedFilter(baseImage: uiImage) { filtered in
-                                                vm.finalImage = filtered ?? uiImage
-                                            }
                                         } else {
-                                            vm.finalImage = uiImage
+                                            vm.selectedFilter = .none
                                         }
+
+                                        // ✅ Render lại preview filter hiện tại
+                                        vm.filteredImage = nil
+                                        vm.applySelectedFilter()
                                     }
-                                    
                                 }
                             }
+
 
                         } else {
                             AddBackgroundsView(
@@ -156,7 +158,7 @@ struct AddProjectView: View {
                                 isShowBackgroundPicker: $isShowBackgroundPicker,
                                 showBackgroundEdit: $showBackgroundEdit,
                                 vm: vm,
-                                filteredImage: vm.finalImage,
+                                filteredImage: vm.filteredImage, // dùng filteredImage thay cho finalImage
                                 project: $project
                             )
                             .onAppear {
@@ -168,7 +170,8 @@ struct AddProjectView: View {
                             }
                         }
                     }
-                        .modifier(SnapshotWrapper(isExport: isExport, snapshot: $snapshotImage, trigger: $triggerSnapshot))
+                    .modifier(SnapshotWrapper(isExport: isExport, snapshot: $snapshotImage, trigger: $triggerSnapshot))
+
                     
                     //view editor
                     if showBackgroundEdit {
@@ -417,7 +420,7 @@ struct AddProjectView: View {
                     if let snap = snapshotImage {
                         ProjectStorage.saveProject(current, previewImage: snap)
                         print("Saved snapshot onDisappear")
-                    } else if let filtered = vm.finalImage {
+                    } else if let filtered = vm.filteredImage {
                         ProjectStorage.saveProject(current, previewImage: filtered)
                         print("Saved filtered image onDisappear")
                     }
@@ -427,29 +430,26 @@ struct AddProjectView: View {
         
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView() { picked in
-                if let newFrame = picked {
-                    self.frame = newFrame
-                    vm.currentProject = project
-                }
-                
+                guard let newFrame = picked else { return }
+
+                self.frame = newFrame
+                vm.currentProject = project
+
+                // Nếu background thay đổi
                 if vm.currentFrameID != picked?.backgroundID {
                     vm.currentFrameID = picked?.backgroundID
-                    vm.finalImage = nil
-                    if let url = picked?.backgroundURL,
-                       let data = try? Data(contentsOf: url),
-                       let uiImage = UIImage(data: data) {
-                        
-                        vm.baseImage = uiImage
-                        vm.defaultPreview = uiImage
-                        vm.prepareAllPreviews()
-                        vm.updatePreview()
-                        vm.isImageLoaded = true
-                        // Gán baseImage
-//                        vm.baseImage = uiImage
-//                        vm.defaultPreview = uiImage
-//                        vm.finalImage = uiImage
+                    vm.filteredImage = nil
 
-                        //  Lưu project ngay lần đầu chọn background
+                    if let url = picked?.backgroundURL,
+                        let data = try? Data(contentsOf: url),
+                        let uiImage = UIImage(data: data) {
+
+                        vm.baseImage = uiImage
+                        vm.filteredImage = nil
+                        vm.applySelectedFilter(animated: false)
+
+
+                        // Lưu project ngay lần đầu chọn background
                         if var current = self.project {
                             current.frame = picked
 
@@ -458,9 +458,11 @@ struct AddProjectView: View {
                             let originalURL = folderURL.appendingPathComponent("original.jpg")
                             try? data.write(to: originalURL)
 
-                            // 2. Lưu JSON + preview (chưa có edit thì preview = ảnh gốc)
-                            current.previewImage = uiImage
-                            ProjectStorage.saveProject(current, previewImage: uiImage, baseImage: uiImage)
+                            // 2. Lưu JSON + preview (preview = filteredImage nếu đã có filter, hoặc ảnh gốc)
+                            current.previewImage = vm.filteredImage ?? uiImage
+                            ProjectStorage.saveProject(current,
+                                                        previewImage: current.previewImage,
+                                                        baseImage: uiImage)
 
                             // 3. Update vào RAM
                             if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
@@ -491,7 +493,7 @@ struct AddProjectView: View {
                           onTapOutside: {  },
                           onOpenBackgroundEditor: { showBackgroundEdit = true },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
-                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, filteredImage: vm.finalImage, project: $project)
+                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, filteredImage: vm.filteredImage, project: $project)
         }
     }
     
@@ -504,41 +506,57 @@ struct AddProjectView: View {
         overlayVM.deselectAll()
         showBackgroundEdit = false
     }
-
+    
     func exitExport(completion: @escaping () -> Void) {
         isExport = true
         resetEditState()
+
+        //  Delay nhỏ để cho UI snapshot ổn định
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             triggerSnapshot = true
         }
 
+        //  Sau khi snapshot xong, lưu lại dự án
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            if let snap = snapshotImage,
-               var current = project {
-                //  Lưu ảnh full flatten cho thumbnail
-                current.selectedFilter = vm.selectedFilter
-                
-                current.previewImage = snap
-                ProjectStorage.saveProject(current,previewImage: snap)
-                if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
-                    vm.mainprojects[index] = current
-                    vm.mainprojects = Array(vm.mainprojects)
-                }
-                self.project = current
-                print("Snapshot captured: \(snap)")
-            } else {
-                print("Snapshot still nil")
+            guard let snap = snapshotImage,
+                  var current = project else {
+                print("Snapshot still nil — retrying filter flatten")
+                completion()
+                return
             }
+
+            //  Lưu filter + ảnh flatten vào project
+            current.selectedFilter = vm.selectedFilter.rawValue
+            current.previewImage = snap
+
+            //  Ghi xuống bộ nhớ
+            ProjectStorage.saveProject(current, previewImage: snap, baseImage: vm.baseImage)
+
+            // ✅ Cập nhật trong danh sách chính
+            if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
+                vm.mainprojects[index] = current
+                vm.mainprojects = Array(vm.mainprojects)
+            }
+
+            self.project = current
+            print("✅ Snapshot captured & project saved (\(current.id))")
+
             completion()
         }
     }
-
-    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {        
+    
+    func saveCurrentProject(
+        project: MainModel?,
+        overlayVM: OverlayTextViewModel,
+        vm: BackgroundEditorViewModel,
+        completion: @escaping () -> Void
+    ) {
         guard var currentProject = project else {
             completion()
             return
         }
 
+        // ✅ Lưu lại toàn bộ layer và filter hiện tại
         currentProject.textLayers = overlayVM.overlays
         currentProject.frame      = frame
         currentProject.blur       = vm.blur
@@ -546,35 +564,39 @@ struct AddProjectView: View {
         currentProject.opacity    = vm.opacity
         currentProject.lightness  = vm.lightness
         currentProject.saturation = vm.saturation
-        currentProject.previewImage = snapshotImage ?? vm.finalImage
-        currentProject.selectedFilter = vm.selectedFilter
-      
-         // Preview full flatten cho list
-         if let snap = snapshotImage {
-             currentProject.previewImage = snap
-         } else if let filtered = vm.finalImage {
-             currentProject.previewImage = filtered
-         }
-        
-        // lưu docs
-        ProjectStorage.saveProject(currentProject, previewImage: currentProject.previewImage,baseImage: vm.baseImage)
+        currentProject.selectedFilter = vm.selectedFilter.rawValue
+        currentProject.previewImage = snapshotImage ?? vm.filteredImage
 
 
-        // Update vào RAM
+        // ✅ Lưu preview — ưu tiên snapshot > final > filtered
+        if let snap = snapshotImage {
+            currentProject.previewImage = snap
+        } else if let final = vm.filteredImage {
+            currentProject.previewImage = final
+        } else if let filtered = vm.filteredImage {
+            currentProject.previewImage = filtered
+        }
+
+        // ✅ Ghi cả base image gốc (rất quan trọng)
+        ProjectStorage.saveProject(
+            currentProject,
+            previewImage: currentProject.previewImage,
+            baseImage: vm.baseImage
+        )
+
+        // ✅ Cập nhật trong RAM
         if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
             vm.mainprojects[index] = currentProject
-            vm.mainprojects = Array(vm.mainprojects) // ép SwiftUI publish lại
+            vm.mainprojects = Array(vm.mainprojects)
         } else {
             vm.mainprojects.insert(currentProject, at: 0)
-
         }
-        
+
         self.project = currentProject
-        
-        
         completion()
     }
-    
+
+
     // Helper để tạo nút icon
     @ViewBuilder
     private func iconButton(_ imageName: String, _ type: OverlayTextEditEnum) -> some View {
@@ -593,6 +615,7 @@ struct AddProjectView: View {
         @Binding var snapshot: UIImage?
         @Binding var trigger: Bool
 
+        //render thành ảnh
         func makeUIView(context: Context) -> UIView {
             let container = UIView()
             let hosting = UIHostingController(rootView: content)
@@ -615,9 +638,11 @@ struct AddProjectView: View {
                 DispatchQueue.main.async {
                     let renderer = UIGraphicsImageRenderer(bounds: uiView.bounds)
                     let image = renderer.image { _ in
+                        //vẽ lại toàn bộ giao diện
                         uiView.drawHierarchy(in: uiView.bounds, afterScreenUpdates: true)
                     }
                     snapshot = image
+                    // tránh chup lai
                     trigger = false
                 }
             }

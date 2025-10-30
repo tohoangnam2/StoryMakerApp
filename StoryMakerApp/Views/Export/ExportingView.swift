@@ -15,18 +15,16 @@ struct ExportingView: View {
                 VStack() {
                     // Thanh navigationbar
                     HStack {
-                        // Nút Cancel (nếu cần)
                         Button(action: {
                             dismiss()
 
                         }) {
-                            Image("home_back") // Có thể thay bằng icon "x" hoặc "cancel"
+                            Image("home_back")
                         }
                         Spacer()
                     }
                     .padding(.bottom, 31)
 
-                    // Vòng tròn tiến độ
                     ZStack {
                         Circle()
                             .stroke(Color("#F5F5F5"), lineWidth: 10)
@@ -53,7 +51,6 @@ struct ExportingView: View {
                     }
                     .padding(.bottom, 30)
 
-                    // Text "Processing..."
                     Text("Processing...")
                         .font(.system(size: 18, weight: .bold, design: .default))
                         .padding(.bottom, 15)

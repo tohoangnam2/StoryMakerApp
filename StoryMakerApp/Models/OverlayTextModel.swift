@@ -128,7 +128,6 @@ struct OverlayTextModel: Identifiable , Codable {
     var startPoint: CGPoint = .zero
     var originalScale: CGFloat = 1.0
     var startCenter: CGPoint = .zero
-    
     var buttonSize : CGFloat = 30
 
 }
@@ -187,13 +186,8 @@ enum OverlayTextEditEnum : Equatable , CaseIterable {
             return "img_edit1_shadow"
         case .none:
             return "img_edit1_shadow"
-            
         }
     }
-    
-    
-    
-    
 }
 enum FontFmailyEnum : String , CaseIterable , Codable {
     case ff1
@@ -221,7 +215,6 @@ enum FontFmailyEnum : String , CaseIterable , Codable {
             return "ff4"
         case .ff5:
             return "ff5"
-            
         case .ff6:
             return "ff6"
         case .ff7:
@@ -236,7 +229,6 @@ enum FontFmailyEnum : String , CaseIterable , Codable {
             return "ff11"
         case .ff12:
             return "ff12"
-            
             
         }
     }
@@ -273,7 +265,6 @@ enum FontFmailyEnum : String , CaseIterable , Codable {
         case .ff11: return "FontdinerSwanky-Regular"
         case .ff12: return "RubikIso-Regular"
         }
-        
     }
 }
 

@@ -54,16 +54,13 @@ struct AddBackgroundsView: View {
                                 .contentShape(Rectangle())
                                 .id(project.id)
                                 .onAppear {
-//                                    vm.reset()
                                     DispatchQueue.main.async {
-                                        if vm.finalImage == nil {
+                                        if vm.filteredImage == nil {
                                             if let url = frame.backgroundURL,
                                                let data = try? Data(contentsOf: url),
                                                let uiImage = UIImage(data: data) {
                                                 vm.baseImage = uiImage
                                                 vm.defaultPreview = uiImage
-                                                vm.prepareAllPreviews()
-                                                vm.updatePreview()
                                                 vm.isImageLoaded = true
                                             }
                                         }
@@ -76,15 +73,15 @@ struct AddBackgroundsView: View {
                                                 .resizable()
                                                 .scaledToFill()
                                                 .opacity(vm.opacity)
-                                                .brightness(vm.lightness)   // điều chỉnh sáng tối
-                                                .saturation(vm.saturation) // điều chỉnh độ bão hòa
+                                                .brightness(vm.lightness)
+                                                .saturation(vm.saturation)
                                                 .blur(radius: vm.blur)
                                                 .shadow(radius: vm.blur)
                                                 .allowsHitTesting(false)
                                         }
-                                        
                                     }
                                 )
+                            
                                 .onTapGesture {
                                     guard frame != nil else { return }
                                     if isSelected == false{
@@ -92,12 +89,9 @@ struct AddBackgroundsView: View {
                                     } else {
                                         onTapOutside()
                                         showBackgroundEdit = false
-                                        
                                     }
-                                    
                                 }
                                 .overlay(
-                                    //Group không ảnh hưởng layout, chỉ gom nhiều view trong điều kiện.
                                     Group {
                                         ForEach($overlayVM.overlays){ $overlay in
                                             if showTextField && overlay.id == overlayVM.selectedOverlayID   {

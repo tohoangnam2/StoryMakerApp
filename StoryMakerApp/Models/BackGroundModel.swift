@@ -12,13 +12,12 @@ class BackgroundModel: Identifiable, ObservableObject {
     let id = UUID()
     let url: URL
     @Published var opacity: Double
-    @Published var filter: FilterType
+//    @Published var filter: FilterType
     var editEnum : BackGroundEditEditEnum = .filter
     
-    init(url: URL, opacity: Double = 1.0, filter: FilterType = .normal) {
+    init(url: URL, opacity: Double = 1.0) {
         self.url = url
         self.opacity = opacity
-        self.filter = filter
     }
 }
 enum BackGroundEditEditEnum : CaseIterable {
@@ -39,9 +38,9 @@ enum BackGroundEditEditEnum : CaseIterable {
 }
 
 
-enum FilterType: String, CaseIterable {
-    case normal, light, red, cyal, vintage, hot, old
-}
+//enum FilterType: String, CaseIterable {
+//    case normal, light, red, cyal, vintage, hot, old
+//}
 
 struct CategoryResponse: Codable {
     let error: Int
@@ -70,12 +69,6 @@ struct BackgroundItem: Identifiable , Codable {
         return UIImage(data: baseImage)
     }
 }
-
-
-
-
-
-
 
 //background open
 
