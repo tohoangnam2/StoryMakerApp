@@ -14,7 +14,13 @@ struct HomeView: View {
     @Binding var isShowPremium: Bool
     
     @State var isShowProject: Bool = false
+    
+    @State private var showImagePicker = false
+    @State private var selectedImage: UIImage?
 
+    @State private var isShowAddProject = false
+    
+    @State var project: MainModel?
 
     var body: some View {
         NavigationView{
@@ -126,21 +132,51 @@ struct HomeView: View {
 
             //view add
             .overlay(
-                VStack(spacing:15){
-                    withAnimation(.spring){
-                        NavigationLink(destination: AddProjectView(project : nil, projectID: nil,vm:vm)
-                        ) {
-                            Image("home_icBtn")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 65, height: 65)
+                VStack(spacing:15) {
+                    Menu {
+                        // 1. Tạo project trống
+                        Button {
+                            let newProject = vm.createEmptyProject()
+                            self.project = newProject
+                            self.isShowAddProject = true
+                        } label: {
+                            Label("Tạo project mới", systemImage: "plus.capsule")
                         }
+
+                        // 2. Chọn ảnh từ thư viện
+                        Button {
+                            self.showImagePicker = true
+                        } label: {
+                            Label("Chọn ảnh từ thư viện", systemImage: "photo")
+                        }
+
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .foregroundColor(.white)
+                            .padding(6)
                     }
-                   
-                }
-                ,alignment: .bottom
-             )
+
+                    // NavigationLink ẩn để điều hướng
+                    NavigationLink(
+                        destination: AddProjectView(project: project,
+                                                    projectID: project?.id,
+                                                    vm: vm),
+                        isActive: $isShowAddProject
+                    ) {
+                        EmptyView()
+                    }
+                    .hidden()
+                },
+                alignment: .bottom
+            )
+   
+
         }
+        // Khi người dùng chọn ảnh từ photo library
+        .sheet(isPresented: $showImagePicker, onDismiss: applySelectedImage) {
+            ImagePicker(selectedImage: $selectedImage)
+        }
+
         .onAppear {
             let projects = ProjectStorage.loadAllProjects()
             vm.mainprojects = projects
@@ -151,5 +187,84 @@ struct HomeView: View {
         .navigationBarBackButtonHidden(true)
     }
 
+   
+
+    // Hàm áp dụng ảnh vừa chọn
+    func applySelectedImage() {
+        guard let image = selectedImage else { return }
+
+        // 1. Tạo project mới
+        let newProject = vm.createEmptyProject()
+        self.project = newProject
+
+        // 2. Lưu ảnh gốc vào thư mục project
+        let folderURL = ProjectStorage.projectFolder(for: newProject.id)
+        let filename = "original.jpg"
+        let fileURL = folderURL.appendingPathComponent(filename)
+
+        if let data = image.jpegData(compressionQuality: 0.9) {
+            try? data.write(to: fileURL)
+        }
+
+        // 3. Cập nhật VM
+        vm.baseImage = image
+        vm.filteredImage = image
+        vm.selectedFilter = .none
+
+        // 4. Cập nhật project
+        var updated = newProject
+        updated.originalImagePath = filename
+        updated.previewImage = image
+        ProjectStorage.saveProject(updated, previewImage: image, baseImage: image)
+
+        if let index = vm.mainprojects.firstIndex(where: { $0.id == updated.id }) {
+            vm.mainprojects[index] = updated
+        } else {
+            vm.mainprojects.insert(updated, at: 0)
+        }
+        self.project = updated
+
+        // 5. Điều hướng sang AddProjectView
+        DispatchQueue.main.async {
+            self.isShowAddProject = true
+        }
+    }
+
+
+    
+    
+
 }
+struct ImagePicker: UIViewControllerRepresentable {
+    @Environment(\.presentationMode) var presentationMode
+    var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @Binding var selectedImage: UIImage?
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = sourceType
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: ImagePicker
+        init(_ parent: ImagePicker) { self.parent = parent }
+
+        func imagePickerController(_ picker: UIImagePickerController,
+                                   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.selectedImage = image
+            }
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+
 

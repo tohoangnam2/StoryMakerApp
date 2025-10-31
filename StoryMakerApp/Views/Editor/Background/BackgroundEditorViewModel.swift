@@ -40,25 +40,18 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published var currentProjectID: UUID?
     @Published var currentProject: MainModel?   // project đang edit
     @Published var project: MainModel = MainModel()
-    
-   
-    
-    @Published var baseImage: UIImage? {
-        didSet {
-            guard let _ = baseImage else { return }
-            generateThumbnails()
-            applySelectedFilter(animated: false)
-        }
-    }
+
 
     @Published var filteredImage: UIImage?
     @Published var selectedFilter: FilterType = .none
+    @Published var hasLoadedFiltered = false
+
     @Published var thumbnails: [FilterType: UIImage] = [:]
     
 
     private let context = CIContext()
     private let processingQueue = DispatchQueue(label: "FilterProcessingQueue", qos: .userInitiated)
-    private let thumbnailCache = NSCache<NSString, UIImage>() // ⚡ Cache cho preview
+    private let thumbnailCache = NSCache<NSString, UIImage>() // Cache cho preview
 
     //network
     @Published var isOnline: Bool = NetworkManager.shared.isOnline
@@ -70,7 +63,36 @@ class BackgroundEditorViewModel: ObservableObject {
             .assign(to: \.isOnline, on: self)
             .store(in: &cancellables)
     }
+    
+    @Published var baseImage: UIImage? {
+        didSet {
+            guard let newImage = baseImage else { return }
+            updatePreviewForNewBaseImage(newImage)
+        }
+    }
 
+    func resetFilterState() {
+        selectedFilter = .none
+        filteredImage = nil
+        thumbnails.removeAll()
+        thumbnailCache.removeAllObjects()
+        isImageLoaded = false
+    }
+
+    func updatePreviewForNewBaseImage(_ newImage: UIImage) {
+        self.defaultPreview = newImage
+        self.filteredImage = newImage
+        self.thumbnails.removeAll()
+        self.thumbnailCache.removeAllObjects()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.generateThumbnails()
+            if self.selectedFilter != .none {
+                self.applySelectedFilter(animated: false)
+            }
+            self.isImageLoaded = true
+        }
+    }
 
     // MARK: - Filter Preview Cache
     func generateThumbnails() {
@@ -99,6 +121,13 @@ class BackgroundEditorViewModel: ObservableObject {
 
     // MARK: - Main Filter Apply
     func applySelectedFilter(animated: Bool = true) {
+        // 🧩 Nếu vừa load filtered.jpg thì bỏ qua apply để tránh nháy
+        guard !hasLoadedFiltered else {
+            print("⏭️ Skip reapplying filter (already loaded filtered image)")
+            hasLoadedFiltered = false // reset để lần sau chọn filter mới thì apply lại bình thường
+            return
+        }
+
         guard let baseImage = baseImage else { return }
 
         // Giữ lại ảnh hiện tại để không bị trắng nháy
@@ -133,7 +162,25 @@ class BackgroundEditorViewModel: ObservableObject {
             filter.inputImage = ciImage
             filter.inputImage2 = ciImage2
             return render(filter.outputImage)
+        
+        case .toneCuver:
+            // tone curve filter
+            let filter = CIFilter.toneCurve()
+            filter.inputImage = ciImage
+            filter.point0 = CGPoint(x: 0.0, y: 0.0)
+            filter.point1 = CGPoint(x: 0.22, y: 0.25)
+            filter.point2 = CGPoint(x: 0.4, y: 0.5)
+            filter.point3 = CGPoint(x: 0.65, y: 0.75)
+            filter.point4 = CGPoint(x: 1.0, y: 1.0)
+            return render(filter.outputImage)
 
+        case .vibrance:
+            let filter = CIFilter.vibrance()
+            filter.inputImage = ciImage
+            filter.amount = 2
+            return render(filter.outputImage)
+        
+        
         default:
             guard let filter = CIFilter(name: filterType.rawValue) else { return nil }
             filter.setValue(ciImage, forKey: kCIInputImageKey)
@@ -141,6 +188,8 @@ class BackgroundEditorViewModel: ObservableObject {
                 filter.setValue(0.8, forKey: kCIInputIntensityKey)
             }
             return render(filter.outputImage)
+        
+            
         }
     }
 
@@ -150,31 +199,6 @@ class BackgroundEditorViewModel: ObservableObject {
         else { return nil }
         return UIImage(cgImage: cgimg)
     }
-    
-    func updatePreviewForNewBaseImage(_ newImage: UIImage) {
-        // 1. Cập nhật baseImage
-        self.baseImage = newImage
-        self.defaultPreview = newImage
-
-        // 2. Reset ảnh hiện tại
-        self.filteredImage = newImage
-
-        // 🧠 3. Xóa cache filter cũ (rất quan trọng!)
-        self.thumbnails.removeAll()
-        self.generateThumbnails() // tái tạo từ base mới
-
-        // 4. Áp lại filter đang chọn (nếu có)
-        if selectedFilter != .none {
-            applySelectedFilter(animated: false)
-        } else {
-            self.filteredImage = newImage
-        }
-
-        // 5. Báo UI biết đã load xong ảnh
-        self.isImageLoaded = true
-    }
-
-
     
     func createEmptyProject() -> MainModel {
         let newProject = MainModel(id: UUID())
@@ -186,12 +210,6 @@ class BackgroundEditorViewModel: ObservableObject {
         
         return newProject
     }
-}
-
-
-
-extension BackgroundEditorViewModel {
-    
     func deleteProject(_ project: MainModel) {
         // 1. Xoá trong docs
         ProjectStorage.deleteProject(id: project.id)
@@ -201,8 +219,9 @@ extension BackgroundEditorViewModel {
             mainprojects.remove(at: index)
         }
     }
-
+    
+    
+    
 }
-
 
 

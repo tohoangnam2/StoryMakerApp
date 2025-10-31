@@ -14,7 +14,7 @@ struct StoryMakerAppApp: App {
     @AppStorage("hasShownGetStarted") var hasShownGetStarted: Bool = false
     @State private var showSplash: Bool = true
     @State var isShowPremium: Bool = false
-    
+
     var body: some Scene {
         WindowGroup {
             ZStack {

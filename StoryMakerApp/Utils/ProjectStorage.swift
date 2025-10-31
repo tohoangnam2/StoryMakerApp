@@ -12,14 +12,19 @@ struct ProjectStorage {
     }
     
     // Lưu project + ảnh snapshot vào folder riêng
-    static func saveProject(_ project: MainModel, previewImage: UIImage?, baseImage: UIImage? = nil) {
+    static func saveProject(
+        _ project: MainModel,
+        previewImage: UIImage?,
+        baseImage: UIImage? = nil,
+        filteredImage: UIImage? = nil
+    ) {
         let folderURL = projectFolder(for: project.id)
         do {
             try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
 
             var projectToSave = project
 
-            // Lưu preview
+            // Lưu preview (thumbnail / cover)
             if let img = previewImage,
                let imgData = img.jpegData(compressionQuality: 0.9) {
                 let previewFileName = "project_\(project.id).jpg"
@@ -28,22 +33,30 @@ struct ProjectStorage {
                 projectToSave.previewImagePath = previewFileName
             }
 
-            // Lưu original
+            // Lưu original.jpg
             let originalFileName = "original.jpg"
             let originalURL = folderURL.appendingPathComponent(originalFileName)
             if let base = baseImage,
                let data = base.jpegData(compressionQuality: 1.0) {
                 try? data.write(to: originalURL)
             }
-            // Ép luôn lưu tên file vào JSON
             projectToSave.originalImagePath = originalFileName
 
-            // Lưu JSON
+            // Lưu filtered.jpg (để load nhanh)
+            if let filtered = filteredImage,
+               let filteredData = filtered.jpegData(compressionQuality: 0.9) {
+                let filteredFileName = "filtered.jpg"
+                let filteredURL = folderURL.appendingPathComponent(filteredFileName)
+                try? filteredData.write(to: filteredURL)
+                projectToSave.filteredImagePath = filteredFileName
+            }
+
+            // Ghi JSON
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
             let data = try JSONEncoder().encode(projectToSave)
             try data.write(to: jsonURL)
 
-            print("Saved JSON + preview + original.jpg")
+            print(" Saved project: JSON + preview + original + filtered ")
         } catch {
             print(" Error saving project: \(error)")
         }
@@ -103,17 +116,24 @@ struct ProjectStorage {
         do {
             let data = try Data(contentsOf: jsonURL)
             var project = try JSONDecoder().decode(MainModel.self, from: data)
+            
+            
+            // Ưu tiên load ảnh filtered trước cho tốc độ mở nhanh
+            let filteredURL = folderURL.appendingPathComponent(project.filteredImagePath ?? "filtered.jpg")
+            if FileManager.default.fileExists(atPath: filteredURL.path),
+               let imgData = try? Data(contentsOf: filteredURL),
+               let filtered = UIImage(data: imgData) {
+                project.previewImage = filtered
+                print(" Loaded filtered image for preview:", filteredURL.lastPathComponent)
+            }
 
-            //  Load ảnh gốc từ local
+            // Load ảnh gốc (dành cho re-apply filter)
             if let originalName = project.originalImagePath {
                 let originalURL = folderURL.appendingPathComponent(originalName)
-                if FileManager.default.fileExists(atPath: originalURL.path),
-                   let imgData = try? Data(contentsOf: originalURL),
-                   let uiImage = UIImage(data: imgData) {
-                    project.previewImage = uiImage   // hoặc gán vào vm.baseImage
-                    print(" Loaded original image from:", originalURL.path)
+                if FileManager.default.fileExists(atPath: originalURL.path) {
+                    print(" Loaded original.jpg for project:", id)
                 } else {
-                    print(" original.jpg not found at:", originalURL.path)
+                    print(" original.jpg not found:", originalURL.lastPathComponent)
                 }
             }
 
@@ -124,22 +144,22 @@ struct ProjectStorage {
         }
     }
     
-    func debugPrintProjectJSON(id: UUID) {
-        let folderURL = ProjectStorage.projectFolder(for: id)
-        let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
-        print(" JSON path:", jsonURL.path)
+    static func debugPrintProjectJSON(id: UUID) {
+            let folderURL = projectFolder(for: id)
+            let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
+            print(" JSON path:", jsonURL.path)
 
-        do {
-            let data = try Data(contentsOf: jsonURL)
-            if let rawString = String(data: data, encoding: .utf8) {
-                print(" Raw JSON content:\n\(rawString)")
-            } else {
-                print("Không đọc được JSON thành chuỗi UTF-8")
+            do {
+                let data = try Data(contentsOf: jsonURL)
+                if let rawString = String(data: data, encoding: .utf8) {
+                    print(" Raw JSON content:\n\(rawString)")
+                } else {
+                    print(" Không đọc được JSON thành chuỗi UTF-8")
+                }
+            } catch {
+                print(" Lỗi đọc JSON:", error)
             }
-        } catch {
-            print(" Lỗi đọc JSON:", error)
         }
-    }
 
     // Liệt kê tất cả folder project
     static func listSavedProjects() -> [URL] {

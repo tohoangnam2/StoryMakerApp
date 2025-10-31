@@ -70,6 +70,7 @@ class OverlayTextViewModel: ObservableObject {
         
         newOverlay.offset.width += 30
         newOverlay.offset.height += 30
+        newOverlay.endset = newOverlay.offset
         overlays.append(newOverlay)
         selectOverlay(newOverlay.id)
         

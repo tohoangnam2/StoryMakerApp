@@ -89,12 +89,6 @@ struct BackgroundEditorView: View {
                         EmptyView()
                     case .filter:
                         FilterEditorCIView(vm:vm)
-                        
-                        //lut api
-//                        FilterEditorView( vm: vm, project: Binding(
-//                            get: { project! },
-//                            set: { project = $0 }
-//                        ))
                     case .brightness:
                         if let _ = project {
                             BrightNessBGView(

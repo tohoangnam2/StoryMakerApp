@@ -13,6 +13,7 @@
 		543F83B12EB2080700354EDB /* FilterDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543F83B02EB2080700354EDB /* FilterDemoView.swift */; };
 		543F83B52EB21BE400354EDB /* FilterEditorCIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543F83B42EB21BE400354EDB /* FilterEditorCIView.swift */; };
 		543F83B72EB21C8100354EDB /* FilterCIViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543F83B62EB21C7600354EDB /* FilterCIViewModel.swift */; };
+		543F83B92EB4A18D00354EDB /* TestPhotopicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543F83B82EB4A18D00354EDB /* TestPhotopicker.swift */; };
 		544C17592E8FBF0200999A9B /* ColorPickerFromImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C17572E8FBF0200999A9B /* ColorPickerFromImage.swift */; };
 		544C175F2E8FBF0600999A9B /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C175A2E8FBF0600999A9B /* Color.swift */; };
 		544C17602E8FBF0600999A9B /* Shimmering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C175B2E8FBF0600999A9B /* Shimmering.swift */; };
@@ -66,6 +67,7 @@
 		543F83B02EB2080700354EDB /* FilterDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterDemoView.swift; sourceTree = "<group>"; };
 		543F83B42EB21BE400354EDB /* FilterEditorCIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterEditorCIView.swift; sourceTree = "<group>"; };
 		543F83B62EB21C7600354EDB /* FilterCIViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCIViewModel.swift; sourceTree = "<group>"; };
+		543F83B82EB4A18D00354EDB /* TestPhotopicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPhotopicker.swift; sourceTree = "<group>"; };
 		544C17572E8FBF0200999A9B /* ColorPickerFromImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerFromImage.swift; sourceTree = "<group>"; };
 		544C175A2E8FBF0600999A9B /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		544C175B2E8FBF0600999A9B /* Shimmering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shimmering.swift; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 				546968A92E6E8C2E00BD2B77 /* Test.swift */,
 				543F83AE2EB084B900354EDB /* TestMoveCanve.swift */,
 				543F83B02EB2080700354EDB /* FilterDemoView.swift */,
+				543F83B82EB4A18D00354EDB /* TestPhotopicker.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -463,6 +466,7 @@
 				544C17742E8FBF1600999A9B /* HomePreview.swift in Sources */,
 				544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */,
 				544C17762E8FBF1600999A9B /* TestPreview1.swift in Sources */,
+				543F83B92EB4A18D00354EDB /* TestPhotopicker.swift in Sources */,
 				546968B42E6E8C2E00BD2B77 /* SubcriptionView.swift in Sources */,
 				543401112E83CF9A0047336A /* ProjectStorage.swift in Sources */,
 				546968B52E6E8C2E00BD2B77 /* TextView.swift in Sources */,

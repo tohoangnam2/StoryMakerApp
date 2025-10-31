@@ -207,7 +207,6 @@ struct AddBackgroundsView: View {
                                                                             .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
                                                                             .padding(10 / overlay.currentScale)
                                                                             .contentShape(Rectangle())
-                                                                        
                                                                             .position(x: 0, y: 0)
                                                                             .onTapGesture {
                                                                                 overlayVM.removeOverlay(overlay.id)
@@ -270,7 +269,6 @@ struct AddBackgroundsView: View {
                                                                                         overlay.startLocation = nil
                                                                                     }
                                                                             )
-                                                                        
                                                                         
                                                                         Image("img_edit_zoom")
                                                                             .resizable()
