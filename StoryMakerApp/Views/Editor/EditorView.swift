@@ -46,6 +46,10 @@ struct AddProjectView: View {
 
     var completion: ((UIImage) -> Void)? = nil
     @State private var isInitialized = false
+    
+    //go home
+    @State private var showExport = false
+    @State private var goHome = false
         
     var body: some View {
         NavigationView {
@@ -54,28 +58,26 @@ struct AddProjectView: View {
                     //top bar
                 HStack{
                     Button(action: {
-                        exitExport {
-                            saveCurrentProject(project: project,
-                                                overlayVM: overlayVM,
-                                                vm: vm) {
-                                print("x : \(snapshotImage)")
-                                presentationMode.wrappedValue.dismiss()
-                            }
+                        saveAndExitExport(
+                            project: project,
+                            overlayVM: overlayVM,
+                            vm: vm
+                        ) {
+                            presentationMode.wrappedValue.dismiss()
                         }
                     }) {
                         Image("home_back")
                     }
+
                     Spacer()
                     Button {
                         if frame != nil {
-                            exitExport {
-                                saveCurrentProject(project: project,
-                                                    overlayVM: overlayVM,
-                                                    vm: vm) {
-                                    print("x : \(snapshotImage)")
-                                    
-                                    showPreview = true
-                                }
+                            saveAndExitExport(
+                                project: project,
+                                overlayVM: overlayVM,
+                                vm: vm
+                            ) {
+                                showPreview = true
                             }
                         }
                     } label: {
@@ -121,7 +123,7 @@ struct AddProjectView: View {
 
                                 let folderURL = ProjectStorage.projectFolder(for: existingProject.id)
 
-                                // Luôn load original.jpg làm baseImage (gốc)
+                                // Luôn load original.jpg làm baseImage
                                 if let originalName = existingProject.originalImagePath {
                                     let originalURL = folderURL.appendingPathComponent(originalName)
                                     if FileManager.default.fileExists(atPath: originalURL.path),
@@ -423,20 +425,32 @@ struct AddProjectView: View {
                 }
                 .onDisappear {
                     guard var current = project else {
-                        print("Không có project, bỏ qua lưu")
+                        print("bỏ qua lưu")
                         return
                     }
+
                     guard vm.baseImage != nil || snapshotImage != nil else {
-                        print("Project chưa chọn background, bỏ qua lưu")
+                        print(" Project chưa chọn background, ko lưu")
                         return
                     }
-                    // merge state từ vm.projectStates
+                    current.textLayers = overlayVM.overlays
+                    current.frame      = frame
+                    current.blur       = vm.blur
+                    current.shadow     = vm.shadow
+                    current.opacity    = vm.opacity
+                    current.lightness  = vm.lightness
+                    current.saturation = vm.saturation
+                    current.selectedFilter = vm.selectedFilter.rawValue
+
+                    // preview
                     if let snap = snapshotImage {
+                        current.previewImage = snap
                         ProjectStorage.saveProject(current, previewImage: snap)
-                        print("Saved snapshot onDisappear")
+                        print(" Saved snapshot onDisappear")
                     } else if let filtered = vm.filteredImage {
+                        current.previewImage = filtered
                         ProjectStorage.saveProject(current, previewImage: filtered)
-                        print("Saved filtered image onDisappear")
+                        print(" Saved filtered image onDisappear")
                     }
                 }
             }
@@ -445,7 +459,6 @@ struct AddProjectView: View {
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView { picked in
                 guard let newFrame = picked else { return }
-
                 self.frame = newFrame
                 vm.currentProject = project
 
@@ -514,11 +527,19 @@ struct AddProjectView: View {
                           onTapOutside: {  },
                           onOpenBackgroundEditor: { showBackgroundEdit = true },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
-                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, filteredImage: vm.filteredImage, project: $project)
+                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, filteredImage: vm.filteredImage, project: $project,goHome:$goHome)
         }
+        
+        //back về rôt home
+        .onChange(of: goHome) { newValue in
+            if newValue {
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+
     }
     
-    //func
+    //reset
     func resetEditState() {
         selectedEditText = .none
         showTextField = false
@@ -528,98 +549,67 @@ struct AddProjectView: View {
         showBackgroundEdit = false
         
     }
-    
-    func exitExport(completion: @escaping () -> Void) {
+    func saveAndExitExport(
+        project: MainModel?,
+        overlayVM: OverlayTextViewModel,
+        vm: BackgroundEditorViewModel,
+        completion: @escaping () -> Void
+    ) {
         isExport = true
         resetEditState()
 
+        //  trigger snapshot
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             triggerSnapshot = true
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            guard let snap = snapshotImage,
-                  var current = project else {
-                print("Snapshot still nil — retrying filter flatten")
+            guard var currentProject = project else {
+                print("0 có project hiện tại")
                 completion()
                 return
             }
 
-            current.selectedFilter = vm.selectedFilter.rawValue
-            current.previewImage = snap
-
-            //  Ghi filteredImage (preview filter)
+            // Ảnh snapshot / filtered / default
+            let snap = snapshotImage ?? vm.filteredImage ?? vm.defaultPreview
             let filteredImage = vm.filteredImage ?? snap
 
+            // Cập nhật các thuộc tính chỉnh sửa
+            currentProject.textLayers = overlayVM.overlays
+            currentProject.frame      = frame
+            currentProject.blur       = vm.blur
+            currentProject.shadow     = vm.shadow
+            currentProject.opacity    = vm.opacity
+            currentProject.lightness  = vm.lightness
+            currentProject.saturation = vm.saturation
+            currentProject.selectedFilter = vm.selectedFilter.rawValue
+            currentProject.previewImage   = snap
+            currentProject.filteredImagePath = "filtered.jpg"
+
+            // Lưu project vào file
             ProjectStorage.saveProject(
-                current,
+                currentProject,
                 previewImage: snap,
-                baseImage: vm.baseImage,          // ảnh gốc
-                filteredImage: filteredImage      // ảnh đã filter
+                baseImage: vm.baseImage,
+                filteredImage: filteredImage
             )
 
-            current.filteredImagePath = "filtered.jpg"
-
-            if let index = vm.mainprojects.firstIndex(where: { $0.id == current.id }) {
-                vm.mainprojects[index] = current
+            // Cập nhật lại danh sách project trong VM
+            if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
+                vm.mainprojects[index] = currentProject
                 vm.mainprojects = Array(vm.mainprojects)
+            } else {
+                vm.mainprojects.insert(currentProject, at: 0)
             }
 
-            self.project = current
-            print(" Saved project with filtered.jpg & base original.jpg")
+            self.project = currentProject
+            print(" Saved full project with snapshot & overlays")
+            ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
 
             completion()
         }
     }
 
-    func saveCurrentProject(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-        guard var currentProject = project else {
-            completion()
-            return
-        }
-
-        currentProject.textLayers = overlayVM.overlays
-        currentProject.frame      = frame
-        currentProject.blur       = vm.blur
-        currentProject.shadow     = vm.shadow
-        currentProject.opacity    = vm.opacity
-        currentProject.lightness  = vm.lightness
-        currentProject.saturation = vm.saturation
-        currentProject.selectedFilter = vm.selectedFilter.rawValue
-
-        //  Ưu tiên filtered preview
-        if let snap = snapshotImage {
-            currentProject.previewImage = snap
-        } else if let filtered = vm.filteredImage {
-            currentProject.previewImage = filtered
-        } else {
-            currentProject.previewImage = vm.defaultPreview
-        }
-
-        //  Không thay baseImage, chỉ lưu filtered riêng
-        let filteredImage = vm.filteredImage ?? currentProject.previewImage
-
-        ProjectStorage.saveProject(
-            currentProject,
-            previewImage: currentProject.previewImage,
-            baseImage: vm.baseImage,
-            filteredImage: filteredImage
-        )
-
-        currentProject.filteredImagePath = "filtered.jpg"
-
-        if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-            vm.mainprojects[index] = currentProject
-            vm.mainprojects = Array(vm.mainprojects)
-        } else {
-            vm.mainprojects.insert(currentProject, at: 0)
-        }
-
-        self.project = currentProject
-        ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
-
-        completion()
-    }
 
     // Helper để tạo nút icon
     @ViewBuilder

@@ -136,13 +136,15 @@ struct AddBackgroundsView: View {
                                                     .contentShape(Rectangle())
                                                     //solid
                                                     .if(!overlay.userGradient) { view in
-                                                        view.foregroundColor(Color(hex: overlay.colorSolid)?.opacity(overlay.valueOpacity) ?? .black)                                                }
+                                                        view.foregroundColor(Color(hex: overlay.colorSolid)?.opacity(overlay.valueOpacity) ?? .black)
+                                                    }
                                                     //gradient
                                                     .if(overlay.userGradient) { view in
                                                         view.foregroundStyle(overlay.gradient)
                                                             .opacity(overlay.valueOpacity)
                                                     }
                                                     .padding(overlay.paddingBG)
+                                                    .animation(nil, value: overlay.paddingBG)
                                                     .shadow(
                                                         color:Color(hex: overlay.shawDowColor)?.opacity(overlay.opacitySD) ?? .black,
                                                         //độ mở
@@ -342,13 +344,14 @@ struct AddBackgroundsView: View {
                                                             }
                                                         }
                                                     )
-                                                    .animation(.spring())
-                                                    //move+ rotate + zoom
-                                                    .rotationEffect(.degrees(overlay.currentRotation), anchor: .center)
-                                                    .offset(x: overlay.offset.width / overlay.currentScale,
-                                                            y: overlay.offset.height / overlay.currentScale)
-                                                    .scaleEffect(overlay.currentScale)
+                                                    
                                                 }
+                                                .animation(.spring())
+                                                //move+ rotate + zoom
+                                                .rotationEffect(.degrees(overlay.currentRotation), anchor: .center)
+                                                .offset(x: overlay.offset.width / overlay.currentScale,
+                                                        y: overlay.offset.height / overlay.currentScale)
+                                                .scaleEffect(overlay.currentScale)
                                             }
                                         }
                                         .coordinateSpace(name: "canvas")
