@@ -10,6 +10,7 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 enum FilterType: String, CaseIterable, Identifiable {
+    
     var id: String { rawValue }
 
     case none = "None"
@@ -27,16 +28,26 @@ enum FilterType: String, CaseIterable, Identifiable {
     
     var displayName: String {
            switch self {
-           case .none: return "None"
-           case .noir: return "Noir"
-           case .sepia: return "Sepia"
-           case .invert: return "Invert"
-           case .mono: return "Mono"
-           case .chrome: return "Chrome"
-           case .fade: return "Fade"
-           case .instant: return "Instant"
-           case .posterize: return "Posterize"
-           case .colorAbsolute: return "Abs Diff"
+           case .none: 
+               return "None"
+           case .noir: 
+               return "Noir"
+           case .sepia: 
+               return "Sepia"
+           case .invert: 
+               return "Invert"
+           case .mono: 
+               return "Mono"
+           case .chrome: 
+               return "Chrome"
+           case .fade: 
+               return "Fade"
+           case .instant: 
+               return "Instant"
+           case .posterize: 
+               return "Posterize"
+           case .colorAbsolute: 
+               return "Abs Diff"
            case .toneCuver:
                return "Tone Cur"
            case .vibrance:
@@ -44,7 +55,6 @@ enum FilterType: String, CaseIterable, Identifiable {
            }
     }
 }
-
 // MARK: - Helper: Resize
 extension UIImage {
     func resized(to targetSize: CGSize) -> UIImage {

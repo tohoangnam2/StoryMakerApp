@@ -14,7 +14,7 @@ enum EditMode {
     case scaling
 }
 
-struct AddBackgroundsView: View {
+struct EditorCanvasView: View {
     
     @ObservedObject var overlayVM: OverlayTextViewModel
     @StateObject private var bgoverrlayVM = BackGroundViewModel()

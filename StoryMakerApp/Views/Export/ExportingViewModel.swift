@@ -17,56 +17,6 @@ class ExportingViewModel: ObservableObject {
     
     private var documentController: UIDocumentInteractionController?
 
-//    func startExporting(from frame: Frame?) {
-//            guard let frame = frame,
-//                  let url = frame.backgroundURL else {
-//                print(" Frame hoặc backgroundURL nil")
-//                return
-//            }
-//            
-//            self.isExporting = true
-//            self.progress = 0.1
-//            
-//            // Load image từ URL (hoặc local nếu đã có)
-//            URLSession.shared.dataTask(with: url) { data, _, error in
-//                guard let data = data, error == nil,
-//                      let image = UIImage(data: data) else {
-//                    DispatchQueue.main.async {
-//                        self.isExporting = false
-//                    }
-//                    return
-//                }
-//                DispatchQueue.main.async {
-//                    self.progress = 0.5
-//                }
-//                // Lưu vào Documents
-//                self.saveImageToDocumentsDirectory(image: image, filename: "namto_\(UUID().uuidString).jpg")
-//
-//            }.resume()
-//        }
-    
-//    func startExporting(projectID: UUID,image: UIImage) {
-//        self.isExporting = true
-//        self.progress = 0.0
-//        
-//        // Giả lập progress tăng dần
-//        timer?.invalidate()
-//        timer = Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true) { [weak self] t in
-//            guard let self = self else { return }
-//            if self.progress < 1.0 {
-//                self.progress += 0.005
-//            } else {
-//                t.invalidate()
-//                self.isExporting = false
-//                self.isDone = true
-//            }
-//        }
-//        
-//        DispatchQueue.global(qos: .background).async {
-//            let filename = "project_\(projectID).jpg"
-//            self.saveImageToProjectDirectory(projectID: projectID, image: image, filename: filename)
-//        }
-//    }
     func startExporting(projectID: UUID, image: UIImage) {
         self.isExporting = true
         self.progress = 0.0
@@ -93,17 +43,6 @@ class ExportingViewModel: ObservableObject {
         }
     }
 
-    
-    func quickExport(projectID: UUID, image: UIImage) {
-        self.isExporting = false
-        self.progress = 1.0
-        self.isDone = true
-        
-        DispatchQueue.global(qos: .background).async {
-            let filename = "project_\(projectID).jpg"
-            self.saveImageToProjectDirectory(projectID: projectID, image: image, filename: filename)
-        }
-    }
 
     private func saveImageToProjectDirectory(projectID: UUID, image: UIImage, filename: String) {
         guard let imageData = image.jpegData(compressionQuality: 0.9) else { return }
@@ -186,7 +125,7 @@ class ExportingViewModel: ObservableObject {
           }
       }
       
-      /// Chụp ngay từ UIImage có sẵn và lưu
+      // Chụp ngay từ UIImage có sẵn và lưu
       func snapshotAndSave(image: UIImage, filename: String = "snapshot_\(UUID().uuidString).jpg") {
           saveImageToDocumentsDirectory(image: image, filename: filename)
       }

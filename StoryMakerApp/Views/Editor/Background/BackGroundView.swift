@@ -122,15 +122,10 @@ struct BackGroundView: View {
                     }
                     
                 }
-                
-                
-                
             }
-            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
-        
     }
     
 }

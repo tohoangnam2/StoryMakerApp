@@ -26,14 +26,15 @@
 		544C17742E8FBF1600999A9B /* HomePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176C2E8FBF1600999A9B /* HomePreview.swift */; };
 		544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176E2E8FBF1600999A9B /* TestPreview.swift */; };
 		544C17762E8FBF1600999A9B /* TestPreview1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176F2E8FBF1600999A9B /* TestPreview1.swift */; };
-		5454444D2E7A6A780080D518 /* AddBackgroundsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */; };
+		5454444D2E7A6A780080D518 /* EditorCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454444C2E7A6A780080D518 /* EditorCanvasView.swift */; };
 		545B40242EA22D1500C1CA05 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545B40232EA22D1200C1CA05 /* Network.swift */; };
+		546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489AD2EB9AB7900818483 /* ExtensionTextView.swift */; };
 		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
 		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
 		546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */; };
 		546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */; };
 		546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */; };
-		546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */; };
+		546968B02E6E8C2E00BD2B77 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689A2E6E8C2E00BD2B77 /* EditorView.swift */; };
 		546968B12E6E8C2E00BD2B77 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689B2E6E8C2E00BD2B77 /* HomeView.swift */; };
 		546968B22E6E8C2E00BD2B77 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689D2E6E8C2E00BD2B77 /* OnboardingView.swift */; };
 		546968B32E6E8C2E00BD2B77 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469689F2E6E8C2E00BD2B77 /* SplashView.swift */; };
@@ -57,7 +58,6 @@
 		546968D52E6E988E00BD2B77 /* RubikIso-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */; };
 		546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */; };
 		546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */; };
-		54F4FEE22E8CC56C00A1B5CF /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4FEE12E8CC56C00A1B5CF /* ProjectManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,14 +80,15 @@
 		544C176C2E8FBF1600999A9B /* HomePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePreview.swift; sourceTree = "<group>"; };
 		544C176E2E8FBF1600999A9B /* TestPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview.swift; sourceTree = "<group>"; };
 		544C176F2E8FBF1600999A9B /* TestPreview1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview1.swift; sourceTree = "<group>"; };
-		5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBackgroundsView.swift; sourceTree = "<group>"; };
+		5454444C2E7A6A780080D518 /* EditorCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCanvasView.swift; sourceTree = "<group>"; };
 		545B40232EA22D1200C1CA05 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		546489AD2EB9AB7900818483 /* ExtensionTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionTextView.swift; sourceTree = "<group>"; };
 		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
 		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
 		546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundViewModel.swift; sourceTree = "<group>"; };
 		546968962E6E8C2E00BD2B77 /* OverlayTextModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextModel.swift; sourceTree = "<group>"; };
 		546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextViewModel.swift; sourceTree = "<group>"; };
-		5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
+		5469689A2E6E8C2E00BD2B77 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		5469689B2E6E8C2E00BD2B77 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5469689D2E6E8C2E00BD2B77 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		5469689F2E6E8C2E00BD2B77 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
@@ -113,7 +114,6 @@
 		546968D42E6E988E00BD2B77 /* RubikIso-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RubikIso-Regular.ttf"; sourceTree = "<group>"; };
 		546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorView.swift; sourceTree = "<group>"; };
 		546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundEditorViewModel.swift; sourceTree = "<group>"; };
-		54F4FEE12E8CC56C00A1B5CF /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManager.swift; sourceTree = "<group>"; };
 		BB94D9EE2E541CBD008F66EA /* StoryMakerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMakerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -143,6 +143,7 @@
 				544C175B2E8FBF0600999A9B /* Shimmering.swift */,
 				544C175C2E8FBF0600999A9B /* Snapshot.swift */,
 				544C175D2E8FBF0600999A9B /* UIImage+LUT.swift */,
+				546489AD2EB9AB7900818483 /* ExtensionTextView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -174,7 +175,6 @@
 			children = (
 				5469689B2E6E8C2E00BD2B77 /* HomeView.swift */,
 				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
-				54F4FEE12E8CC56C00A1B5CF /* ProjectManager.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -185,8 +185,8 @@
 				544C17802E8FC95900999A9B /* Background */,
 				544C17582E8FBF0200999A9B /* Color */,
 				544C177C2E8FC0FA00999A9B /* Text */,
-				5454444C2E7A6A780080D518 /* AddBackgroundsView.swift */,
-				5469689A2E6E8C2E00BD2B77 /* AddProjectView.swift */,
+				5454444C2E7A6A780080D518 /* EditorCanvasView.swift */,
+				5469689A2E6E8C2E00BD2B77 /* EditorView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -443,7 +443,6 @@
 				546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */,
 				544C17592E8FBF0200999A9B /* ColorPickerFromImage.swift in Sources */,
 				543F83AF2EB084B900354EDB /* TestMoveCanve.swift in Sources */,
-				54F4FEE22E8CC56C00A1B5CF /* ProjectManager.swift in Sources */,
 				546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */,
 				543F83B12EB2080700354EDB /* FilterDemoView.swift in Sources */,
 				544C17662E8FBF0A00999A9B /* BrightNessBGView.swift in Sources */,
@@ -452,9 +451,10 @@
 				544C17602E8FBF0600999A9B /* Shimmering.swift in Sources */,
 				544C17612E8FBF0600999A9B /* Snapshot.swift in Sources */,
 				544C17622E8FBF0600999A9B /* UIImage+LUT.swift in Sources */,
-				546968B02E6E8C2E00BD2B77 /* AddProjectView.swift in Sources */,
+				546968B02E6E8C2E00BD2B77 /* EditorView.swift in Sources */,
+				546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */,
 				543F83B52EB21BE400354EDB /* FilterEditorCIView.swift in Sources */,
-				5454444D2E7A6A780080D518 /* AddBackgroundsView.swift in Sources */,
+				5454444D2E7A6A780080D518 /* EditorCanvasView.swift in Sources */,
 				546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */,
 				546968B12E6E8C2E00BD2B77 /* HomeView.swift in Sources */,
 				546968B22E6E8C2E00BD2B77 /* OnboardingView.swift in Sources */,

@@ -9,7 +9,7 @@ import SwiftUI
 
 
 
-struct AddProjectView: View {
+struct EditorView: View {
     
     @State var project: MainModel?
     @State var openedProjectID: UUID? = nil
@@ -51,6 +51,7 @@ struct AddProjectView: View {
     @State private var showExport = false
     @State private var goHome = false
         
+    @State var lastEdit: BackGroundEditEditEnum = .filter
     var body: some View {
         NavigationView {
             ZStack{
@@ -65,20 +66,28 @@ struct AddProjectView: View {
                         ) {
                             presentationMode.wrappedValue.dismiss()
                         }
+                        
                     }) {
                         Image("home_back")
                     }
 
+
                     Spacer()
                     Button {
-                        if frame != nil {
-                            saveAndExitExport(
-                                project: project,
-                                overlayVM: overlayVM,
-                                vm: vm
-                            ) {
-                                showPreview = true
+                        if showBackgroundEdit{
+                            showBackgroundEdit = false
+                            isSelected = false
+                        }else{
+                            if frame != nil {
+                                saveAndExitExport(
+                                    project: project,
+                                    overlayVM: overlayVM,
+                                    vm: vm
+                                ) {
+                                    showPreview = true
+                                }
                             }
+
                         }
                     } label: {
                         Image("home_share")
@@ -91,38 +100,38 @@ struct AddProjectView: View {
                     
                     //view project
                     Group {
-                        if let existingProject = vm.mainprojects.first(where: { $0.id == projectID }) {
-                            AddBackgroundsView(
-                                overlayVM: overlayVM,
-                                frame: existingProject.frame,
-                                showTextField: $showTextField,
-                                isTextFieldFocused: $isTextFieldFocused,
-                                isSelected: $isSelected,
-                                isEditingText: $isEditingText,
-                                onAddTap: { isShowBackgroundPicker = true },
-                                onTapOutside: { resetEditState() },
-                                onOpenBackgroundEditor: { showBackgroundEdit = true },
-                                isShowBackgroundPicker: $isShowBackgroundPicker,
-                                showBackgroundEdit: $showBackgroundEdit,
-                                vm: vm,
-                                filteredImage: vm.filteredImage,
-                                project: $project
-                            )
-                            .onAppear {
+                        EditorCanvasView(
+                            overlayVM: overlayVM,
+                            frame: frame,
+                            showTextField: $showTextField,
+                            isTextFieldFocused: $isTextFieldFocused,
+                            isSelected: $isSelected,
+                            isEditingText: $isEditingText,
+                            onAddTap: { isShowBackgroundPicker = true },
+                            onTapOutside: { resetEditState() },
+                            onOpenBackgroundEditor: { showBackgroundEdit = true },
+                            isShowBackgroundPicker: $isShowBackgroundPicker,
+                            showBackgroundEdit: $showBackgroundEdit,
+                            vm: vm,
+                            filteredImage: vm.filteredImage,
+                            project: $project
+                        )
+                        .onAppear {
+                            if let existingProject = vm.mainprojects.first(where: { $0.id == projectID }) {
                                 guard !isInitialized else { return }
                                 isInitialized = true
-
+                                
                                 self.project = existingProject
                                 overlayVM.overlays = existingProject.textLayers
                                 frame = existingProject.frame
-
+                                
                                 vm.blur = existingProject.blur
                                 vm.opacity = existingProject.opacity
                                 vm.lightness = existingProject.lightness
                                 vm.saturation = existingProject.saturation
-
+                                
                                 let folderURL = ProjectStorage.projectFolder(for: existingProject.id)
-
+                                
                                 // Luôn load original.jpg làm baseImage
                                 if let originalName = existingProject.originalImagePath {
                                     let originalURL = folderURL.appendingPathComponent(originalName)
@@ -133,21 +142,21 @@ struct AddProjectView: View {
                                         vm.defaultPreview = originalImage
                                     }
                                 }
-
+                                
                                 // Nếu có filtered.jpg thì hiển thị filter preview, không thay base
                                 if let filteredName = existingProject.filteredImagePath {
                                     let filteredURL = folderURL.appendingPathComponent(filteredName)
                                     if FileManager.default.fileExists(atPath: filteredURL.path),
                                        let data = try? Data(contentsOf: filteredURL),
                                        let filteredImg = UIImage(data: data) {
-
+                                        
                                         vm.filteredImage = filteredImg
                                         vm.selectedFilter = FilterType(rawValue: existingProject.selectedFilter ?? "") ?? .none
                                         print(" Hiển thị filtered.jpg preview (base vẫn là original)")
                                         return
                                     }
                                 }
-
+                                
                                 //  Nếu không có filtered → apply filter lại
                                 vm.selectedFilter = FilterType(rawValue: existingProject.selectedFilter ?? "") ?? .none
                                 if vm.selectedFilter != .none {
@@ -157,27 +166,7 @@ struct AddProjectView: View {
                                     vm.filteredImage = vm.baseImage
                                 }
                             }
-
-
-                        }
-                        else {
-                            AddBackgroundsView(
-                                overlayVM: overlayVM,
-                                frame: project?.frame,
-                                showTextField: $showTextField,
-                                isTextFieldFocused: $isTextFieldFocused,
-                                isSelected: $isSelected,
-                                isEditingText: $isEditingText,
-                                onAddTap: { isShowBackgroundPicker = true },
-                                onTapOutside: { resetEditState() },
-                                onOpenBackgroundEditor: { showBackgroundEdit = true },
-                                isShowBackgroundPicker: $isShowBackgroundPicker,
-                                showBackgroundEdit: $showBackgroundEdit,
-                                vm: vm,
-                                filteredImage: vm.filteredImage,
-                                project: $project
-                            )
-                            .onAppear {
+                            else {
                                 if project == nil {
                                     let newProject = vm.createEmptyProject()
                                     self.project = newProject
@@ -188,18 +177,18 @@ struct AddProjectView: View {
                     }
                     .modifier(SnapshotWrapper(isExport: isExport, snapshot: $snapshotImage, trigger: $triggerSnapshot))
 
-                    
                     //view editor
                     if showBackgroundEdit {
-                        BackgroundEditorView(vm: vm, overlayVM: overlayVM, frame: frame, isShowBackgroundPicker: $isShowBackgroundPicker, showBackgroundEdit: $showBackgroundEdit, isSelected: $isSelected, project: $project)
-                            .id(showBackgroundEdit) // ép SwiftUI coi là view mới mỗi lần đổi
-                            .transition(.move(edge: .bottom).combined(with: .opacity)) // trượt từ dưới lên + fade
-                            .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit) // animate khi state thay đổi
+                        BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker,showBackgroundEdit:$showBackgroundEdit,isSelected:$isSelected,project:$project,editEnum:$lastEdit)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit)
                     }
+
                     else {
                         if  selectedEditText != .none {
                             VStack(spacing: 0) {
                                 VStack {
+                                    
                                     HStack {
                                         Button(action: {}) {
                                             Image("img_edit1_keyboard")
@@ -217,6 +206,7 @@ struct AddProjectView: View {
                                     }
                                     .padding(.top, 10)
                                     .padding(.horizontal)
+                                    
                                     HStack(spacing: 20) {
                                         iconButton("img_edit1_text", .fontSize)
                                         iconButton("img_edit1_size", .fontFamily)
@@ -261,7 +251,6 @@ struct AddProjectView: View {
                                             removal: .move(edge: .bottom).combined(with: .opacity)
                                         ))
                                         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: selectedEditText)
-
                                     }
                                 }
                                 .id(selectedEditText)
@@ -280,7 +269,6 @@ struct AddProjectView: View {
                                                 isTextFieldFocused = true
                                                 showTextField = true
                                                 isSelected = true
-                                                
                                             }) {
                                                 VStack {
                                                     Image("home_tabbartext")
@@ -289,6 +277,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 isShowBackgroundPicker = true
                                             }) {
@@ -317,6 +306,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .fontFamily
                                             }) {
@@ -327,6 +317,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .colorSolid
                                             }) {
@@ -337,6 +328,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .gradient
                                             }) {
@@ -347,6 +339,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .stroke
                                             }) {
@@ -357,6 +350,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .align
                                             }) {
@@ -367,6 +361,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .shadow
                                             }) {
@@ -377,6 +372,7 @@ struct AddProjectView: View {
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
                                             Spacer()
+                                            
                                             Button(action: {
                                                 selectedEditText = .background
                                             }) {
@@ -386,7 +382,8 @@ struct AddProjectView: View {
                                                 }
                                                 .foregroundColor(.black.opacity(0.8))
                                             }
-                                            Spacer().frame(width: 16)
+                                            Spacer()
+                                            .frame(width: 16)
                                         }
                                         .padding(.top)
                                         .background(ignoresSafeAreaEdges: .bottom)
@@ -403,9 +400,11 @@ struct AddProjectView: View {
                                                 .opacity(0)
                                         }
                                         Spacer()
+                                        
                                         Text("Text Edit")
                                             .font(.system(size: 16, weight: .medium, design: .default))
                                         Spacer()
+                                        
                                         Button(action: {
                                             showTextField = false
                                             isTextFieldFocused = false
@@ -423,12 +422,19 @@ struct AddProjectView: View {
                     }
                 }
                 }
+                Color.white.opacity(0.01)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        if showBackgroundEdit {
+                             showBackgroundEdit = false
+                         }
+                    }
+                    .allowsHitTesting(showBackgroundEdit)
                 .onDisappear {
                     guard var current = project else {
                         print("bỏ qua lưu")
                         return
                     }
-
                     guard vm.baseImage != nil || snapshotImage != nil else {
                         print(" Project chưa chọn background, ko lưu")
                         return
@@ -464,6 +470,7 @@ struct AddProjectView: View {
 
                 // Nếu background thực sự thay đổi
                 if vm.currentFrameID != newFrame.backgroundID {
+                    //gán lại để biết là trùng nên code đằng sau ko cần load
                     vm.currentFrameID = newFrame.backgroundID
 
                     //  Reset toàn bộ state filter + cache cũ
@@ -536,7 +543,6 @@ struct AddProjectView: View {
                 presentationMode.wrappedValue.dismiss()
             }
         }
-
     }
     
     //reset
@@ -549,12 +555,8 @@ struct AddProjectView: View {
         showBackgroundEdit = false
         
     }
-    func saveAndExitExport(
-        project: MainModel?,
-        overlayVM: OverlayTextViewModel,
-        vm: BackgroundEditorViewModel,
-        completion: @escaping () -> Void
-    ) {
+    
+    func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
         isExport = true
         resetEditState()
 
@@ -624,7 +626,7 @@ struct AddProjectView: View {
 //bọc lại view con luôn
 
 //snapshoot view con
-    struct SnapshotContainer<Content: View>: UIViewRepresentable {
+struct SnapshotContainer<Content: View>: UIViewRepresentable {
         let content: Content
         @Binding var snapshot: UIImage?
         @Binding var trigger: Bool
@@ -682,9 +684,6 @@ struct SnapshotWrapper: ViewModifier {
     }
 }
 
-
-// MARK: EXTENSION
-
 extension View {
     @ViewBuilder
     func `if`<Content: View>(
@@ -699,50 +698,6 @@ extension View {
     }
 }
 
-
-//align
-
-extension Text {
-    func applyAlign(_ align: AlignEnum) -> some View {
-        switch align {
-        case .left:
-            return self.frame(maxWidth: .infinity, alignment: .leading)
-        case .center:
-            return self.frame(maxWidth: .infinity, alignment: .center)
-        case .right:
-            return self.frame(maxWidth: .infinity, alignment: .trailing)
-        case .none:
-            return self.frame(maxWidth: .infinity, alignment: .center)
-
-        }
-    }
-    
-    func applyCase(_ textCase: AlignCaseEnum) -> Text {
-        switch textCase {
-        case .up:
-            return Text(self.string.uppercased())
-        case .cap:
-            return Text(self.string.capitalized)
-        case .low:
-            return Text(self.string.lowercased())
-        case .none:
-            return Text(self.string.lowercased())
-        
-
-        }
-    }
-    
-    // Helper property để lấy String từ Text
-    private var string: String {
-        let mirror = Mirror(reflecting: self)
-        for child in mirror.children {
-            if let storage = child.value as? String {
-                return storage
-            }
-        }
-        return ""
-    }
-}
 
 
 

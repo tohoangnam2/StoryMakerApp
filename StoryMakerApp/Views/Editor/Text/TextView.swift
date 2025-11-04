@@ -66,17 +66,17 @@ struct TextView: View {
     var body: some View {
         VStack{
             if let overlay = $overlayVM.overlays.first(where: { $0.id == overlayVM.selectedOverlayID }) {
-                
                 switch selectedEditText {
                 case .fontSize:
                     VStack{
                         VStack(spacing: 2) {
-                            CustomSliderRow(title: "Font size", value: overlay.fontSize, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                            CustomSliderRowLineHeight(title: "Line height", value: overlay.lineHeight, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                            CustomSliderRowLetter(title: "Letter Spacing", value: overlay.letterSpacing, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: "Font size", value: overlay.fontSize, minValue: 15.0, maxValue: 80.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: "Line high", value: overlay.lineHeight, minValue: 15.0, maxValue: 80.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: "Letter Spacing", value: overlay.letterSpacing, minValue: 0, maxValue: 20.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         }
                         .padding()
                     }
+                    
                 case .fontFamily:
                     VStack{
                         LazyVGrid(
@@ -109,10 +109,9 @@ struct TextView: View {
                         .frame(height: 200)
                     }
                     
-                    
                 case .colorSolid:
                     VStack{
-                        CustomSliderRowColor(title: "Opacity", valueOpacity:overlay.valueOpacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: "Opacity", valueOpacity:overlay.valueOpacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal,showsIndicators: false) {
                                 HStack() {
@@ -155,7 +154,7 @@ struct TextView: View {
                     
                 case .gradient:
                     VStack {
-                        CustomSliderRowColor(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack {
@@ -211,15 +210,15 @@ struct TextView: View {
                                     }
                                 }
                             }
-
+                            
                             
                         }
                     }
                     .padding(.leading, 8)
                 case .stroke:
                     VStack {
-                        CustomSliderRowStroke(title: "Stroke Width", value: overlay.strokeWidth, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        CustomSliderRowColor(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: "Stroke Width", value: overlay.strokeWidth, minValue: 0, maxValue: 30.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal) {
                                 HStack {
@@ -260,15 +259,16 @@ struct TextView: View {
                     VStack{
                         CustomAlign(title: "Align", selectedAlign: overlay.selectedAlign)
                         CustomAlignCase(title: "Case", selectedAlignCase: overlay.selectedAlignCase)
-                        CustomSliderBackGround(title: "Cuver", valueBG: overlay.cuver, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: "Cuver", value: overlay.cuver, minValue: 0, maxValue: 30.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                     }
                     .padding(.top, 12)
+                    
                 case .background:
                     VStack{
-                        CustomSliderBackGround(title: "Padding", valueBG: overlay.paddingBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        CustomSliderBackGround(title: "Corner", valueBG: overlay.cornerRadiusBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        CustomSliderRowBgOpacity(title: "Opacity", valueOpacity:overlay.opacityBG, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        
+                        CustomSliderRow(title: "Padding", value: overlay.paddingBG, minValue: 0, maxValue: 100.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: "Corner", value: overlay.cornerRadiusBG, minValue: 0, maxValue: 100.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: "Opacity", valueOpacity: overlay.opacityBG, minValue: 0.1, maxValue: 1,  sliderColor: .gray,thumbColor: .red.opacity(0.6))
+
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal) {
                                 HStack {
@@ -302,15 +302,15 @@ struct TextView: View {
                             }
                             
                         }
-                        
                     }
                     .padding(.leading, 8)
+                    
                 case .shadow:
                     VStack{
-                        CustomSliderShadow(title: "X", valueBG: overlay.offSetXSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        CustomSliderShadow(title: "Y", valueBG: overlay.offSetYSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        CustomSliderShaDowBlur(title: "Blur", valueBG:overlay.blurSD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
-                        CustomSliderRowColor(title: "Opacity", valueOpacity:overlay.opacitySD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: "X", value: overlay.offSetXSD, minValue: -5, maxValue: 5, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: "Y", value: overlay.offSetYSD, minValue: -5, maxValue: 5, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: "Blur", value: overlay.blurSD, minValue: 2.0, maxValue: 10.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: "Opacity", valueOpacity:overlay.opacitySD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal) {
@@ -343,22 +343,16 @@ struct TextView: View {
                                     proxy.scrollTo(newColor, anchor: .center)
                                 }
                             }
-                            
-                            
                         }
-                        
-                        
                     }
                     .padding(.leading, 8)
+                    
                 case nil:
                     ProgressView()
                 case .none:
                     Text("8 Family Picker")
                 }
             }
-            //            else{
-            //                Text("Không có overlay nào được chọn")
-            //            }
         }
         .background(.white)
         .padding(.top,5)
@@ -393,68 +387,14 @@ struct CustomSliderRow: View {
                 Text("\(Int(value))")
             }
         }
-    }
-}
-struct CustomSliderRowLineHeight: View {
-    let title: String
-    @Binding var value: Double
-    var minValue: Double = 5
-    var maxValue: Double = 80
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-                .frame(width: 200, alignment: .leading)
-            
-            HStack {
-                CustomSlider(value: $value,
-                             minValue: minValue,
-                             maxValue: maxValue,
-                             trackColor: .gray,
-                             thumbColor: .red)
-                .frame(height: 25)
-                
-                Text("\(Int(value))")
-            }
-        }
-    }
-}
-struct CustomSliderRowLetter: View {
-    let title: String
-    @Binding var value: Double
-    var minValue: Double = 0
-    var maxValue: Double = 20
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-                .frame(width: 200, alignment: .leading)
-            
-            HStack {
-                CustomSlider(value: $value,
-                             minValue: minValue,
-                             maxValue: maxValue,
-                             trackColor: .gray,
-                             thumbColor: .red)
-                .frame(height: 25)
-                
-                Text("\(Int(value))")
-            }
-        }
-    }
-}
+        .padding(.horizontal)
 
+    }
+}
 //customsilder color solid
 
-struct CustomSliderRowColor: View {
+
+struct CustomSliderOpacity: View {
     let title: String
     @Binding var valueOpacity: Double
     var minValue: Double = 0.1
@@ -468,81 +408,10 @@ struct CustomSliderRowColor: View {
             Text(title)
                 .font(.system(size: 12))
             HStack {
-                CustomUISlider(
-                    valueOpacity: $valueOpacity,
-                    minValue: 0.3,
-                    maxValue: 1.0,
-                    trackColor: .gray,
-                    thumbColor: .red // màu thumb
-                )
+                CustomUISlider(valueOpacity: $valueOpacity,minValue: 0.3,maxValue: 1.0,trackColor: .gray,thumbColor: .red)
                 .frame(height: 25)
                 
-                Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
-            }
-        }
-        .padding(.horizontal)
-    }
-}
-
-
-struct CustomSliderRowBgOpacity: View {
-    let title: String
-    @Binding var valueOpacity: Double
-    var minValue: Double = 0.1
-    var maxValue: Double = 1
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-            HStack {
-                CustomUISlider(
-                    valueOpacity: $valueOpacity,
-                    minValue: 0,
-                    maxValue: 1,
-                    trackColor: .gray,
-                    thumbColor: .red // màu thumb
-                )
-                .frame(height: 25)
-                
-                Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
-            }
-        }
-        .padding(.horizontal)
-    }
-}
-
-
-
-
-//customslider stroke
-
-struct CustomSliderRowStroke: View {
-    let title: String
-    @Binding var value: Double
-    
-    var minValue: Double = 0
-    var maxValue: Double = 30
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-            HStack {
-                CustomSlider(value: $value,
-                             minValue: minValue,
-                             maxValue: maxValue,
-                             trackColor: .gray,
-                             thumbColor: .red)
-                .frame(height: 25)
-                
-                Text("\(Int(value))")
+                Text(String(format: "%.0f", valueOpacity * 10))
             }
         }
         .padding(.horizontal)
@@ -556,12 +425,12 @@ struct CustomAlign: View {
     @Binding var selectedAlign: AlignEnum
     
     var body: some View {
-        
         HStack {
             Text(title)
                 .font(.system(size: 12))
             Spacer()
             HStack(spacing: 8) {
+                
                 Button(action: {
                     selectedAlign = .left
                 }) {
@@ -569,6 +438,7 @@ struct CustomAlign: View {
                         .background(selectedAlign == .left ? Color.black.opacity(0.65) : Color.clear)
                         .frame(width: 30, height: 30)
                 }
+                
                 Button(action: {
                     selectedAlign = .center
                 }) {
@@ -576,6 +446,7 @@ struct CustomAlign: View {
                         .background(selectedAlign == .center ? Color.black.opacity(0.65) : Color.clear)
                         .frame(width: 30, height: 30)
                 }
+                
                 Button(action: {
                     selectedAlign = .right
                 }) {
@@ -597,7 +468,8 @@ struct CustomAlignCase: View {
             Text(title)
                 .font(.system(size: 12))
             Spacer()
-            HStack() {
+            
+            HStack{
                 Button(action: {
                     selectedAlignCase = .up
                 }) {
@@ -606,7 +478,6 @@ struct CustomAlignCase: View {
                         .foregroundColor(selectedAlignCase == .up ? .white : .black)
                         .padding(5)
                         .background(selectedAlignCase == .up ? Color.black : Color.clear)
-                    
                 }
                 
                 Button(action: {
@@ -617,7 +488,6 @@ struct CustomAlignCase: View {
                         .foregroundColor(selectedAlignCase == .cap ? .white : .black)
                         .padding(5)
                         .background(selectedAlignCase == .cap ? Color.black : Color.clear)
-                    
                 }
                 
                 Button(action: {
@@ -636,227 +506,3 @@ struct CustomAlignCase: View {
     }
 }
 
-//background
-
-struct CustomSliderShadow: View {
-    let title: String
-    @Binding var valueBG: Double
-    var minValue: Double = -5
-    var maxValue: Double = 5
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-                .frame(width: 200, alignment: .leading)
-            
-            HStack {
-                CustomSlider(value: $valueBG,
-                             minValue: minValue,
-                             maxValue: maxValue,
-                             trackColor: .gray,
-                             thumbColor: .red)
-                .frame(height: 25)
-                
-                Text("\(Int(valueBG))")
-            }
-        }
-        .padding(.horizontal)
-    }
-}
-
-struct CustomSliderBackGround: View {
-    let title: String
-    @Binding var valueBG: Double
-    var minValue: Double = 0
-    var maxValue: Double = 100
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-                .frame(width: 200, alignment: .leading)
-            
-            HStack {
-                CustomSlider(value: $valueBG,
-                             minValue: minValue,
-                             maxValue: maxValue,
-                             trackColor: .gray,
-                             thumbColor: .red)
-                .frame(height: 25)
-                
-                Text("\(Int(valueBG))")
-            }
-        }
-        .padding(.horizontal)
-    }
-}
-
-
-
-struct CustomSliderShaDowBlur: View {
-    let title: String
-    @Binding var valueBG: Double
-    var minValue: Double = 2
-    var maxValue: Double = 10
-    var sliderColor: Color = .red
-    var thumbColor: Color = .red
-    var trackHeight: CGFloat = 3
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.system(size: 12))
-                .frame(width: 200, alignment: .leading)
-            
-            HStack {
-                CustomSlider(value: $valueBG,
-                             minValue: minValue,
-                             maxValue: maxValue,
-                             trackColor: .gray,
-                             thumbColor: .red)
-                .frame(height: 25)
-                Text("\(Int(valueBG))")
-            }
-        }
-        .padding(.horizontal)
-    }
-}
-
-//MARK: CUSTOMSLIDER
-struct CustomSlider: UIViewRepresentable {
-    @Binding var value: Double
-    var minValue: Double
-    var maxValue: Double
-    var trackColor: UIColor
-    var thumbColor: UIColor
-    
-    func makeUIView(context: Context) -> UISlider {
-        let slider = UISlider(frame: .zero)
-        slider.minimumValue = Float(minValue)
-        slider.maximumValue = Float(maxValue)
-        slider.minimumTrackTintColor = trackColor
-        slider.maximumTrackTintColor = .lightGray
-        slider.thumbTintColor = thumbColor
-        slider.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged(_:)), for: .valueChanged)
-        return slider
-    }
-    
-    func updateUIView(_ uiView: UISlider, context: Context) {
-        uiView.value = Float(value)
-        uiView.thumbTintColor = thumbColor // cập nhật màu thumb khi đổi
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject {
-        var parent: CustomSlider
-        init(_ parent: CustomSlider) { self.parent = parent }
-        
-        @objc func valueChanged(_ sender: UISlider) {
-            parent.value = Double(sender.value)
-        }
-    }
-}
-
-//slider X10
-
-struct CustomUISlider: UIViewRepresentable {
-    @Binding var valueOpacity: Double  // 0.1 → 1.0
-    var minValue: Double = 0.1
-    var maxValue: Double = 1.0
-    var trackColor: UIColor = .red
-    var thumbColor: UIColor = .blue
-    
-    func makeUIView(context: Context) -> UISlider {
-        let slider = UISlider()
-        slider.minimumValue = Float(minValue * 10)  // 1 → 10
-        slider.maximumValue = Float(maxValue * 10)
-        slider.minimumTrackTintColor = trackColor
-        slider.maximumTrackTintColor = .lightGray
-        slider.thumbTintColor = thumbColor
-        slider.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged(_:)), for: .valueChanged)
-        return slider
-    }
-    
-    func updateUIView(_ uiView: UISlider, context: Context) {
-        uiView.value = Float(valueOpacity * 10) // binding ngược lại
-        uiView.thumbTintColor = thumbColor
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    //khi kéo nhận giá trị ở đay và gửi sang vm.lightness
-    class Coordinator: NSObject {
-        var parent: CustomUISlider
-        init(_ parent: CustomUISlider) {
-            self.parent = parent
-        }
-        
-        @objc func valueChanged(_ sender: UISlider) {
-            parent.valueOpacity = Double(sender.value) / 10  // scale ngược lại
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//MARK: EXTENSION
-
-extension Color {
-    init(_ hex: String) {
-        var hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hex = hex.replacingOccurrences(of: "#", with: "")
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB, e.g. "f00"
-            (a, r, g, b) = (255,
-                            (int >> 8) * 17,
-                            (int >> 4 & 0xF) * 17,
-                            (int & 0xF) * 17)
-        case 6: // RRGGBB
-            (a, r, g, b) = (255,
-                            (int >> 16) & 0xFF,
-                            (int >> 8) & 0xFF,
-                            int & 0xFF)
-        case 8: // AARRGGBB
-            (a, r, g, b) = ((int >> 24) & 0xFF,
-                            (int >> 16) & 0xFF,
-                            (int >> 8) & 0xFF,
-                            int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-        
-        self.init(.sRGB,
-                  red: Double(r) / 255,
-                  green: Double(g) / 255,
-                  blue: Double(b) / 255,
-                  opacity: Double(a) / 255)
-    }
-}

@@ -12,15 +12,12 @@ import SwiftUI
 struct SplashView: View {
     
     @Binding var isShowPremium: Bool
-    
     @Binding var hasShownGetStarted: Bool
     
     var body: some View {
         NavigationView {
             ZStack{
-                LinearGradient(gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
-                               startPoint: .topLeading,
-                               endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),startPoint: .topLeading,endPoint: .bottomTrailing)
                 .edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing:200) {

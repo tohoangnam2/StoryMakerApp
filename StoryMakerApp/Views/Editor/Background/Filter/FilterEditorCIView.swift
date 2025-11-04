@@ -13,7 +13,8 @@ struct FilterEditorCIView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            CustomSliderRowBgOpacity(title: "Opacity", valueOpacity: $vm.opacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+            CustomSliderOpacity(title: "Opacity", valueOpacity:$vm.opacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -30,6 +31,7 @@ struct FilterEditorCIView: View {
                                         ProgressView()
                                             .frame(width: 70, height: 70)
                                     }
+                                    
                                     Text(filter.displayName)
                                         .font(.system(size: 15))
                                         .fontWeight(.medium)
@@ -38,6 +40,7 @@ struct FilterEditorCIView: View {
                                         .padding(.bottom,6)
                                 }
                             }
+                            
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(vm.selectedFilter == filter ? Color.red : Color.clear, lineWidth: 2)
@@ -66,12 +69,11 @@ struct FilterEditorCIView: View {
                         }
                     }
                 }
-
-
+                
             }
         }
         .onAppear {
-            // Nếu baseImage đã có (từ frame đã chọn) → sinh thumbnail filter sẵn
+            // Nếu baseImage đã có  → sinh thumbnail filter sẵn
             if let _ = vm.baseImage {
                 vm.generateThumbnails()
             }

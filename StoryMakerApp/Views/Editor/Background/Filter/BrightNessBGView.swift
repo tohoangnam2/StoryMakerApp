@@ -41,11 +41,11 @@ struct CustomSliderBG: View {
                                 minValue: minValue,
                                 maxValue: maxValue,
                                 trackColor: .gray,
-                                thumbColor: .red // màu thumb
+                                thumbColor: .red
                  )
                             .frame(height: 25)
                 
-                Text(String(format: "%.0f", valueOpacity * 10)) // Hiển thị 1-10
+                Text(String(format: "%.0f", valueOpacity * 10)) 
             }
         }
         .padding(.horizontal)
