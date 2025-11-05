@@ -7,14 +7,13 @@
 
 import SwiftUI
 
-struct OnboardingView: View {
+struct IntroView: View {
     
     @State var onboardingState : Int = 0
-    @Binding var isShowPremium: Bool
-    @Binding var seenOnboarding: Bool
     let trainstion: AnyTransition = .asymmetric(insertion: .move(edge: .trailing),
                                                 removal: .move(edge: .leading))
-    
+    @Binding var screen : ScreenEnum
+
     
     var body: some View {
         NavigationView {
@@ -42,26 +41,21 @@ struct OnboardingView: View {
                         fourOnboarding
                             .transition(trainstion)
                     }
-
                 default:
                     withAnimation(.spring()){
-                       EmptyView()
+                       HomeView()
                     }
                 }
                
             }
-            .onChange(of: onboardingState) { value in
-                if value > 3 {
-                    seenOnboarding = true
-                    isShowPremium = true
-                }
-            }
+            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
         }
       
     }
 }
 
-extension OnboardingView {
+extension IntroView {
     private var firstOnboarding: some View {
         ZStack{
             Image("bg_ob_1")

@@ -11,7 +11,7 @@ struct HomeView: View {
     
     @StateObject var vm: BackgroundEditorViewModel = BackgroundEditorViewModel()
     @State private var selectedProjectID: UUID?
-    @Binding var isShowPremium: Bool    
+    @State var isShowPremium: Bool = false
     @State var project: MainModel?
 
     var body: some View {

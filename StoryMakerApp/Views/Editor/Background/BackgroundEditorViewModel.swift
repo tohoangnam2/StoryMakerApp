@@ -35,18 +35,9 @@ class BackgroundEditorViewModel: ObservableObject {
 
     private let context = CIContext()
     private let processingQueue = DispatchQueue(label: "FilterProcessingQueue", qos: .userInitiated)
-    private let thumbnailCache = NSCache<NSString, UIImage>() // Cache cho preview
 
     //network
-    @Published var isOnline: Bool = NetworkManager.shared.isOnline
-    private var cancellables = Set<AnyCancellable>()
 
-    init() {
-        NetworkManager.shared.$isOnline
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.isOnline, on: self)
-            .store(in: &cancellables)
-    }
     
     @Published var baseImage: UIImage? {
         //base change là cái này cũng change
@@ -60,7 +51,6 @@ class BackgroundEditorViewModel: ObservableObject {
         selectedFilter = .none
         filteredImage = nil
         thumbnails.removeAll()
-        thumbnailCache.removeAllObjects()
         isImageLoaded = false
     }
 
@@ -68,7 +58,6 @@ class BackgroundEditorViewModel: ObservableObject {
         self.defaultPreview = newImage
         self.filteredImage = newImage
         self.thumbnails.removeAll()
-        self.thumbnailCache.removeAllObjects()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.generateThumbnails()
@@ -80,58 +69,55 @@ class BackgroundEditorViewModel: ObservableObject {
         }
     }
 
-    // Filter Preview Cache
     func generateThumbnails() {
         guard let base = baseImage else { return }
+        // Tạo ảnh nhỏ cho nhanh (chỉ 150px)
         let thumbnail = base.resized(to: CGSize(width: 150, height: 150))
+        
         for filter in FilterType.allCases {
-            processingQueue.async {
-//                App sẽ kiểm tra cache trước: nếu ảnh preview cho filter đó đã có rồi → lấy ngay từ RAM.
-                let key = filter.rawValue as NSString
-                if let cached = self.thumbnailCache.object(forKey: key) {
-                    DispatchQueue.main.async { self.thumbnails[filter] = cached }
-                    return
-                }
-//          Nếu chưa có → apply filter, rồi lưu lại vào cache
-                let result = self.applyFilter(filter, to: thumbnail)
-                if let result {
-                    self.thumbnailCache.setObject(result, forKey: key)
-                    DispatchQueue.main.async {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            self.thumbnails[filter] = result
-                        }
+            // Nếu đã có rồi thì bỏ qua
+            if thumbnails[filter] != nil { continue }
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                // Apply filter cho bản thumbnail
+                guard let result = self.applyFilter(filter, to: thumbnail) else { return }
+                
+                DispatchQueue.main.async {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        self.thumbnails[filter] = result
                     }
                 }
             }
         }
     }
 
-    //  Main Filter Apply
+
+    //  luồng xử lí
     func applySelectedFilter(animated: Bool = true) {
-        // Nếu vừa load filtered.jpg thì bỏ qua apply
-        guard !hasLoadedFiltered else {
-            print(" Skip reapplying filter (already loaded filtered image)")
-            hasLoadedFiltered = false // reset để lần sau chọn filter mới thì apply lại bình thường
+        guard let baseImage = baseImage else { return }
+        
+        let currentFilter = selectedFilter
+        
+        // Nếu user chọn "none" thì reset về ảnh gốc
+        if currentFilter == .none {
+            withAnimation(animated ? .easeInOut(duration: 0.25) : nil) {
+                self.filteredImage = baseImage
+            }
             return
         }
-        guard let baseImage = baseImage else { return }
-
-        // Giữ lại ảnh hiện tại để không bị trắng nháy
-        let previousImage = filteredImage ?? baseImage
-        let currentFilter = selectedFilter
-
+        
+        // Xử lý filter ở background thread
         DispatchQueue.global(qos: .userInitiated).async {
             guard let output = self.applyFilter(currentFilter, to: baseImage) else { return }
-
+            
             DispatchQueue.main.async {
-                // Crossfade nhẹ giữa 2 ảnh
                 withAnimation(animated ? .easeInOut(duration: 0.25) : nil) {
                     self.filteredImage = output
                 }
             }
         }
-        
     }
+
 
     private func applyFilter(_ filterType: FilterType, to image: UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: image) else { return nil }
@@ -176,7 +162,8 @@ class BackgroundEditorViewModel: ObservableObject {
         
         }
     }
-//nhận core - uiimage
+    
+    //nhận core - uiimage
     private func render(_ output: CIImage?) -> UIImage? {
         guard let output = output,
               let cgimg = context.createCGImage(output, from: output.extent)
