@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 class BackGroundViewModel: ObservableObject {
-    
 
     @Published var model: BackGroundModel? = nil
     @Published var selectedCategory: Category? = nil
@@ -38,7 +37,7 @@ class BackGroundViewModel: ObservableObject {
     //Tìm tên category mà 1 frame đang thuộc về.
     func categoryName(for frame: Frame) -> String? {
           return model?.config.category.first(where: { $0.id == frame.category })?.name
-      }
+    }
 }
 
 

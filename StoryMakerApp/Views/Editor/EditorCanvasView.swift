@@ -156,11 +156,13 @@ struct EditorCanvasView: View {
                                                     .gesture(
                                                         DragGesture(minimumDistance: 0,coordinateSpace: .named("canvas"))
                                                             .onChanged { value in
+                                                                //vị trí cuối + dịch chuyển ngón tay =giá trị thực
                                                                 overlay.offset = CGSize(
                                                                     width: overlay.endset.width + value.translation.width,
                                                                     height: overlay.endset.height + value.translation.height
                                                                 )
                                                             }
+                                                            
                                                             .onEnded { _ in
                                                                 overlay.endset = overlay.offset
                                                             }
@@ -239,35 +241,38 @@ struct EditorCanvasView: View {
                                                                             .gesture(
                                                                                 DragGesture(minimumDistance: 10, coordinateSpace: .named("canvas"))
                                                                                     .onChanged { value in
+                                                                                        //tâm
                                                                                         let center = CGPoint(
                                                                                             x: textGeo.frame(in: .named("canvas")).midX,
                                                                                             y: textGeo.frame(in: .named("canvas")).midY
                                                                                         )
-                                                                                        
+                                                                                        // vị trí chạm ban đầu , lưu góc xoay
                                                                                         if overlay.startLocation == nil {
                                                                                             let dx = value.startLocation.x - center.x
                                                                                             let dy = value.startLocation.y - center.y
                                                                                             overlay.startLocation = CGPoint(x: dx, y: dy)
                                                                                             overlay.startAngle = overlay.currentRotation   // Double
                                                                                         }
-                                                                                        
+                                                                                        //move thì tạo 2 vector : hướng từ tâm đến vị trí move của ngón tay
                                                                                         let currentVector = CGVector(
                                                                                             dx: value.location.x - center.x,
                                                                                             dy: value.location.y - center.y
                                                                                         )
+                                                                                        // từ tâm đến vị trí ban đầu
                                                                                         let startVector = CGVector(
                                                                                             dx: overlay.startLocation!.x,
                                                                                             dy: overlay.startLocation!.y
                                                                                         )
-                                                                                        
+                                                                                        //hiệu 2 góc là sự thay đổi góc giữa hiện tại và ban đầu, phép trừ là để xác định chiều xoay
                                                                                         let angleChange = atan2(currentVector.dy, currentVector.dx)
                                                                                         - atan2(startVector.dy, startVector.dx)
                                                                                         
                                                                                         let angleInDegrees = CGFloat(angleChange) * 180 / .pi
-                                                                                        
+                                                                                        //cộng với góc ban đầu ra vị trí hiện tại
                                                                                         overlay.currentRotation = overlay.startAngle + angleInDegrees
                                                                                     }
                                                                                     .onEnded { _ in
+                                                                                        //rs dểd xoay lại
                                                                                         overlay.startLocation = nil
                                                                                     }
                                                                             )

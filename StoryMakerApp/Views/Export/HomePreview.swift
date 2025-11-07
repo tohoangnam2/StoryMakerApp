@@ -169,12 +169,12 @@ struct HomePreview: View {
                                         var currentProject = project ?? MainModel(id: UUID())
                                         currentProject.previewImage = image
 
-                                        // Update RAM
-                                        if let index = vm.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-                                            vm.mainprojects[index] = currentProject
-                                        } else {
-                                            vm.mainprojects.insert(currentProject, at: 0)
-                                        }
+//                                        // Update RAM
+//                                        if let index = homeVM.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
+//                                            vm.mainprojects[index] = currentProject
+//                                        } else {
+//                                            vm.mainprojects.insert(currentProject, at: 0)
+//                                        }
                                             // Export JPG ra thư mục + Photos
                                         exportingVM.startExporting(projectID: currentProject.id, image: image)
                                         
@@ -189,13 +189,10 @@ struct HomePreview: View {
                                     Image("ic_right")
                                 }
                             }
-
                         }
                         .padding(.horizontal, 80)
-                        
                     }
                 }
-                
             }
             .fullScreenCover(isPresented: $exportingVM.isExporting) {
                 ExportingView(exportingVM: exportingVM)

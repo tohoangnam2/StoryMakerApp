@@ -3,11 +3,8 @@
 import SwiftUI
 
 struct ExportingView: View {
-    // Nhận ViewModel từ HomePreview
     @ObservedObject var exportingVM: ExportingViewModel
-    
     @Environment(\.dismiss) var dismiss
-
     
     var body: some View {
         NavigationView {
@@ -17,7 +14,6 @@ struct ExportingView: View {
                     HStack {
                         Button(action: {
                             dismiss()
-
                         }) {
                             Image("home_back")
                         }

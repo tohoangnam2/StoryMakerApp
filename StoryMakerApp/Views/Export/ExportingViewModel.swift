@@ -2,19 +2,14 @@
 
 import SwiftUI
 import UIKit
-import Photos // Thêm import này nếu bạn muốn dùng PHPhotoLibrary để lưu ảnh thật
-
-
+import Photos
 
 class ExportingViewModel: ObservableObject {
     @Published var isExporting: Bool = false
     @Published var progress: Double = 0.0
     @Published var isDone: Bool = false
-    
     @Published var exportedFileURL: URL? = nil
-    
     private var timer: Timer?
-    
     private var documentController: UIDocumentInteractionController?
 
     func startExporting(projectID: UUID, image: UIImage) {
@@ -22,6 +17,7 @@ class ExportingViewModel: ObservableObject {
         self.progress = 0.0
         
         // Giả lập progress
+        // check xem lúc đó timer cũ đang chạy thì dừng
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true) { [weak self] t in
             guard let self = self else { return }
@@ -43,10 +39,11 @@ class ExportingViewModel: ObservableObject {
         }
     }
 
-
     private func saveImageToProjectDirectory(projectID: UUID, image: UIImage, filename: String) {
+        //chuyen anh thanh du lieu dangnen
         guard let imageData = image.jpegData(compressionQuality: 0.9) else { return }
         
+        //duong dan
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let projectFolder = documentsURL.appendingPathComponent("project_\(projectID)")
         
@@ -59,7 +56,7 @@ class ExportingViewModel: ObservableObject {
             try imageData.write(to: fileURL)
             print(" Saved JPG to: \(fileURL)")
             
-            //lưu vào Photo Library
+            //lưu vào Photo Library, xin quyền
             PHPhotoLibrary.requestAuthorization { status in
                         switch status {
                         case .authorized, .limited:
@@ -93,12 +90,13 @@ class ExportingViewModel: ObservableObject {
     }
 
     func openInFiles(url: URL) {
+        //Lấy rootViewController hiện tại của ứng dụng (để hiển thị hộp thoại chia sẻ).
         DispatchQueue.main.async {
             guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                   let rootVC = scene.windows.first?.rootViewController else {
                 return
             }
-            
+            //chia sẻ url
             let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
             
             if let popover = activityVC.popoverPresentationController {
@@ -108,36 +106,9 @@ class ExportingViewModel: ObservableObject {
                                             width: 0, height: 0)
                 popover.permittedArrowDirections = []
             }
-            
+            //giao diện file ra màn hình
             rootVC.present(activityVC, animated: true)
         }
     }
-    
-    @MainActor func snapshotAndSave<V: View>(view: V, size: CGSize, filename: String = "snapshot_\(UUID().uuidString).jpg") {
-          let renderer = ImageRenderer(content: view)
-          renderer.proposedSize = .init(size)
-          
-          if let uiImage = renderer.uiImage {
-              // Lưu ngay không cần progress
-              saveImageToDocumentsDirectory(image: uiImage, filename: filename)
-          } else {
-              print("Không render được snapshot")
-          }
-      }
-      
-      // Chụp ngay từ UIImage có sẵn và lưu
-      func snapshotAndSave(image: UIImage, filename: String = "snapshot_\(UUID().uuidString).jpg") {
-          saveImageToDocumentsDirectory(image: image, filename: filename)
-      }
 
-
-
-
-
-
-    
-
-    
-    
-    
 }

@@ -5,40 +5,28 @@ import SwiftUI
 
 class BackgroundEditorViewModel: ObservableObject {
     
-    @Published var categories: [CategoryBG] = []
-    @Published var backgrounds: [BackgroundItem] = []
     @Published var valueOpacity : Double = 1
     @Published var opacity : Double = 1
     @Published var lightness : Double = 0
     @Published var saturation : Double = 1
     @Published var blur : Double = 0
     @Published var shadow : Double = 0
-
     //change bg -> rs frame
     @Published var currentFrameID: String?
     @Published var defaultPreview: UIImage? = nil
-    
-    // dùng khi ko cần click vào preview
-    
     // lưu project
     @Published var projects: [Frame] = []  // lưu danh sách project
     @Published  var isImageLoaded = false
-    @Published var mainprojects: [MainModel] = []
+    
     @Published var currentProjectID: UUID?
     @Published var currentProject: MainModel?   // project đang edit
     @Published var project: MainModel = MainModel()
     @Published var filteredImage: UIImage?
     @Published var selectedFilter: FilterType = .none
     @Published var hasLoadedFiltered = false
-    //Là để lưu tạm (cache) các ảnh thumbnail đã được xử lý
     @Published var thumbnails: [FilterType: UIImage] = [:]
-
     private let context = CIContext()
     private let processingQueue = DispatchQueue(label: "FilterProcessingQueue", qos: .userInitiated)
-
-    //network
-
-    
     @Published var baseImage: UIImage? {
         //base change là cái này cũng change
         didSet {
@@ -91,11 +79,9 @@ class BackgroundEditorViewModel: ObservableObject {
         }
     }
 
-
     //  luồng xử lí
     func applySelectedFilter(animated: Bool = true) {
         guard let baseImage = baseImage else { return }
-        
         let currentFilter = selectedFilter
         
         // Nếu user chọn "none" thì reset về ảnh gốc
@@ -117,7 +103,6 @@ class BackgroundEditorViewModel: ObservableObject {
             }
         }
     }
-
 
     private func applyFilter(_ filterType: FilterType, to image: UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: image) else { return nil }
@@ -159,7 +144,7 @@ class BackgroundEditorViewModel: ObservableObject {
                 filter.setValue(0.8, forKey: kCIInputIntensityKey)
             }
             return render(filter.outputImage)
-        
+            
         }
     }
     
@@ -171,24 +156,54 @@ class BackgroundEditorViewModel: ObservableObject {
         return UIImage(cgImage: cgimg)
     }
     
-    func createEmptyProject() -> MainModel {
-        let newProject = MainModel(id: UUID())
-        ProjectStorage.saveProject(newProject, previewImage: nil)
+    func loadFromProject(_ project: MainModel) {
+        print("Load lại project \(project.id)")
+
+        // copy thông số cơ bản
+        blur = project.blur
+        shadow = project.shadow
+        opacity = project.opacity
+        lightness = project.lightness
+        saturation = project.saturation
+        selectedFilter = FilterType(rawValue: project.selectedFilter ?? "") ?? .none
+
+        let folderURL = ProjectStorage.projectFolder(for: project.id)
         
-        DispatchQueue.main.async {
-            self.mainprojects.insert(newProject, at: 0)
+        // Load original base image
+        if let originalName = project.originalImagePath {
+            let originalURL = folderURL.appendingPathComponent(originalName)
+            if FileManager.default.fileExists(atPath: originalURL.path),
+               let data = try? Data(contentsOf: originalURL),
+               let originalImage = UIImage(data: data) {
+                baseImage = originalImage
+                defaultPreview = originalImage
+            } else {
+                print(" Không tìm thấy original.jpg cho project \(project.id)")
+            }
         }
-        return newProject
-    }
-    func deleteProject(_ project: MainModel) {
-        // 1. Xoá trong docs
-        ProjectStorage.deleteProject(id: project.id)
-        
-        // 2. Xoá trong RAM
-        if let index = mainprojects.firstIndex(where: { $0.id == project.id }) {
-            mainprojects.remove(at: index)
+
+        // Load filtered image nếu có
+        if let filteredName = project.filteredImagePath {
+            let filteredURL = folderURL.appendingPathComponent(filteredName)
+            if FileManager.default.fileExists(atPath: filteredURL.path),
+               let data = try? Data(contentsOf: filteredURL),
+               let filteredImg = UIImage(data: data) {
+                filteredImage = filteredImg
+                print(" Loaded filtered.jpg preview")
+            }
+        } else {
+            // Nếu không có filtered thì tự apply lại
+            if selectedFilter != .none {
+                applySelectedFilter(animated: false)
+            } else {
+                filteredImage = baseImage
+            }
         }
     }
+    
+    
+
+
 }
 
 

@@ -9,10 +9,9 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @StateObject var vm: BackgroundEditorViewModel = BackgroundEditorViewModel()
-    @State private var selectedProjectID: UUID?
+    @StateObject var homeVM = HomeViewModel()
+    @State private var selectedProject: MainModel? = nil
     @State var isShowPremium: Bool = false
-    @State var project: MainModel?
 
     var body: some View {
         NavigationView{
@@ -53,37 +52,33 @@ struct HomeView: View {
                                     columns: Array(repeating: GridItem(.flexible()), count: 3),
                                     spacing: 16
                                 ) {
-                                    ForEach(vm.mainprojects, id: \.id) { project in
+                                    ForEach(homeVM.mainprojects, id: \.id) { project in
                                         if project.frame != nil {
                                             ZStack(alignment: .topTrailing) {
                                                 Button(action: {
-                                                    selectedProjectID = project.id
+                                                    selectedProject = project
                                                 }, label: {
-                                                    let folderURL = ProjectStorage.projectFolder(for: project.id)
-                                                    let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
-                                                    
-                                                    if let data = try? Data(contentsOf: previewURL),
-                                                        let uiImage = UIImage(data: data) {
-                                                        Image(uiImage: uiImage)
+                                                    if let img = project.previewImage {
+                                                        Image(uiImage: img)
                                                             .resizable()
                                                             .scaledToFill()
                                                             .frame(width: 98, height: 208)
                                                             .cornerRadius(8)
-                                                            .clipped()
                                                     } else {
                                                         Color.gray
                                                             .frame(width: 98, height: 208)
                                                             .cornerRadius(8)
                                                     }
+
                                                 })
                                                 Menu {
                                                     Button(role: .destructive) {
-                                                        vm.deleteProject(project)
+                                                        homeVM.deleteProject(project)
                                                     } label: {
                                                         Label("Delete", systemImage: "trash")
                                                     }
                                                     Button {
-                                                        selectedProjectID = project.id
+                                                        selectedProject = project
                                                     } label: {
                                                         Label("Edit", systemImage: "pencil")
                                                     }
@@ -92,14 +87,19 @@ struct HomeView: View {
                                                         .foregroundColor(.white)
                                                         .padding(6)
                                                 }
-                                                
                                                 NavigationLink(
-                                                    destination: EditorView(projectID: project.id, vm: vm),
-                                                    tag: project.id,
-                                                    selection: $selectedProjectID
+                                                    destination: EditorView(project: selectedProject, homeVM: homeVM),
+                                                    isActive: Binding(
+                                                        get: { selectedProject?.id == project.id },
+                                                        set: { isActive in
+                                                            //back thì rs state
+                                                            if !isActive { selectedProject = nil }
+                                                        }
+                                                    )
                                                 ) {
                                                     EmptyView()
                                                 }
+                                                
                                             }
                                             .id(project.id)
                                         }
@@ -107,7 +107,7 @@ struct HomeView: View {
                                 }
                                     .padding(.horizontal)
                             }
-                            .onChange(of: vm.mainprojects.first?.id) { newID in
+                            .onChange(of: homeVM.mainprojects.first?.id) { newID in
                                 if let id = newID {
                                     withAnimation {
                                         proxy.scrollTo(id, anchor: .top)
@@ -123,7 +123,7 @@ struct HomeView: View {
             .overlay(
                 VStack(spacing:15){
                     withAnimation(.spring){
-                        NavigationLink(destination: EditorView(project : nil, projectID: nil,vm:vm)
+                        NavigationLink(destination: EditorView(project : nil, homeVM: homeVM)
                         ) {
                             Image("home_icBtn")
                                 .resizable()
@@ -137,9 +137,9 @@ struct HomeView: View {
             )
         }
         .onAppear {
-            let projects = ProjectStorage.loadAllProjects()
-            vm.mainprojects = projects
+            homeVM.loadProjects()
         }
+        
         .fullScreenCover(isPresented: $isShowPremium) {
             SubcriptionView()
         }

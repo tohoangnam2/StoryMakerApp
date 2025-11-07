@@ -21,10 +21,11 @@ struct ProjectStorage {
     }
     
     static func saveProject(_ project: MainModel,previewImage: UIImage?,baseImage: UIImage? = nil,filteredImage: UIImage? = nil) {
+        //check thư mục lưuu proj
         let folderURL = projectFolder(for: project.id)
         do {
             try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
-
+            //bản sao
             var projectToSave = project
 
             if let img = previewImage,
@@ -32,9 +33,10 @@ struct ProjectStorage {
                 let previewFileName = "project_\(project.id).jpg"
                 let previewURL = folderURL.appendingPathComponent(previewFileName)
                 try imgData.write(to: previewURL)
+                //gán vào model
                 projectToSave.previewImagePath = previewFileName
             }
-
+            
             let originalFileName = "original.jpg"
             let originalURL = folderURL.appendingPathComponent(originalFileName)
             if let base = baseImage,
@@ -52,15 +54,17 @@ struct ProjectStorage {
             }
 
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
+            //encode projectToSave thành json
             let data = try JSONEncoder().encode(projectToSave)
+            
             try data.write(to: jsonURL)
+            
 
             print(" Saved project: JSON + preview + original + filtered ")
         } catch {
             print(" Error saving project: \(error)")
         }
     }
-    
     // Load tất cả project từ Documents
     static func loadAllProjects() -> [MainModel] {
         let documentsURL = getDocumentsDirectory()
@@ -74,34 +78,11 @@ struct ProjectStorage {
                 
                 guard let data = try? Data(contentsOf: jsonURL),
                       var project = try? JSONDecoder().decode(MainModel.self, from: data) else {
-                    print(" Failed to decode project at:", jsonURL.path)
                     return nil
                 }
                 
-                // Load preview từ relative path
-                if let previewName = project.previewImagePath {
-                    let previewURL = folderURL.appendingPathComponent(previewName)
-                    if let imgData = try? Data(contentsOf: previewURL),
-                       let uiImage = UIImage(data: imgData) {
-                        project.previewImage = uiImage
-                        print(" Loaded preview image:", previewName)
-                    } else {
-                        print(" Failed to load preview image:", previewName)
-                    }
-                }
-                
-                // Kiểm tra ảnh gốc từ originalImagePath
-                if let originalName = project.originalImagePath {
-                    let originalURL = folderURL.appendingPathComponent(originalName)
-                    if FileManager.default.fileExists(atPath: originalURL.path) {
-                        print(" original.jpg exists for project:", project.id)
-                    } else {
-                        print(" original.jpg NOT FOUND for project:", project.id)
-                    }
-                } else {
-                    print(" originalImagePath is nil for project:", project.id)
-                }
-                
+                // Giữ nguyên đường dẫn preview
+                project.previewImagePath = project.previewImagePath ?? "project_\(project.id).jpg"
                 return project
             }
         } catch {
@@ -109,7 +90,7 @@ struct ProjectStorage {
             return []
         }
     }
-    
+
     static func debugPrintProjectJSON(id: UUID) {
             let folderURL = projectFolder(for: id)
             let jsonURL = folderURL.appendingPathComponent("project_\(id).json")
@@ -126,9 +107,6 @@ struct ProjectStorage {
                 print(" Lỗi đọc JSON:", error)
             }
         }
-
-
-    
     // Xoá project
     static func deleteProject(id: UUID) {
         let folderURL = projectFolder(for: id)
@@ -141,6 +119,7 @@ struct ProjectStorage {
             print("Failed to delete project: \(error)")
         }
     }
+    
 }
 
 

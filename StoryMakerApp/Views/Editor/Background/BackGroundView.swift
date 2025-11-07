@@ -10,19 +10,11 @@ import SwiftUI
 struct BackGroundView: View {
     
     @ObservedObject var vm = BackGroundViewModel()
-    
     @Environment(\.dismiss) var dismiss
-    
     //next page
-    
     @State private var selectedFrame: Frame? = nil
     @State var isNextPage = false
-    
-//    @Binding var isShowBackgroundPicker : Bool
-    
-    
     let onPicked: (Frame?) -> Void
-    
     
     var body: some View {
         NavigationView{
@@ -38,6 +30,7 @@ struct BackGroundView: View {
                         Text("Background")
                             .font(.system(size: 18, weight: .medium, design: .default))
                         Spacer()
+                        
                         Button(action: {
                             onPicked(selectedFrame)
                             dismiss()
@@ -47,6 +40,7 @@ struct BackGroundView: View {
                         }
                     }
                     .padding(.horizontal , 16)
+                    
                     VStack {
                         if let _ = vm.model {
                             CategoryTagView(vm: vm)
@@ -127,7 +121,6 @@ struct BackGroundView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
     }
-    
 }
 struct CategoryTagView: View {
     @ObservedObject var vm: BackGroundViewModel

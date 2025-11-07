@@ -12,7 +12,6 @@ class BackgroundModel: Identifiable, ObservableObject {
     let id = UUID()
     let url: URL
     @Published var opacity: Double
-//    @Published var filter: FilterType
     var editEnum : BackGroundEditEditEnum = .filter
     
     init(url: URL, opacity: Double = 1.0) {
@@ -36,11 +35,6 @@ enum BackGroundEditEditEnum : CaseIterable {
         }
     }
 }
-
-
-//enum FilterType: String, CaseIterable {
-//    case normal, light, red, cyal, vintage, hot, old
-//}
 
 struct CategoryResponse: Codable {
     let error: Int

@@ -15,8 +15,7 @@ struct ColorPickerFromImage: View {
             Image("cs1")
                 .resizable()
                 .frame(width: 40, height: 40)
-//                .colorMultiply(overlay.colorSolid)
-                .allowsHitTesting(false) // ảnh không chặn sự kiện tap
+                .allowsHitTesting(false)
 
             ColorPicker("Colors", selection: Binding<Color>(
                 get: {
@@ -30,9 +29,6 @@ struct ColorPickerFromImage: View {
                 .opacity(0.02)
                 .frame(width: 40, height: 40)
         }
-
-
-
 
     }
 }

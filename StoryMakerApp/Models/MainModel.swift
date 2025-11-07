@@ -24,7 +24,8 @@ struct MainModel: Identifiable, Codable {
 
     // Không encode UIImage
     var previewImage: UIImage?
-    var filteredImage: UIImage? 
+    var filteredImage: UIImage?
+    var baseImage: UIImage?
 
     enum CodingKeys: String, CodingKey {
         case id, textLayers, frame, blur, shadow, opacity, lightness, saturation, selectedFilter, previewImagePath, originalImagePath,filteredImagePath

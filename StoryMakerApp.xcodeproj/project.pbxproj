@@ -21,7 +21,6 @@
 		544C17622E8FBF0600999A9B /* UIImage+LUT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C175D2E8FBF0600999A9B /* UIImage+LUT.swift */; };
 		544C17662E8FBF0A00999A9B /* BrightNessBGView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C17632E8FBF0A00999A9B /* BrightNessBGView.swift */; };
 		544C17712E8FBF1600999A9B /* ExportingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C17682E8FBF1600999A9B /* ExportingViewModel.swift */; };
-		544C17722E8FBF1600999A9B /* ExportingDoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176A2E8FBF1600999A9B /* ExportingDoneView.swift */; };
 		544C17732E8FBF1600999A9B /* ExportingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176B2E8FBF1600999A9B /* ExportingView.swift */; };
 		544C17742E8FBF1600999A9B /* HomePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176C2E8FBF1600999A9B /* HomePreview.swift */; };
 		544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176E2E8FBF1600999A9B /* TestPreview.swift */; };
@@ -30,6 +29,7 @@
 		545B40242EA22D1500C1CA05 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545B40232EA22D1200C1CA05 /* Network.swift */; };
 		546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489AD2EB9AB7900818483 /* ExtensionTextView.swift */; };
 		546489B12EBB494200818483 /* AppUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489B02EBB493300818483 /* AppUsage.swift */; };
+		546489B32EBD8E8300818483 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489B22EBD8E8300818483 /* HomeViewModel.swift */; };
 		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
 		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
 		546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */; };
@@ -76,7 +76,6 @@
 		544C175D2E8FBF0600999A9B /* UIImage+LUT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+LUT.swift"; sourceTree = "<group>"; };
 		544C17632E8FBF0A00999A9B /* BrightNessBGView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightNessBGView.swift; sourceTree = "<group>"; };
 		544C17682E8FBF1600999A9B /* ExportingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportingViewModel.swift; sourceTree = "<group>"; };
-		544C176A2E8FBF1600999A9B /* ExportingDoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportingDoneView.swift; sourceTree = "<group>"; };
 		544C176B2E8FBF1600999A9B /* ExportingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportingView.swift; sourceTree = "<group>"; };
 		544C176C2E8FBF1600999A9B /* HomePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePreview.swift; sourceTree = "<group>"; };
 		544C176E2E8FBF1600999A9B /* TestPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview.swift; sourceTree = "<group>"; };
@@ -85,6 +84,7 @@
 		545B40232EA22D1200C1CA05 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		546489AD2EB9AB7900818483 /* ExtensionTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionTextView.swift; sourceTree = "<group>"; };
 		546489B02EBB493300818483 /* AppUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsage.swift; sourceTree = "<group>"; };
+		546489B22EBD8E8300818483 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
 		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
 		546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundViewModel.swift; sourceTree = "<group>"; };
@@ -176,7 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				5469689B2E6E8C2E00BD2B77 /* HomeView.swift */,
-				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
+				546489B22EBD8E8300818483 /* HomeViewModel.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -197,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				546968A32E6E8C2E00BD2B77 /* TextView.swift */,
+				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
 			);
 			path = Text;
 			sourceTree = "<group>";
@@ -243,7 +244,6 @@
 		544C17822E8FC99F00999A9B /* Export */ = {
 			isa = PBXGroup;
 			children = (
-				544C176A2E8FBF1600999A9B /* ExportingDoneView.swift */,
 				544C176B2E8FBF1600999A9B /* ExportingView.swift */,
 				544C176C2E8FBF1600999A9B /* HomePreview.swift */,
 				544C17682E8FBF1600999A9B /* ExportingViewModel.swift */,
@@ -458,6 +458,7 @@
 				546968B02E6E8C2E00BD2B77 /* EditorView.swift in Sources */,
 				546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */,
 				543F83B52EB21BE400354EDB /* FilterEditorCIView.swift in Sources */,
+				546489B32EBD8E8300818483 /* HomeViewModel.swift in Sources */,
 				5454444D2E7A6A780080D518 /* EditorCanvasView.swift in Sources */,
 				546968DD2E71625600BD2B77 /* BackgroundEditorView.swift in Sources */,
 				546968B12E6E8C2E00BD2B77 /* HomeView.swift in Sources */,
@@ -465,7 +466,6 @@
 				546968B32E6E8C2E00BD2B77 /* SplashView.swift in Sources */,
 				546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */,
 				544C17712E8FBF1600999A9B /* ExportingViewModel.swift in Sources */,
-				544C17722E8FBF1600999A9B /* ExportingDoneView.swift in Sources */,
 				544C17732E8FBF1600999A9B /* ExportingView.swift in Sources */,
 				544C17742E8FBF1600999A9B /* HomePreview.swift in Sources */,
 				544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */,
