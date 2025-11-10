@@ -17,6 +17,8 @@ class HomeViewModel: ObservableObject {
     func createEmptyProject() -> MainModel {
         let newProject = MainModel(id: UUID())
         ProjectStorage.saveProject(newProject, previewImage: nil)
+        //Insert vào đầu mảng để nó thành phần tử đầu tiên
+        mainprojects.insert(newProject, at: 0)
         return newProject
     }
     
@@ -28,27 +30,33 @@ class HomeViewModel: ObservableObject {
     }
     func loadProjects() {
         let projects = ProjectStorage.loadAllProjects()
-        //mảng tạm chứa project đã load
         var loaded: [MainModel] = []
 
         for var project in projects {
             if let previewPath = project.previewImagePath {
                 let folderURL = ProjectStorage.projectFolder(for: project.id)
                 let previewURL = folderURL.appendingPathComponent(previewPath)
-                if let data = try? Data(contentsOf: previewURL),
-                   let image = UIImage(data: data) {
+
+                // Kiểm tra file tồn tại rồi tạo UIImage trực tiếp
+                if FileManager.default.fileExists(atPath: previewURL.path),
+                   let image = UIImage(contentsOfFile: previewURL.path) {
                     project.previewImage = image
+                } else {
+                    project.previewImage = nil
                 }
+            } else {
+                project.previewImage = nil
             }
+
             loaded.append(project)
         }
 
         DispatchQueue.main.async {
-            //thêm ảnh đấy xong gán vào main
             self.mainprojects = loaded
-            print(" Loaded \(loaded.count) projects with previews")
+            print("Loaded \(loaded.count) projects with previews")
         }
     }
+
 
 }
 

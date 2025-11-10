@@ -1,47 +1,61 @@
-//
-//  BackGroundView.swift
-//  StoryMakerApp
-//
-//  Created by to hoang nam on 19/8/25.
-//
-
 import SwiftUI
+import PhotosUI
+
+enum BackGroundTypeEnum {
+   case photo
+   case api
+}
 
 struct BackGroundView: View {
     
     @ObservedObject var vm = BackGroundViewModel()
     @Environment(\.dismiss) var dismiss
-    //next page
+    
     @State private var selectedFrame: Frame? = nil
-    @State var isNextPage = false
-    let onPicked: (Frame?) -> Void
+    @State private var pickedImage: UIImage? = nil
+    @State private var showImagePicker = false
+    @State var backgroundType: BackGroundTypeEnum = .api
+    let onPicked: (Frame?, UIImage?) -> Void // callback trả Frame hoặc UIImage
     
     var body: some View {
-        NavigationView{
-            ZStack{
-                VStack{
-                    HStack{
-                        Button(action: {
-                            dismiss()
-                        }) {
-                            Image("home_back")
-                        }
-                        Spacer()
-                        Text("Background")
-                            .font(.system(size: 18, weight: .medium, design: .default))
-                        Spacer()
-                        
-                        Button(action: {
-                            onPicked(selectedFrame)
-                            dismiss()
-                        }) {
-                            Image("img_bg_check")
-                                .foregroundColor(selectedFrame != nil ? .green : .gray)
-                        }
+        NavigationView {
+            VStack {
+                // Top Bar
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image("home_back")
                     }
-                    .padding(.horizontal , 16)
                     
-                    VStack {
+                    Spacer()
+                    Text("Background")
+                        .font(.system(size: 18, weight: .medium))
+                    Spacer()
+                    
+                    Button(action: {
+                        backgroundType = .photo
+                        showImagePicker = true
+                    }) {
+                        Image(systemName: "photo.on.rectangle")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                    }
+                    
+                    Button(action: {
+                        onPicked(selectedFrame, pickedImage)
+                        dismiss()
+                    }) {
+                        Image("img_bg_check")
+                            .foregroundColor(selectedFrame != nil || pickedImage != nil ? .green : .gray)
+                    }
+                   
+                }
+                .padding(.horizontal)
+                
+                Divider().padding(.vertical, 4)
+                
+                // Body
+                VStack {
+                    if backgroundType == .api {
                         if let _ = vm.model {
                             CategoryTagView(vm: vm)
                             ScrollView {
@@ -50,16 +64,14 @@ struct BackGroundView: View {
                                     spacing: 5
                                 ) {
                                     ForEach(vm.framesForSelectedCategory()) { frame in
-                                        
                                         AsyncImage(url: frame.thumbURL) { img in
                                             img.resizable()
                                                 .scaledToFill()
-                                        }
-                                        placeholder: {
+                                        } placeholder: {
                                             Color.gray.opacity(0.3)
                                         }
                                         .frame(width: UIScreen.main.bounds.width/5 - 16,
-                                               height: UIScreen.main.bounds.width/5-16)
+                                               height: UIScreen.main.bounds.width/5 - 16)
                                         .clipped()
                                         .cornerRadius(8)
                                         .overlay(
@@ -68,60 +80,41 @@ struct BackGroundView: View {
                                         )
                                         .onTapGesture {
                                             selectedFrame = frame
+                                            pickedImage = nil
                                         }
-                                        
                                     }
                                 }
-                                .padding(.all, 12)
-                                
+                                .padding(12)
                             }
                             .refreshable {
                                 vm.fetch()
                             }
-                            
                         } else {
-                            VStack {
-                                ScrollView(.horizontal) {
-                                    HStack {
-                                        ForEach(0..<5, id: \.self) { _ in
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(Color.gray.opacity(0.3))
-                                                .frame(width: 80, height: 30)
-                                                .shimmering() // optional, nếu bạn muốn hiệu ứng shimmer
-                                            
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                                
-                                LazyVGrid(
-                                    columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
-                                    spacing: 5
-                                ) {
-                                    ForEach(0..<16, id: \.self) { _ in
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: UIScreen.main.bounds.width/5 - 16,
-                                                   height: UIScreen.main.bounds.width/5 - 16)
-                                    }
-                                }
-                                .padding(.all, 12)
-                            }
-                            Spacer()
+                            Text("Loading...")
                         }
                     }
-                    
-                    .onAppear{
+                }
+                .onAppear {
+                    if backgroundType == .api {
                         vm.fetch()
                     }
-                    
                 }
             }
+            .sheet(isPresented: $showImagePicker) {
+                ImagePicker(image: $pickedImage)
+            }
+            .onChange(of: pickedImage) { newImage in
+                guard let img = newImage else { return }
+                // gọi callback, không cần hiển thị
+                onPicked(nil, img)
+                dismiss()
+            }
+            .navigationBarBackButtonHidden(true)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationBarBackButtonHidden(true)
     }
 }
+
+// Category tags
 struct CategoryTagView: View {
     @ObservedObject var vm: BackGroundViewModel
     
@@ -143,3 +136,44 @@ struct CategoryTagView: View {
     }
 }
 
+// SwiftUI wrapper cho PHPickerViewController
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var image: UIImage?
+
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 1
+
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: ImagePicker
+
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            guard let provider = results.first?.itemProvider else { return }
+
+            if provider.canLoadObject(ofClass: UIImage.self) {
+                provider.loadObject(ofClass: UIImage.self) { image, _ in
+                    DispatchQueue.main.async {
+                        self.parent.image = image as? UIImage
+                    }
+                }
+            }
+        }
+    }
+}

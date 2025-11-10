@@ -48,6 +48,7 @@ struct EditorView: View {
     @State private var goHome = false
     @State var lastEdit: BackGroundEditEditEnum = .filter
     
+    
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom){
@@ -109,8 +110,8 @@ struct EditorView: View {
                             )
                             .onAppear {
                                 print("onapear")
-//                                guard !isInitialized else { return }
-//                                isInitialized = true
+                                guard !isInitialized else { return }
+                                isInitialized = true
 
                                 if let existingProject = project {
                                     print("Khôi phục project cũ:", existingProject.id)
@@ -380,6 +381,10 @@ struct EditorView: View {
                 }
             }
             .onDisappear {
+                homeVM.loadProjects()
+            }
+
+            .onDisappear {
                 guard var current = project else {
                     print("bỏ qua lưu")
                     return
@@ -408,53 +413,71 @@ struct EditorView: View {
                     print(" Saved filtered image onDisappear")
                 }
             }
+          
         }
         
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
-            BackGroundView { picked in
-                guard let newFrame = picked else { return }
-                self.frame = newFrame
-                vm.currentProject = project
-                
-                // Nếu background thực sự thay đổi
-                if vm.currentFrameID != newFrame.backgroundID {
-                    //gán lại để biết là trùng nên code đằng sau ko cần load
-                    vm.currentFrameID = newFrame.backgroundID
+            BackGroundView { pickedFrame, pickedImage in
+                if let newFrame = pickedFrame {
+                    self.frame = newFrame
+                    vm.currentProject = project
                     
-                    //  Reset toàn bộ state filter + cache cũ
-                    vm.resetFilterState()
-                    
-                    if let url = newFrame.backgroundURL,
-                       let data = try? Data(contentsOf: url),
-                       let uiImage = UIImage(data: data) {
+                    if vm.currentFrameID != newFrame.backgroundID {
+                        vm.currentFrameID = newFrame.backgroundID
+                        vm.resetFilterState()
                         
-                        //  Cập nhật base image mới
-                        vm.baseImage = uiImage
-                        vm.defaultPreview = uiImage
-                        vm.filteredImage = nil
-                        vm.isImageLoaded = true
-                        vm.objectWillChange.send()
-                        vm.generateThumbnails()
-                        
-                        //  Lưu lại project ngay lần đầu chọn background
-                        if var current = self.project {
-                            current.frame = newFrame
-                            current.previewImage = uiImage
-                            current.selectedFilter = FilterType.none.rawValue
+                        if let url = newFrame.backgroundURL,
+                           let data = try? Data(contentsOf: url),
+                           let uiImage = UIImage(data: data) {
                             
-                            //  Lưu cả base image và filtered (lúc đầu = nil)
-                            ProjectStorage.saveProject(
-                                current,
-                                previewImage: uiImage,
-                                baseImage: uiImage,
-                                filteredImage: nil
-                            )
+                            vm.baseImage = uiImage
+                            vm.defaultPreview = uiImage
+                            vm.filteredImage = nil
+                            vm.isImageLoaded = true
+                            vm.objectWillChange.send()
+                            vm.generateThumbnails()
                             
-                            self.project = current
-                            vm.currentProject = current
+                            if var current = self.project {
+                                current.frame = newFrame
+                                current.previewImage = uiImage
+                                current.selectedFilter = FilterType.none.rawValue
+                                
+                                ProjectStorage.saveProject(
+                                    current,
+                                    previewImage: uiImage,
+                                    baseImage: uiImage,
+                                    filteredImage: nil
+                                )
+                                
+                                self.project = current
+                                vm.currentProject = current
+                            }
                         }
-                    } else {
-                        print(" Không thể đọc ảnh từ background URL.")
+                    }
+                }
+                else if let uiImage = pickedImage {
+                    // xử lý ảnh từ máy
+                    vm.baseImage = uiImage
+                    vm.defaultPreview = uiImage
+                    vm.filteredImage = nil
+                    vm.isImageLoaded = true
+                    vm.objectWillChange.send()
+                    vm.generateThumbnails()
+                    
+                    if var current = self.project {
+                        current.frame = nil
+                        current.previewImage = uiImage
+                        current.selectedFilter = FilterType.none.rawValue
+                        
+                        ProjectStorage.saveProject(
+                            current,
+                            previewImage: uiImage,
+                            baseImage: uiImage,
+                            filteredImage: nil
+                        )
+                        
+                        self.project = current
+                        vm.currentProject = current
                     }
                 }
             }
@@ -464,6 +487,7 @@ struct EditorView: View {
                 showTextField = false
             }
         }
+
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
@@ -485,7 +509,6 @@ struct EditorView: View {
                 presentationMode.wrappedValue.dismiss()
             }
         }
-        
     }
     
     //reset
@@ -528,7 +551,8 @@ struct EditorView: View {
             currentProject.selectedFilter = vm.selectedFilter.rawValue
             currentProject.previewImage   = snap
             currentProject.filteredImagePath = "filtered.jpg"
-            
+
+
             // Lưu project vào file
             ProjectStorage.saveProject(
                 currentProject,
@@ -536,7 +560,6 @@ struct EditorView: View {
                 baseImage: vm.baseImage,
                 filteredImage: filteredImage
             )
-                
                 // Lưu state cục bộ
                 self.project = currentProject
                 print(" Saved full project with snapshot & overlays")
@@ -608,7 +631,6 @@ struct SnapshotWrapper: ViewModifier {
                 SnapshotContainer(content: content,
                                   snapshot: $snapshot,
                                   trigger: $trigger)
-                .overlay(.red)
             } else {
                 //kothi hien thi bthg
                 content

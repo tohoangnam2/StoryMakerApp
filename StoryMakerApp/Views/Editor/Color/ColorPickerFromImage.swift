@@ -16,7 +16,6 @@ struct ColorPickerFromImage: View {
                 .resizable()
                 .frame(width: 40, height: 40)
                 .allowsHitTesting(false)
-
             ColorPicker("Colors", selection: Binding<Color>(
                 get: {
                     Color(overlay.colorSolid) ?? .black

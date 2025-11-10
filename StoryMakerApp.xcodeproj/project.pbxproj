@@ -26,6 +26,7 @@
 		544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176E2E8FBF1600999A9B /* TestPreview.swift */; };
 		544C17762E8FBF1600999A9B /* TestPreview1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544C176F2E8FBF1600999A9B /* TestPreview1.swift */; };
 		5454444D2E7A6A780080D518 /* EditorCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454444C2E7A6A780080D518 /* EditorCanvasView.swift */; };
+		5454EE332EC1D0CD0044A5CE /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5454EE322EC1D0C50044A5CE /* ImagePicker.swift */; };
 		545B40242EA22D1500C1CA05 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545B40232EA22D1200C1CA05 /* Network.swift */; };
 		546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489AD2EB9AB7900818483 /* ExtensionTextView.swift */; };
 		546489B12EBB494200818483 /* AppUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489B02EBB493300818483 /* AppUsage.swift */; };
@@ -81,6 +82,7 @@
 		544C176E2E8FBF1600999A9B /* TestPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview.swift; sourceTree = "<group>"; };
 		544C176F2E8FBF1600999A9B /* TestPreview1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPreview1.swift; sourceTree = "<group>"; };
 		5454444C2E7A6A780080D518 /* EditorCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCanvasView.swift; sourceTree = "<group>"; };
+		5454EE322EC1D0C50044A5CE /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		545B40232EA22D1200C1CA05 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		546489AD2EB9AB7900818483 /* ExtensionTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionTextView.swift; sourceTree = "<group>"; };
 		546489B02EBB493300818483 /* AppUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsage.swift; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 		544C17582E8FBF0200999A9B /* Color */ = {
 			isa = PBXGroup;
 			children = (
+				5454EE322EC1D0C50044A5CE /* ImagePicker.swift */,
 				544C17572E8FBF0200999A9B /* ColorPickerFromImage.swift */,
 			);
 			path = Color;
@@ -272,19 +275,19 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
-		5469689E2E6E8C2E00BD2B77 /* Onboarding */ = {
+		5469689E2E6E8C2E00BD2B77 /* IntroView */ = {
 			isa = PBXGroup;
 			children = (
 				5469689D2E6E8C2E00BD2B77 /* IntroView.swift */,
 			);
-			path = Onboarding;
+			path = IntroView;
 			sourceTree = "<group>";
 		};
 		546968A02E6E8C2E00BD2B77 /* Splash */ = {
 			isa = PBXGroup;
 			children = (
 				5469689F2E6E8C2E00BD2B77 /* SplashView.swift */,
-				5469689E2E6E8C2E00BD2B77 /* Onboarding */,
+				5469689E2E6E8C2E00BD2B77 /* IntroView */,
 			);
 			path = Splash;
 			sourceTree = "<group>";
@@ -475,6 +478,7 @@
 				543401112E83CF9A0047336A /* ProjectStorage.swift in Sources */,
 				546968B52E6E8C2E00BD2B77 /* TextView.swift in Sources */,
 				546968B72E6E8C2E00BD2B77 /* StoryMakerAppApp.swift in Sources */,
+				5454EE332EC1D0CD0044A5CE /* ImagePicker.swift in Sources */,
 				545B40242EA22D1500C1CA05 /* Network.swift in Sources */,
 				546968B82E6E8C2E00BD2B77 /* Test.swift in Sources */,
 			);

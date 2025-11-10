@@ -35,6 +35,7 @@ struct EditorCanvasView: View {
     let filteredImage : UIImage?
     @Binding var project : MainModel?
     
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -53,6 +54,25 @@ struct EditorCanvasView: View {
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .contentShape(Rectangle())
                                 .id(project.id)
+                                .onAppear {
+                                    DispatchQueue.main.async {
+                                        // Nếu là ảnh từ API (frame != nil) thì vẫn load như cũ
+                                        if vm.filteredImage == nil {
+                                            if let url = frame.backgroundURL,
+                                               let data = try? Data(contentsOf: url),
+                                               let uiImage = UIImage(data: data) {
+                                                vm.baseImage = uiImage
+                                                vm.defaultPreview = uiImage
+                                                vm.isImageLoaded = true
+                                            } else {
+                                                //  Nếu là ảnh chọn từ Photo
+                                                vm.baseImage = uiImage
+                                                vm.defaultPreview = uiImage
+                                                vm.isImageLoaded = true
+                                            }
+                                        }
+                                    }
+                                }
                                 .onAppear {
                                     DispatchQueue.main.async {
                                         if vm.filteredImage == nil {
@@ -81,7 +101,6 @@ struct EditorCanvasView: View {
                                         }
                                     }
                                 )
-                            
                                 .onTapGesture {
                                     guard frame != nil else { return }
                                     if isSelected == false{

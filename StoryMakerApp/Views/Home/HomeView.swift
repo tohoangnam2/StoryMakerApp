@@ -109,11 +109,14 @@ struct HomeView: View {
                             }
                             .onChange(of: homeVM.mainprojects.first?.id) { newID in
                                 if let id = newID {
-                                    withAnimation {
-                                        proxy.scrollTo(id, anchor: .top)
+                                    DispatchQueue.main.async {
+                                        withAnimation(.spring()) {
+                                            proxy.scrollTo(id, anchor: .top)
+                                        }
                                     }
                                 }
                             }
+
                         }
                     }
                     Spacer()
