@@ -11,7 +11,8 @@ struct HomeView: View {
     
     @StateObject var homeVM = HomeViewModel()
     @State private var selectedProject: MainModel? = nil
-    @State var isShowPremium: Bool = false
+    @State var isShowPremium: Bool = true
+    var isNewProject: Bool = false
 
     var body: some View {
         NavigationView{
@@ -23,6 +24,7 @@ struct HomeView: View {
                             HStack{
                                 Image("home_ictabbar")
                                 Spacer()
+                                
                                 Text("Art story".uppercased())
                                     .font(.system(size: 18, weight: .bold, design: .default))
                                 Spacer()
@@ -53,7 +55,7 @@ struct HomeView: View {
                                     spacing: 16
                                 ) {
                                     ForEach(homeVM.mainprojects, id: \.id) { project in
-                                        if project.frame != nil {
+                                        if project.previewImage != nil {
                                             ZStack(alignment: .topTrailing) {
                                                 Button(action: {
                                                     selectedProject = project
@@ -69,8 +71,8 @@ struct HomeView: View {
                                                             .frame(width: 98, height: 208)
                                                             .cornerRadius(8)
                                                     }
-
                                                 })
+                                                
                                                 Menu {
                                                     Button(role: .destructive) {
                                                         homeVM.deleteProject(project)
@@ -107,8 +109,8 @@ struct HomeView: View {
                                 }
                                     .padding(.horizontal)
                             }
-                            .onChange(of: homeVM.mainprojects.first?.id) { newID in
-                                if let id = newID {
+                            .onChange(of: homeVM.mainprojects.count) { _ in
+                                if let id = homeVM.mainprojects.first?.id {
                                     DispatchQueue.main.async {
                                         withAnimation(.spring()) {
                                             proxy.scrollTo(id, anchor: .top)
@@ -116,7 +118,6 @@ struct HomeView: View {
                                     }
                                 }
                             }
-
                         }
                     }
                     Spacer()
@@ -126,7 +127,7 @@ struct HomeView: View {
             .overlay(
                 VStack(spacing:15){
                     withAnimation(.spring){
-                        NavigationLink(destination: EditorView(project : nil, homeVM: homeVM)
+                        NavigationLink(destination: EditorView(project : nil, isNewProject: true, homeVM: homeVM)
                         ) {
                             Image("home_icBtn")
                                 .resizable()

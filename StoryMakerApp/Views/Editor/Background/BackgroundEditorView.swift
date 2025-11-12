@@ -19,7 +19,6 @@ struct BackgroundEditorView: View {
     @Binding var isSelected : Bool
     @Binding var project: MainModel?
     @Binding var editEnum: BackGroundEditEditEnum
-
     
     var body: some View {
         ZStack{
@@ -76,7 +75,6 @@ struct BackgroundEditorView: View {
                     .background(Color.gray.opacity(0.2).cornerRadius(70))
                     .scaleEffect(1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: editEnum)
-
                 }
                 
                 ZStack {
@@ -86,7 +84,7 @@ struct BackgroundEditorView: View {
                     case .filter:
                         FilterEditorCIView(vm:vm)
                     case .brightness:
-                        //unwrap get lay giri that xogn gán ngược lai
+                        //unwrap get lay giari that xogn gán ngược lai
                         if let _ = project {
                             BrightNessBGView(
                                 vm: vm, project: Binding(

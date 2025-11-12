@@ -63,7 +63,6 @@ struct BackgroundItem: Identifiable , Codable {
         return UIImage(data: baseImage)
     }
 }
-
 //background open
 
 struct BackGroundModel: Codable {
@@ -101,8 +100,6 @@ struct Frame: Codable, Identifiable {
         URL(string: "https://api.fleet-tech.net" + background)
     }
 }
-
-
 
 //tránh mở lần 2 ko hiện        
 extension BackgroundItem {

@@ -71,7 +71,7 @@ struct EditorView: View {
                         Spacer()
                         
                         Button {
-                            if frame != nil {
+                            if vm.baseImage != nil {
                                 saveAndExitExport(
                                     project: project,
                                     overlayVM: overlayVM,
@@ -119,7 +119,7 @@ struct EditorView: View {
                                     frame = existingProject.frame
                                     vm.loadFromProject(existingProject)
                                 } else {
-                                    let newProject = homeVM.createEmptyProject()
+                                    let newProject = vm.createEmptyProject()
                                     project = newProject
                                     frame = newProject.frame
                                 }
@@ -206,7 +206,7 @@ struct EditorView: View {
                                     HStack {
                                         Spacer()
                                         Button(action: {
-                                            guard frame != nil else { return }
+                                            guard vm.baseImage != nil else { return }
                                             let newOverlay = overlayVM.addOverlay("")
                                             overlayVM.selectOverlay(newOverlay.id)
                                             isTextFieldFocused = true
@@ -381,10 +381,6 @@ struct EditorView: View {
                 }
             }
             .onDisappear {
-                homeVM.loadProjects()
-            }
-
-            .onDisappear {
                 guard var current = project else {
                     print("bỏ qua lưu")
                     return
@@ -413,7 +409,6 @@ struct EditorView: View {
                     print(" Saved filtered image onDisappear")
                 }
             }
-          
         }
         
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
@@ -451,6 +446,8 @@ struct EditorView: View {
                                 
                                 self.project = current
                                 vm.currentProject = current
+                                
+                                homeVM.loadProjects()
                             }
                         }
                     }
@@ -478,6 +475,8 @@ struct EditorView: View {
                         
                         self.project = current
                         vm.currentProject = current
+                        
+                        homeVM.loadProjects()
                     }
                 }
             }
@@ -487,7 +486,6 @@ struct EditorView: View {
                 showTextField = false
             }
         }
-
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
@@ -502,7 +500,6 @@ struct EditorView: View {
                           isShowBackgroundPicker: $isShowBackgroundPicker,
                           showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, filteredImage: vm.filteredImage, project: $project,goHome:$goHome)
         }
-        
         //back về rôt home
         .onChange(of: goHome) { newValue in
             if newValue {
@@ -523,12 +520,24 @@ struct EditorView: View {
     
     func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,homeVM: HomeViewModel,completion: @escaping () -> Void) {
         
+        if isNewProject && vm.baseImage == nil && snapshotImage == nil {
+                if let proj = project {
+                    // Xoá project rỗng luôn khỏi disk + list
+                    homeVM.deleteProject(proj)
+                    homeVM.loadProjects()
+                }
+                completion()
+                return
+        }
+        
         isExport = true
         resetEditState()
-        //  trigger snapshot
+        // bật trigger snapshot
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             triggerSnapshot = true
         }
+        
+        //đợi chụp xong rồi mới save
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             guard var currentProject = project else {
                 print("0 có project hiện tại")
@@ -552,7 +561,6 @@ struct EditorView: View {
             currentProject.previewImage   = snap
             currentProject.filteredImagePath = "filtered.jpg"
 
-
             // Lưu project vào file
             ProjectStorage.saveProject(
                 currentProject,
@@ -560,16 +568,17 @@ struct EditorView: View {
                 baseImage: vm.baseImage,
                 filteredImage: filteredImage
             )
-                // Lưu state cục bộ
-                self.project = currentProject
-                print(" Saved full project with snapshot & overlays")
-                
-                ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
-                completion()
             
+            //  Cập nhật state cục bộ trong EditorView
+            self.project = currentProject
+            print(" Saved full project with snapshot & overlays")
+            ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
+            
+            homeVM.loadProjects()
+            completion()
         }
     }
-    
+
     // Helper để tạo nút icon
     @ViewBuilder
     private func iconButton(_ imageName: String, _ type: OverlayTextEditEnum) -> some View {

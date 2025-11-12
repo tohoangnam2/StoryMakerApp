@@ -8,7 +8,6 @@ import SwiftUI
 
 @main
 struct StoryMakerAppApp: App {
-
     @State var screen : ScreenEnum = .splash
 
     var body: some Scene {
@@ -22,6 +21,7 @@ struct StoryMakerAppApp: App {
         }
     }
 }
+
 enum ScreenEnum {
     case splash
     case home

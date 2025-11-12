@@ -77,10 +77,8 @@ struct OverlayTextModel: Identifiable , Codable {
     // Color solid
     var colorSolid: String = "#FFFFFF"
     var valueOpacity : Double = 1
-    
     //color gradient
     var colorGradient: [String] = ["#FFFFFF", "#FF0000"]
-
     var gradient: LinearGradient {
         let colors = colorGradient.toColorArray()
         let safeColors = colors.isEmpty ? [.white, .black] : colors
@@ -90,7 +88,6 @@ struct OverlayTextModel: Identifiable , Codable {
             endPoint: .bottomTrailing
         )
     }
-
     var userGradient: Bool = false
     
     // Stroke

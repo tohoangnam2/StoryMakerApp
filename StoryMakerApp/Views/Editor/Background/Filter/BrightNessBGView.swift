@@ -10,7 +10,6 @@ import SwiftUI
 struct BrightNessBGView: View {
     
     @ObservedObject var vm: BackgroundEditorViewModel
-    
     @Binding var project : MainModel
     
     var body: some View {

@@ -10,12 +10,13 @@ struct BackGroundView: View {
     
     @ObservedObject var vm = BackGroundViewModel()
     @Environment(\.dismiss) var dismiss
-    
     @State private var selectedFrame: Frame? = nil
     @State private var pickedImage: UIImage? = nil
     @State private var showImagePicker = false
     @State var backgroundType: BackGroundTypeEnum = .api
     let onPicked: (Frame?, UIImage?) -> Void // callback trả Frame hoặc UIImage
+    
+    @State var isTransferring = false
     
     var body: some View {
         NavigationView {
@@ -54,61 +55,83 @@ struct BackGroundView: View {
                 Divider().padding(.vertical, 4)
                 
                 // Body
-                VStack {
-                    if backgroundType == .api {
-                        if let _ = vm.model {
-                            CategoryTagView(vm: vm)
-                            ScrollView {
-                                LazyVGrid(
-                                    columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
-                                    spacing: 5
-                                ) {
-                                    ForEach(vm.framesForSelectedCategory()) { frame in
-                                        AsyncImage(url: frame.thumbURL) { img in
-                                            img.resizable()
-                                                .scaledToFill()
-                                        } placeholder: {
-                                            Color.gray.opacity(0.3)
-                                        }
-                                        .frame(width: UIScreen.main.bounds.width/5 - 16,
-                                               height: UIScreen.main.bounds.width/5 - 16)
-                                        .clipped()
-                                        .cornerRadius(8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(selectedFrame?.id == frame.id ? Color.blue : Color.clear, lineWidth: 3)
-                                        )
-                                        .onTapGesture {
-                                            selectedFrame = frame
-                                            pickedImage = nil
+                ZStack{
+                    VStack {
+                        if backgroundType == .api {
+                            if let _ = vm.model {
+                                CategoryTagView(vm: vm)
+                                ScrollView {
+                                    LazyVGrid(
+                                        columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
+                                        spacing: 5
+                                    ) {
+                                        ForEach(vm.framesForSelectedCategory()) { frame in
+                                            AsyncImage(url: frame.thumbURL) { img in
+                                                img.resizable()
+                                                    .scaledToFill()
+                                            } placeholder: {
+                                                Color.gray.opacity(0.3)
+                                            }
+                                            .frame(width: UIScreen.main.bounds.width/5 - 16,
+                                                   height: UIScreen.main.bounds.width/5 - 16)
+                                            .clipped()
+                                            .cornerRadius(8)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(selectedFrame?.id == frame.id ? Color.blue : Color.clear, lineWidth: 3)
+                                            )
+                                            .onTapGesture {
+                                                selectedFrame = frame
+                                                pickedImage = nil
+                                            }
                                         }
                                     }
+                                    .padding(12)
                                 }
-                                .padding(12)
+                                .refreshable {
+                                    vm.fetch()
+                                }
                             }
-                            .refreshable {
-                                vm.fetch()
+                        }
+                        if isTransferring {
+                            ZStack {
+                                Color.white.opacity(0.25)
+                                    .edgesIgnoringSafeArea(.bottom)
+                                    .transition(.opacity)
+                                ProgressView()
+                                Text("Loading…")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white)
                             }
-                        } else {
-                            Text("Loading...")
+                            .padding(16)
+                            .zIndex(1)
+                        }
+                    }
+                    .onAppear {
+                        if backgroundType == .api {
+                            vm.fetch()
                         }
                     }
                 }
-                .onAppear {
-                    if backgroundType == .api {
-                        vm.fetch()
-                    }
-                }
+                
             }
             .sheet(isPresented: $showImagePicker) {
                 ImagePicker(image: $pickedImage)
             }
             .onChange(of: pickedImage) { newImage in
                 guard let img = newImage else { return }
-                // gọi callback, không cần hiển thị
-                onPicked(nil, img)
-                dismiss()
+                //  bật loading trước khi bắn callback
+                isTransferring = true
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    onPicked(nil, img)
+                    // dismiss sau 0.15s để Editor có thời gian render ảnh
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        dismiss()
+                    }
+                }
             }
+            
             .navigationBarBackButtonHidden(true)
         }
     }

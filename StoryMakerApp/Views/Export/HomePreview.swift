@@ -70,8 +70,7 @@ struct HomePreview: View {
                         let folderURL = ProjectStorage.projectFolder(for: project.id)
                         let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
 
-                        if let data = try? Data(contentsOf: previewURL),
-                           let uiImage = UIImage(data: data) {
+                        if let uiImage = UIImage(contentsOfFile: previewURL.path) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
@@ -168,14 +167,6 @@ struct HomePreview: View {
                                         // Nếu chưa có project thì tạo mới
                                         var currentProject = project ?? MainModel(id: UUID())
                                         currentProject.previewImage = image
-
-//                                        // Update RAM
-//                                        if let index = homeVM.mainprojects.firstIndex(where: { $0.id == currentProject.id }) {
-//                                            vm.mainprojects[index] = currentProject
-//                                        } else {
-//                                            vm.mainprojects.insert(currentProject, at: 0)
-//                                        }
-                                            // Export JPG ra thư mục + Photos
                                         exportingVM.startExporting(projectID: currentProject.id, image: image)
                                         
                                     } else {

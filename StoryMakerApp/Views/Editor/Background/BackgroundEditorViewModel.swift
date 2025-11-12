@@ -201,6 +201,12 @@ class BackgroundEditorViewModel: ObservableObject {
         }
     }
     
+    func createEmptyProject() -> MainModel {
+        let newProject = MainModel(id: UUID())
+        ProjectStorage.saveProject(newProject, previewImage: nil)
+        return newProject
+    }
+    
     
 
 
