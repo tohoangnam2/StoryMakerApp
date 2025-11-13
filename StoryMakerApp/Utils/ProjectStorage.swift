@@ -108,6 +108,10 @@ struct ProjectStorage {
             }
         }
     // Xoá project
+    static func deleteProject(_ project: MainModel) {
+        deleteProject(id: project.id)
+    }
+
     static func deleteProject(id: UUID) {
         let folderURL = projectFolder(for: id)
         do {
@@ -116,9 +120,10 @@ struct ProjectStorage {
                 print(" Deleted project folder: \(folderURL.lastPathComponent)")
             }
         } catch {
-            print("Failed to delete project: \(error)")
+            print(" Failed to delete project: \(error)")
         }
     }
+
     
 }
 

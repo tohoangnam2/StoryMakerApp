@@ -12,6 +12,7 @@ class HomeViewModel: ObservableObject {
     @Published var mainprojects: [MainModel] = []
     @Published var selectedProjectID: UUID?
     @Published var isShowPremium: Bool = false
+    @Published var isLoading : Bool = false
 
     
     func deleteProject(_ project: MainModel) {
@@ -25,7 +26,8 @@ class HomeViewModel: ObservableObject {
     func loadProjects() {
         let projects = ProjectStorage.loadAllProjects()
         var loaded: [MainModel] = []
-
+        self.isLoading = true
+        
         for var project in projects {
             if let previewPath = project.previewImagePath {
                 let folderURL = ProjectStorage.projectFolder(for: project.id)
@@ -57,8 +59,9 @@ class HomeViewModel: ObservableObject {
             return (lDate ?? .distantPast) > (rDate ?? .distantPast)
         }
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.15) {
             self.mainprojects = loaded
+            self.isLoading = false
             print("Loaded \(loaded.count) projects with previews")
         }
     }

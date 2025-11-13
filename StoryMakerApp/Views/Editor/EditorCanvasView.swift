@@ -32,6 +32,10 @@ struct EditorCanvasView: View {
     @State private var isImageLoaded = false
     let filteredImage : UIImage?
     @Binding var project : MainModel?
+
+    @Binding var tempText: String
+    @Binding var isCreateText: Bool
+
     
     var body: some View {
         NavigationView {
@@ -80,7 +84,10 @@ struct EditorCanvasView: View {
     // View dựng background + filter + overlay text
     @ViewBuilder
     private func backgroundView(uiImage: UIImage, projectID: UUID) -> some View {
-        Image(uiImage: uiImage)
+        //chọn filter
+        let displayImage = vm.filteredImage ?? vm.baseImage ?? uiImage
+
+        Image(uiImage: displayImage)
             .resizable()
             .scaledToFill()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -96,22 +103,10 @@ struct EditorCanvasView: View {
                     }
                 }
             }
-            // Lớp filter
-            .overlay(
-                Group {
-                    if let filtered = filteredImage {
-                        Image(uiImage: filtered)
-                            .resizable()
-                            .scaledToFill()
-                            .opacity(vm.opacity)
-                            .brightness(vm.lightness)
-                            .saturation(vm.saturation)
-                            .blur(radius: vm.blur)
-                            .shadow(radius: vm.blur)
-                            .allowsHitTesting(false)
-                    }
-                }
-            )
+            .overlay(Color.black.opacity(1 - vm.opacity))
+            .brightness(vm.lightness)
+            .saturation(vm.saturation)
+            .blur(radius: vm.blur)
             // Tap vào background để mở editor hoặc tắt selection
             .onTapGesture {
                 if isSelected == false {
@@ -124,22 +119,21 @@ struct EditorCanvasView: View {
             // Lớp text overlay
             .overlay(
                 Group {
-                    ForEach($overlayVM.overlays){ $overlay in
-                        if showTextField && overlay.id == overlayVM.selectedOverlayID   {
-                            TextField("Nhập chữ...", text: $overlay.text)
-                                .padding(8)
-                                .background(Color.white.opacity(0.8))
-                                .cornerRadius(8)
-                                .padding(.horizontal,UIScreen.main.bounds.width/3)
-                                .focused($isTextFieldFocused)
-                                .onSubmit {
-                                    showTextField = false
-                                }
-                                .animation(.easeInOut(duration: 0.18), value: showTextField)
-
-                        }
+                    if showTextField && isCreateText  {
+                        TextField("Nhập chữ...", text: $tempText)
+                            .padding(8)
+                            .background(Color.white.opacity(0.8))
+                            .cornerRadius(8)
+                            .padding(.horizontal,UIScreen.main.bounds.width/3)
+                            .focused($isTextFieldFocused)
+                            .onSubmit {
+                                showTextField = false
+                            }
+                            .animation(.easeInOut(duration: 0.18), value: showTextField)
                         
-                        else if !overlay.text.isEmpty  {
+                    }
+                    ForEach($overlayVM.overlays){ $overlay in
+                        if !overlay.text.isEmpty  {
                             ZStack{
                                 //case
                                 Text({
@@ -195,7 +189,7 @@ struct EditorCanvasView: View {
                                                 height: overlay.endset.height + value.translation.height
                                             )
                                         }
-                                        
+                                    
                                         .onEnded { _ in
                                             overlay.endset = overlay.offset
                                         }
@@ -221,7 +215,7 @@ struct EditorCanvasView: View {
                                             print(overlay.id)
                                         }
                                 )
-
+                                
                                 .padding()
                                 .background(
                                     Group{

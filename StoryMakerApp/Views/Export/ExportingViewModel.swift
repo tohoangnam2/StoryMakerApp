@@ -15,100 +15,72 @@ class ExportingViewModel: ObservableObject {
     func startExporting(projectID: UUID, image: UIImage) {
         self.isExporting = true
         self.progress = 0.0
-        
-        // Giả lập progress
-        // check xem lúc đó timer cũ đang chạy thì dừng
+        self.isDone = false
+          
         timer?.invalidate()
+        
+        // Timer chỉ chạy đến 0.99
         timer = Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true) { [weak self] t in
             guard let self = self else { return }
-            if self.progress < 1.0 {
+            
+            if self.progress < 0.99 {
                 self.progress += 0.005
             } else {
                 t.invalidate()
-                self.isExporting = false
-                self.isDone = true
+                self.timer = nil
             }
         }
-        
-        DispatchQueue.global(qos: .background).async {
-            self.saveImageToProjectDirectory(
-                projectID: projectID,
-                image: image,
-                filename: "project_\(projectID).jpg"
-            )
-        }
+
+          DispatchQueue.global(qos: .background).async {
+              self.saveImageToProjectDirectory(
+                  projectID: projectID,
+                  image: image,
+                  filename: "project_\(projectID).jpg"
+              )
+          }
     }
 
     private func saveImageToProjectDirectory(projectID: UUID, image: UIImage, filename: String) {
-        //chuyen anh thanh du lieu dangnen
         guard let imageData = image.jpegData(compressionQuality: 0.9) else { return }
-        
-        //duong dan
+
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let projectFolder = documentsURL.appendingPathComponent("project_\(projectID)")
-        
-        // Tạo folder nếu chưa có
         try? FileManager.default.createDirectory(at: projectFolder, withIntermediateDirectories: true)
-        
+
         let fileURL = projectFolder.appendingPathComponent(filename)
-        
+
         do {
             try imageData.write(to: fileURL)
-            print(" Saved JPG to: \(fileURL)")
-            
-            //lưu vào Photo Library, xin quyền
+            print("Saved JPG to: \(fileURL)")
+
+            // Lưu vào Photos
             PHPhotoLibrary.requestAuthorization { status in
-                        switch status {
-                        case .authorized, .limited:
-                            // Người dùng đã cho phép → lưu vào Photos
-                            PHPhotoLibrary.shared().performChanges({
-                                PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: fileURL)
-                            }) { success, error in
-                                if success {
-                                    print("Saved to Photos")
-                                } else {
-                                    print("Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
-                                }
+                if status == .authorized || status == .limited {
+                    PHPhotoLibrary.shared().performChanges({
+                        PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: fileURL)
+                    }) { _, _ in
+                        DispatchQueue.main.async {
+                            withAnimation {
+                                self.progress = 1.0
                             }
-                        case .denied, .restricted, .notDetermined:
-                            // Người dùng từ chối hoặc chưa cho phép → KHÔNG lưu
-                            print("User denied photo library access, skip saving to Photos")
-                        @unknown default:
-                            break
+                            self.isDone = true
+                            self.isExporting = false
+                            self.exportedFileURL = fileURL
                         }
                     }
-            
-            DispatchQueue.main.async {
-                self.progress = 1.0
-                self.isDone = true
-                self.isExporting = false
-                self.exportedFileURL = fileURL
+                } else {
+                    // User không cho phép → vẫn kết thúc nhưng không save Photos
+                    DispatchQueue.main.async {
+                        withAnimation { self.progress = 1.0 }
+                        self.isDone = true
+                        self.isExporting = false
+                        self.exportedFileURL = fileURL
+                    }
+                }
             }
+
         } catch {
-            print(" Error writing image: \(error)")
+            print("Error: \(error)")
         }
     }
-
-    func openInFiles(url: URL) {
-        //Lấy rootViewController hiện tại của ứng dụng (để hiển thị hộp thoại chia sẻ).
-        DispatchQueue.main.async {
-            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                  let rootVC = scene.windows.first?.rootViewController else {
-                return
-            }
-            //chia sẻ url
-            let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            
-            if let popover = activityVC.popoverPresentationController {
-                popover.sourceView = rootVC.view
-                popover.sourceRect = CGRect(x: rootVC.view.bounds.midX,
-                                            y: rootVC.view.bounds.midY,
-                                            width: 0, height: 0)
-                popover.permittedArrowDirections = []
-            }
-            //giao diện file ra màn hình
-            rootVC.present(activityVC, animated: true)
-        }
-    }
-
 }

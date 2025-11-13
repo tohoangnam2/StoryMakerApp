@@ -16,7 +16,6 @@ struct EditorView: View {
     var isNewProject: Bool = false
     @StateObject  var overlayVM = OverlayTextViewModel()
     @StateObject var vm = BackgroundEditorViewModel()
-    @ObservedObject var homeVM : HomeViewModel
 
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int? = nil
@@ -48,6 +47,10 @@ struct EditorView: View {
     @State private var goHome = false
     @State var lastEdit: BackGroundEditEditEnum = .filter
     
+    @State var tempText: String = ""
+    @State var isCreateText : Bool = false
+    
+    var onDismiss: (() -> Void)?
     
     var body: some View {
         NavigationView {
@@ -59,8 +62,7 @@ struct EditorView: View {
                             saveAndExitExport(
                                 project: project,
                                 overlayVM: overlayVM,
-                                vm: vm,
-                                homeVM: homeVM
+                                vm: vm
                             ) {
                                 presentationMode.wrappedValue.dismiss()
                             }
@@ -75,9 +77,7 @@ struct EditorView: View {
                                 saveAndExitExport(
                                     project: project,
                                     overlayVM: overlayVM,
-                                    vm: vm,
-                                    homeVM: homeVM
-
+                                    vm: vm
                                 ) {
                                     showPreview = true
                                 }
@@ -106,7 +106,7 @@ struct EditorView: View {
                                 showBackgroundEdit: $showBackgroundEdit,
                                 vm: vm,
                                 filteredImage: vm.filteredImage,
-                                project: $project
+                                project: $project, tempText: $tempText, isCreateText: $isCreateText
                             )
                             .onAppear {
                                 print("onapear")
@@ -207,8 +207,8 @@ struct EditorView: View {
                                         Spacer()
                                         Button(action: {
                                             guard vm.baseImage != nil else { return }
-                                            let newOverlay = overlayVM.addOverlay("")
-                                            overlayVM.selectOverlay(newOverlay.id)
+                                            tempText = ""
+                                            isCreateText = true
                                             isTextFieldFocused = true
                                             showTextField = true
                                             isSelected = true
@@ -349,9 +349,27 @@ struct EditorView: View {
                                     Spacer()
                                     
                                     Button(action: {
-                                        showTextField = false
-                                        isTextFieldFocused = false
-                                        isSelected = true
+                                        //xoá đàu cuối
+                                        let trimmed = tempText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        //rỗng ko tạo gì cả
+                                           guard !trimmed.isEmpty else {
+                                               // bạn có thể show alert nếu muốn
+                                               showTextField = false
+                                               isCreateText = false
+                                               isSelected = false
+                                               isTextFieldFocused = false
+                                               return
+                                           }
+
+                                           let newOverlay = overlayVM.addOverlay(trimmed)
+                                           overlayVM.selectOverlay(newOverlay.id)
+
+                                           // reset state
+                                           tempText = ""
+                                           isCreateText = false
+                                           showTextField = false
+                                           isTextFieldFocused = false
+                                           isSelected = true
                                     }) {
                                         Image("img_bg_check")
                                     }
@@ -379,6 +397,9 @@ struct EditorView: View {
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit)
                 }
+            }
+            .onDisappear{
+                onDismiss?()
             }
             .onDisappear {
                 guard var current = project else {
@@ -447,7 +468,6 @@ struct EditorView: View {
                                 self.project = current
                                 vm.currentProject = current
                                 
-                                homeVM.loadProjects()
                             }
                         }
                     }
@@ -476,7 +496,6 @@ struct EditorView: View {
                         self.project = current
                         vm.currentProject = current
                         
-                        homeVM.loadProjects()
                     }
                 }
             }
@@ -518,13 +537,13 @@ struct EditorView: View {
         showBackgroundEdit = false
     }
     
-    func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,homeVM: HomeViewModel,completion: @escaping () -> Void) {
+    func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
         
         if isNewProject && vm.baseImage == nil && snapshotImage == nil {
                 if let proj = project {
                     // Xoá project rỗng luôn khỏi disk + list
-                    homeVM.deleteProject(proj)
-                    homeVM.loadProjects()
+                    ProjectStorage.deleteProject(proj)
+                    
                 }
                 completion()
                 return
@@ -574,7 +593,7 @@ struct EditorView: View {
             print(" Saved full project with snapshot & overlays")
             ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
             
-            homeVM.loadProjects()
+
             completion()
         }
     }
