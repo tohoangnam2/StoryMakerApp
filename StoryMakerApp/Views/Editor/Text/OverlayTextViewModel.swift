@@ -8,62 +8,19 @@
 import SwiftUI
 import Foundation
 
+
 class OverlayTextViewModel: ObservableObject {
     @Published var overlays: [OverlayTextModel] = []
     @Published var selectedOverlayID: UUID? = nil
-    
-    // dùng để disable gesture khác khi đang nhập cữ
-    var isAnyOverlayEditing: Bool {
-        overlays.contains { $0.isEditingText }
-    }
-    
-    //cập. nhâtt text theo id
-    func updateOverlay(id: UUID, update: (inout OverlayTextModel) -> Void) {
-        if let index = overlays.firstIndex(where: { $0.id == id }) {
-            update(&overlays[index])
-        }
-    }
- 
 
-    func removeOverlay(_ id: UUID) {
-        overlays.removeAll { $0.id == id }
-    }
-    
-    
-    
-    func copyOverlay(_ overlay: OverlayTextModel) {
-        //bỏ chọn các overlay trước
-        for index in overlays.indices {
-            overlays[index].isEditingText = true
-        }
-        
-        var newOverlay = overlay
-        newOverlay.id = UUID()
-        
-        newOverlay.offset.width += 30
-        newOverlay.offset.height += 30
-        newOverlay.endset = newOverlay.offset
-        overlays.append(newOverlay)
-        selectOverlay(newOverlay.id)
-        
-    }
-    
-    //tìm vị trí trong mảng đúng thì edit =true
-    func setEditingSelectedOverlay(_ isEditing: Bool) {
-        if let index = overlays.firstIndex(where: { $0.id == selectedOverlayID }) {
-            overlays[index].isEditingText = isEditing
-        }
-    }
-    
-    
     func selectOverlay(_ id: UUID) {
-        for index in overlays.indices {
-            overlays[index].isEditingText = true
-        }
         selectedOverlayID = id
-        setEditingSelectedOverlay(false)
     }
-    
+
+    func deselect() {
+        selectedOverlayID = nil
+    }
+
     func addOverlay(_ text: String) -> OverlayTextModel {
         let newOverlay = OverlayTextModel(
             id: UUID(),
@@ -77,13 +34,24 @@ class OverlayTextViewModel: ObservableObject {
         overlays.append(newOverlay)
         return newOverlay
     }
-    
-    func deselectAll() {
-        selectedOverlayID = nil
-        for index in overlays.indices {
-            overlays[index].isEditingText = true
+
+    func removeOverlay(_ id: UUID) {
+        overlays.removeAll { $0.id == id }
+        if selectedOverlayID == id {
+            selectedOverlayID = nil
         }
     }
- 
+
+    func copyOverlay(_ overlay: OverlayTextModel) {
+        var copied = overlay
+        copied.id = UUID()
+        copied.offset.width += 40
+        copied.offset.height += 40
+        copied.endset = copied.offset
+        
+        overlays.append(copied)
+        selectedOverlayID = copied.id
+    }
 }
+
 

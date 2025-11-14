@@ -213,8 +213,8 @@ extension IntroView {
                     }
                     VStack(spacing:19){
                         Button(action: {
-                            self.onboardingState += 1
-
+                            AppUsage.shared.hasSeenIntro = true
+                            screen = .home
                         }) {
                             Text("Next")
                                 .frame(width:258,height: 47)

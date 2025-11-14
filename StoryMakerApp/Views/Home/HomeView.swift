@@ -16,8 +16,6 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            
-            // 1️⃣ Main navigation view
             NavigationView {
                 ZStack {
                     VStack {
@@ -54,7 +52,11 @@ struct HomeView: View {
                             ScrollViewReader { proxy in
                                 ScrollView(.vertical, showsIndicators: false) {
                                     LazyVGrid(
-                                        columns: Array(repeating: GridItem(.flexible()), count: 3),
+                                        columns: [
+                                               GridItem(.flexible(), spacing: 12),
+                                               GridItem(.flexible(), spacing: 12),
+                                               GridItem(.flexible(), spacing: 12)
+                                           ],
                                         spacing: 16
                                     ) {
                                         ForEach(homeVM.mainprojects, id: \.id) { project in
@@ -68,14 +70,18 @@ struct HomeView: View {
                                                             Image(uiImage: img)
                                                                 .resizable()
                                                                 .scaledToFill()
-                                                                .frame(width: 98, height: 208)
-                                                                .cornerRadius(8)
+                                                                .frame(width: UIScreen.main.bounds.width/3.5, height: UIScreen.main.bounds.width/2)
+                                                                .cornerRadius(14)
+                                                                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
+
                                                         } else {
                                                             Color.gray
                                                                 .frame(width: 98, height: 208)
-                                                                .cornerRadius(8)
+                                                                .cornerRadius(14)
                                                         }
                                                     })
+                                                    .contentShape(Rectangle())
+
                                                     
                                                     Menu {
                                                         Button(role: .destructive) {
@@ -139,10 +145,13 @@ struct HomeView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 65, height: 65)
+                                .background(.black.opacity(0.85))
+                                .clipShape(Circle())
+                                .shadow(radius: 8)
                         }
                     }
                         .padding(.bottom, 25),
-                    alignment: .bottom
+                        alignment: .bottom
                 )
             }
             .onAppear {

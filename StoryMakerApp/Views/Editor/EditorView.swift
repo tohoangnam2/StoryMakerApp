@@ -118,10 +118,6 @@ struct EditorView: View {
                                     overlayVM.overlays = existingProject.textLayers
                                     frame = existingProject.frame
                                     vm.loadFromProject(existingProject)
-                                } else {
-                                    let newProject = vm.createEmptyProject()
-                                    project = newProject
-                                    frame = newProject.frame
                                 }
                             }
                         }
@@ -360,9 +356,15 @@ struct EditorView: View {
                                                isTextFieldFocused = false
                                                return
                                            }
-
-                                           let newOverlay = overlayVM.addOverlay(trimmed)
-                                           overlayVM.selectOverlay(newOverlay.id)
+                                        if isCreateText {
+                                            let newOverlay = overlayVM.addOverlay(trimmed)
+                                            overlayVM.selectOverlay(newOverlay.id)
+                                        }else{
+                                            if let id = overlayVM.selectedOverlayID,
+                                               let idx = overlayVM.overlays.firstIndex(where: { $0.id == id }) {
+                                                overlayVM.overlays[idx].text = trimmed
+                                            }
+                                        }
 
                                            // reset state
                                            tempText = ""
@@ -434,70 +436,7 @@ struct EditorView: View {
         
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView { pickedFrame, pickedImage in
-                if let newFrame = pickedFrame {
-                    self.frame = newFrame
-                    vm.currentProject = project
-                    
-                    if vm.currentFrameID != newFrame.backgroundID {
-                        vm.currentFrameID = newFrame.backgroundID
-                        vm.resetFilterState()
-                        
-                        if let url = newFrame.backgroundURL,
-                           let data = try? Data(contentsOf: url),
-                           let uiImage = UIImage(data: data) {
-                            
-                            vm.baseImage = uiImage
-                            vm.defaultPreview = uiImage
-                            vm.filteredImage = nil
-                            vm.isImageLoaded = true
-                            vm.objectWillChange.send()
-                            vm.generateThumbnails()
-                            
-                            if var current = self.project {
-                                current.frame = newFrame
-                                current.previewImage = uiImage
-                                current.selectedFilter = FilterType.none.rawValue
-                                
-                                ProjectStorage.saveProject(
-                                    current,
-                                    previewImage: uiImage,
-                                    baseImage: uiImage,
-                                    filteredImage: nil
-                                )
-                                
-                                self.project = current
-                                vm.currentProject = current
-                                
-                            }
-                        }
-                    }
-                }
-                else if let uiImage = pickedImage {
-                    // xử lý ảnh từ máy
-                    vm.baseImage = uiImage
-                    vm.defaultPreview = uiImage
-                    vm.filteredImage = nil
-                    vm.isImageLoaded = true
-                    vm.objectWillChange.send()
-                    vm.generateThumbnails()
-                    
-                    if var current = self.project {
-                        current.frame = nil
-                        current.previewImage = uiImage
-                        current.selectedFilter = FilterType.none.rawValue
-                        
-                        ProjectStorage.saveProject(
-                            current,
-                            previewImage: uiImage,
-                            baseImage: uiImage,
-                            filteredImage: nil
-                        )
-                        
-                        self.project = current
-                        vm.currentProject = current
-                        
-                    }
-                }
+              handleBackgroundPicked(frame: pickedFrame, image: pickedImage)
             }
         }
         .onChange(of: frame?.id) { _ in
@@ -533,22 +472,12 @@ struct EditorView: View {
         showTextField = false
         isTextFieldFocused = false
         isSelected = false
-        overlayVM.deselectAll()
+        overlayVM.deselect()
         showBackgroundEdit = false
     }
     
     func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-        
-        if isNewProject && vm.baseImage == nil && snapshotImage == nil {
-                if let proj = project {
-                    // Xoá project rỗng luôn khỏi disk + list
-                    ProjectStorage.deleteProject(proj)
-                    
-                }
-                completion()
-                return
-        }
-        
+       
         isExport = true
         resetEditState()
         // bật trigger snapshot
@@ -607,7 +536,90 @@ struct EditorView: View {
                 selectedEditText = type
             }
     }
+    private func ensureProject() {
+        if project == nil {
+            let newProject = vm.createEmptyProject()
+            project = newProject
+            frame = newProject.frame
+        }
+    }
+    func handleBackgroundPicked(frame pickedFrame: Frame? ,image pickedImage: UIImage?) {
+        if let newFrame = pickedFrame {
+            ensureProject()
+            self.frame = newFrame
+            vm.currentProject = project
+            
+            if vm.currentFrameID != newFrame.backgroundID {
+                vm.currentFrameID = newFrame.backgroundID
+                vm.resetFilterState()
+                
+                if let url = newFrame.backgroundURL,
+                   let data = try? Data(contentsOf: url),
+                   let uiImage = UIImage(data: data) {
+                    
+                    vm.baseImage = uiImage
+                    vm.defaultPreview = uiImage
+                    vm.filteredImage = nil
+                    vm.isImageLoaded = true
+                    vm.objectWillChange.send()
+                    vm.generateThumbnails()
+                    
+                    if var current = self.project {
+                        current.frame = newFrame
+                        current.previewImage = uiImage
+                        current.selectedFilter = FilterType.none.rawValue
+                        
+                        ProjectStorage.saveProject(
+                            current,
+                            previewImage: uiImage,
+                            baseImage: uiImage,
+                            filteredImage: nil
+                        )
+                        
+                        self.project = current
+                        vm.currentProject = current
+                        
+                    }
+                }
+            }
+        }
+        else if let uiImage = pickedImage {
+            ensureProject()
+            // xử lý ảnh từ máy
+            vm.baseImage = uiImage
+            vm.defaultPreview = uiImage
+            vm.filteredImage = nil
+            vm.isImageLoaded = true
+            vm.objectWillChange.send()
+            vm.generateThumbnails()
+            
+            if var current = self.project {
+                current.frame = nil
+                current.previewImage = uiImage
+                current.selectedFilter = FilterType.none.rawValue
+                
+                ProjectStorage.saveProject(
+                    current,
+                    previewImage: uiImage,
+                    baseImage: uiImage,
+                    filteredImage: nil
+                )
+                
+                self.project = current
+                vm.currentProject = current
+                
+            }
+        }
+        
+     
+    }
+
 }
+
+
+
+
+
 //snapshoot view con
 struct SnapshotContainer<Content: View>: UIViewRepresentable {
     let content: Content

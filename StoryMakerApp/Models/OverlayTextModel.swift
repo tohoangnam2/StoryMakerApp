@@ -21,13 +21,8 @@ struct OverlayTextModel: Identifiable , Codable {
     var text: String
     var offset: CGSize = .zero
     var endset: CGSize = .zero
-
-    //new move
-    var position: CGSize = .zero
-    var dragOffset: CGSize = .zero
-
     //rotate
-    // 1. Biến trạng thái để lưu góc xoay
+    //  Biến trạng thái để lưu góc xoay
     var currentRotation: Double = 0
     
     // Biến tạm để lưu góc ban đầu khi bắt đầu kéo
@@ -53,7 +48,6 @@ struct OverlayTextModel: Identifiable , Codable {
     var startAngleToCenter: Double?
     //zoom
     
-    var initialZoom: CGFloat = 1
     var currentZoom: CGFloat = 1
     var displayZoom: CGFloat = 1
     
@@ -109,10 +103,7 @@ struct OverlayTextModel: Identifiable , Codable {
     var shawDowColor: String = "#FFFFFF"
     
     //move
-    var startPoint: CGPoint = .zero
-    var originalScale: CGFloat = 1.0
     var startCenter: CGPoint = .zero
-    var buttonSize : CGFloat = 30
 
 }
 

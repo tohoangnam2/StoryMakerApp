@@ -31,7 +31,6 @@ struct SplashView: View {
                         VStack(spacing: 19) {
                             if !AppUsage.shared.hasSeenIntro {
                                 Button(action: {
-                                    AppUsage.shared.hasSeenIntro = true
                                     showIntro = true
                                 }) {
                                     Text("Get Started")

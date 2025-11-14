@@ -19,120 +19,125 @@ struct BackGroundView: View {
     @State var isTransferring = false
     
     var body: some View {
-        NavigationView {
-            VStack {
-                // Top Bar
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image("home_back")
-                    }
-                    
-                    Spacer()
-                    Text("Background")
-                        .font(.system(size: 18, weight: .medium))
-                    Spacer()
-                    
-                    Button(action: {
-                        backgroundType = .photo
-                        showImagePicker = true
-                    }) {
-                        Image(systemName: "photo.on.rectangle")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                    }
-                    
-                    Button(action: {
-                        onPicked(selectedFrame, pickedImage)
-                        dismiss()
-                    }) {
-                        Image("img_bg_check")
-                            .foregroundColor(selectedFrame != nil || pickedImage != nil ? .green : .gray)
-                    }
-                   
+        VStack(spacing: 0) {
+            // Top Bar
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image("home_back")
                 }
-                .padding(.horizontal)
                 
-                Divider().padding(.vertical, 4)
+                Spacer()
+                Text("Background")
+                    .font(.system(size: 18, weight: .medium))
+                Spacer()
                 
-                // Body
-                ZStack{
-                    VStack {
-                        if backgroundType == .api {
-                            if let _ = vm.model {
-                                CategoryTagView(vm: vm)
-                                ScrollView {
-                                    LazyVGrid(
-                                        columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
-                                        spacing: 5
-                                    ) {
-                                        ForEach(vm.framesForSelectedCategory()) { frame in
-                                            AsyncImage(url: frame.thumbURL) { img in
-                                                img.resizable()
-                                                    .scaledToFill()
-                                            } placeholder: {
-                                                Color.gray.opacity(0.3)
-                                            }
-                                            .frame(width: UIScreen.main.bounds.width/5 - 16,
-                                                   height: UIScreen.main.bounds.width/5 - 16)
-                                            .clipped()
-                                            .cornerRadius(8)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(selectedFrame?.id == frame.id ? Color.blue : Color.clear, lineWidth: 3)
-                                            )
-                                            .onTapGesture {
-                                                selectedFrame = frame
-                                                pickedImage = nil
-                                            }
+                Button(action: {
+                    backgroundType = .photo
+                    showImagePicker = true
+                }) {
+                    Image(systemName: "photo.on.rectangle")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                }
+                
+                Button(action: {
+                    onPicked(selectedFrame, pickedImage)
+                    dismiss()
+                }) {
+                    Image("img_bg_check")
+                        .foregroundColor(selectedFrame != nil || pickedImage != nil ? .green : .gray)
+                }
+                
+            }
+            .padding(.horizontal)
+            
+            Divider().padding(.vertical, 4)
+            
+            // Body
+            ZStack{
+                VStack {
+                    if backgroundType == .api {
+                        if let _ = vm.model {
+                            CategoryTagView(vm: vm)
+                            ScrollView {
+                                LazyVGrid(
+                                    columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 5),
+                                    spacing: 5
+                                ) {
+                                    ForEach(vm.framesForSelectedCategory()) { frame in
+                                        AsyncImage(url: frame.thumbURL) { img in
+                                            img.resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Color.gray.opacity(0.3)
+                                        }
+                                        .frame(width: UIScreen.main.bounds.width/5 - 16,
+                                               height: UIScreen.main.bounds.width/5 - 16)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(selectedFrame?.id == frame.id ? Color.blue : Color.clear, lineWidth: 3)
+                                        )
+                                        .onTapGesture {
+                                            selectedFrame = frame
+                                            pickedImage = nil
                                         }
                                     }
-                                    .padding(12)
                                 }
-                                .refreshable {
-                                    vm.fetch()
-                                }
+                                .padding(12)
                             }
-                        }
-                        if isTransferring {
-                            ZStack {
-                                Color.white.opacity(0.25)
-                                    .edgesIgnoringSafeArea(.bottom)
-                                    .transition(.opacity)
-                                ProgressView()
-                                Text("Loading…")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.white)
+                            .refreshable {
+                                vm.fetch()
                             }
-                            .padding(16)
-                            .zIndex(1)
                         }
                     }
-                    .onAppear {
-                        if backgroundType == .api {
-                            vm.fetch()
+                    if isTransferring {
+                        ZStack {
+                            Color.white.opacity(0.25)
+                                .edgesIgnoringSafeArea(.bottom)
+                                .transition(.opacity)
+                            ProgressView()
+                            Text("Loading…")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
                         }
+                        .padding(16)
+                        .zIndex(1)
                     }
                 }
-                
-            }
-            .sheet(isPresented: $showImagePicker) {
-                ImagePicker(image: $pickedImage)
-            }
-            .onChange(of: pickedImage) { newImage in
-                guard let img = newImage else { return }
-                //  bật loading trước khi bắn callback
-                isTransferring = true
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    onPicked(nil, img)
-                    // dismiss sau 0.15s để Editor có thời gian render ảnh
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        dismiss()
+                .onAppear {
+                    if backgroundType == .api {
+                        vm.fetch()
                     }
                 }
             }
             
-            .navigationBarBackButtonHidden(true)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .ignoresSafeArea(.all, edges: .bottom)
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(image: $pickedImage)
+        }
+        .onChange(of: pickedImage) { newImage in
+            guard let img = newImage else { return }
+            //  bật loading trước khi bắn callback
+            isTransferring = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                onPicked(nil, img)
+                // dismiss sau 0.15s để Editor có thời gian render ảnh
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    dismiss()
+                }
+            }
+        }
+        .onChange(of: showImagePicker) { isShowing in
+            if !isShowing && pickedImage == nil {
+                withAnimation {
+                    backgroundType = .api
+                }
+            }
         }
     }
 }

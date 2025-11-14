@@ -64,7 +64,7 @@ struct EditorCanvasView: View {
                         }
                     }
                 }
-                else {
+                else{
                     Color.colHomeBg
                     VStack(spacing: 16){
                         Button(action: onAddTap)
@@ -119,12 +119,13 @@ struct EditorCanvasView: View {
             // Lớp text overlay
             .overlay(
                 Group {
-                    if showTextField && isCreateText  {
+                    if showTextField {
                         TextField("Nhập chữ...", text: $tempText)
                             .padding(8)
                             .background(Color.white.opacity(0.8))
                             .cornerRadius(8)
                             .padding(.horizontal,UIScreen.main.bounds.width/3)
+                            //tự bật bàn phím
                             .focused($isTextFieldFocused)
                             .onSubmit {
                                 showTextField = false
@@ -197,24 +198,31 @@ struct EditorCanvasView: View {
                                 .simultaneousGesture(
                                     TapGesture(count: 2)
                                         .onEnded {
+                                            overlayVM.selectOverlay(overlay.id)
+
+                                            // mở textfield để sửa overlay.text
+                                            tempText = overlay.text
+                                            isCreateText = false
+
                                             showTextField = true
                                             isTextFieldFocused = true
-                                            showBackgroundEdit = false
-                                            print("Double tapped overlay \(overlay.id) → Edit mode")
+
                                         }
                                 )
                                 .simultaneousGesture(
                                     TapGesture()
                                         .onEnded {
-                                            overlayVM.setEditingSelectedOverlay(false)
                                             overlayVM.selectOverlay(overlay.id)
-                                            if !overlay.isEditingText {
-                                                isSelected = true
-                                                isTextFieldFocused = true
-                                            }
-                                            print(overlay.id)
+                                            
+                                            showTextField = false
+                                            isTextFieldFocused = false
+
+                                            // hiển thị 4 nút + toolbar
+                                            isSelected = true
+                                            showBackgroundEdit = false
                                         }
                                 )
+
                                 
                                 .padding()
                                 .background(
@@ -227,7 +235,7 @@ struct EditorCanvasView: View {
                                                     .frame(width: textGeo.size.width, height: textGeo.size.height)
                                                     .allowsHitTesting(false)
                                                 
-                                                if !overlay.isEditingText {
+                                                if overlayVM.selectedOverlayID == overlay.id {
                                                     
                                                     Rectangle()
                                                         .stroke(style: StrokeStyle(lineWidth: 2 / overlay.currentScale))
@@ -235,7 +243,7 @@ struct EditorCanvasView: View {
                                                     Image("img_edit_x")
                                                         .resizable()
                                                         .scaledToFit()
-                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
+                                                        .frame(width:30 , height:30)
                                                         .padding(10 / overlay.currentScale)
                                                         .contentShape(Rectangle())
                                                         .position(x: 0, y: 0)
@@ -246,7 +254,7 @@ struct EditorCanvasView: View {
                                                     Image("img_edit_copy")
                                                         .resizable()
                                                         .scaledToFit()
-                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
+                                                        .frame(width:30 , height:30)
                                                         .padding(10 / overlay.currentScale)
                                                         .contentShape(Rectangle())
                                                         .position(x: textGeo.size.width, y: 0)
@@ -261,7 +269,7 @@ struct EditorCanvasView: View {
                                                     Image("img_edit_xoay")
                                                         .resizable()
                                                         .scaledToFit()
-                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
+                                                        .frame(width:30 , height:30)
                                                         .padding(10 / overlay.currentScale)
                                                         .contentShape(Rectangle())
                                                         .position(x: 0, y: textGeo.size.height)
@@ -307,7 +315,7 @@ struct EditorCanvasView: View {
                                                     Image("img_edit_zoom")
                                                         .resizable()
                                                         .scaledToFit()
-                                                        .frame(width: overlay.buttonSize , height:  overlay.buttonSize)
+                                                        .frame(width:30 , height:30)
                                                         .padding(10 / overlay.currentScale)
                                                         .contentShape(Rectangle())
                                                         .position(x: textGeo.size.width, y: textGeo.size.height)
