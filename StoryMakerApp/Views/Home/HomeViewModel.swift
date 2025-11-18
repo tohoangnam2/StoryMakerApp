@@ -13,7 +13,6 @@ class HomeViewModel: ObservableObject {
     @Published var selectedProjectID: UUID?
     @Published var isShowPremium: Bool = false
     @Published var isLoading : Bool = false
-
     
     func deleteProject(_ project: MainModel) {
         ProjectStorage.deleteProject(id: project.id)
@@ -21,7 +20,6 @@ class HomeViewModel: ObservableObject {
             loadProjects()
         }
     }
-
 
     func loadProjects() {
         let projects = ProjectStorage.loadAllProjects()

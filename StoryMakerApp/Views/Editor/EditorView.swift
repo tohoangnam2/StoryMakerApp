@@ -87,7 +87,6 @@ struct EditorView: View {
                         }
                     }
                     .padding(.horizontal)
-                    Spacer()
                     
                     ZStack (alignment: .bottom){
                         //view project
@@ -105,7 +104,6 @@ struct EditorView: View {
                                 isShowBackgroundPicker: $isShowBackgroundPicker,
                                 showBackgroundEdit: $showBackgroundEdit,
                                 vm: vm,
-                                filteredImage: vm.filteredImage,
                                 project: $project, tempText: $tempText, isCreateText: $isCreateText
                             )
                             .onAppear {
@@ -118,6 +116,9 @@ struct EditorView: View {
                                     overlayVM.overlays = existingProject.textLayers
                                     frame = existingProject.frame
                                     vm.loadFromProject(existingProject)
+                                    if let f = existingProject.frame {
+                                          vm.currentFrameID = f.backgroundID
+                                    }
                                 }
                             }
                         }
@@ -383,6 +384,7 @@ struct EditorView: View {
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity,maxHeight: .infinity)
                 }
                 //view backgroundedit
                 if showBackgroundEdit {
@@ -426,10 +428,6 @@ struct EditorView: View {
                     current.previewImage = snap
                     ProjectStorage.saveProject(current, previewImage: snap)
                     print(" Saved snapshot onDisappear")
-                } else if let filtered = vm.filteredImage {
-                    current.previewImage = filtered
-                    ProjectStorage.saveProject(current, previewImage: filtered)
-                    print(" Saved filtered image onDisappear")
                 }
             }
         }
@@ -456,7 +454,7 @@ struct EditorView: View {
                           onTapOutside: {  },
                           onOpenBackgroundEditor: { showBackgroundEdit = true },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
-                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, filteredImage: vm.filteredImage, project: $project,goHome:$goHome)
+                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, project: $project,goHome:$goHome)
         }
         //back về rôt home
         .onChange(of: goHome) { newValue in
@@ -494,8 +492,8 @@ struct EditorView: View {
             }
             
             // Ảnh snapshot / filtered / default
-            let snap = snapshotImage ?? vm.filteredImage ?? vm.defaultPreview
-            let filteredImage = vm.filteredImage ?? snap
+            let snap = snapshotImage
+            let filteredImage = snap
             
             // Cập nhật các thuộc tính chỉnh sửa
             currentProject.textLayers = overlayVM.overlays
@@ -507,14 +505,12 @@ struct EditorView: View {
             currentProject.saturation = vm.saturation
             currentProject.selectedFilter = vm.selectedFilter.rawValue
             currentProject.previewImage   = snap
-            currentProject.filteredImagePath = "filtered.jpg"
 
             // Lưu project vào file
             ProjectStorage.saveProject(
                 currentProject,
                 previewImage: snap,
                 baseImage: vm.baseImage,
-                filteredImage: filteredImage
             )
             
             //  Cập nhật state cục bộ trong EditorView
@@ -545,11 +541,8 @@ struct EditorView: View {
     }
     func handleBackgroundPicked(frame pickedFrame: Frame? ,image pickedImage: UIImage?) {
         if let newFrame = pickedFrame {
-            ensureProject()
-            self.frame = newFrame
-            vm.currentProject = project
-            
-            if vm.currentFrameID != newFrame.backgroundID {
+                ensureProject()
+                if vm.currentFrameID != newFrame.backgroundID {
                 vm.currentFrameID = newFrame.backgroundID
                 vm.resetFilterState()
                 
@@ -558,10 +551,6 @@ struct EditorView: View {
                    let uiImage = UIImage(data: data) {
                     
                     vm.baseImage = uiImage
-                    vm.defaultPreview = uiImage
-                    vm.filteredImage = nil
-                    vm.isImageLoaded = true
-                    vm.objectWillChange.send()
                     vm.generateThumbnails()
                     
                     if var current = self.project {
@@ -573,11 +562,9 @@ struct EditorView: View {
                             current,
                             previewImage: uiImage,
                             baseImage: uiImage,
-                            filteredImage: nil
                         )
                         
                         self.project = current
-                        vm.currentProject = current
                         
                     }
                 }
@@ -587,10 +574,6 @@ struct EditorView: View {
             ensureProject()
             // xử lý ảnh từ máy
             vm.baseImage = uiImage
-            vm.defaultPreview = uiImage
-            vm.filteredImage = nil
-            vm.isImageLoaded = true
-            vm.objectWillChange.send()
             vm.generateThumbnails()
             
             if var current = self.project {
@@ -602,23 +585,14 @@ struct EditorView: View {
                     current,
                     previewImage: uiImage,
                     baseImage: uiImage,
-                    filteredImage: nil
                 )
                 
                 self.project = current
-                vm.currentProject = current
                 
             }
         }
-        
-     
     }
-
 }
-
-
-
-
 
 //snapshoot view con
 struct SnapshotContainer<Content: View>: UIViewRepresentable {

@@ -34,7 +34,6 @@ struct HomePreview: View {
     @Binding  var snapshotImage: UIImage?
     @Binding var triggerSnapshot : Bool
     @ObservedObject var vm: BackgroundEditorViewModel
-    let filteredImage: UIImage?
     @Binding var project: MainModel?
     
     @Binding var goHome: Bool

@@ -190,8 +190,8 @@
 				544C17802E8FC95900999A9B /* Background */,
 				544C17582E8FBF0200999A9B /* Color */,
 				544C177C2E8FC0FA00999A9B /* Text */,
-				5454444C2E7A6A780080D518 /* EditorCanvasView.swift */,
 				5469689A2E6E8C2E00BD2B77 /* EditorView.swift */,
+				5454444C2E7A6A780080D518 /* EditorCanvasView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";

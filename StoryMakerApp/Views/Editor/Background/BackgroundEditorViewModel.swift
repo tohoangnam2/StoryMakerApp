@@ -4,29 +4,25 @@ import SwiftUI
 
 
 class BackgroundEditorViewModel: ObservableObject {
-    
+
     @Published var valueOpacity : Double = 1
     @Published var opacity : Double = 1
     @Published var lightness : Double = 0
     @Published var saturation : Double = 1
     @Published var blur : Double = 0
     @Published var shadow : Double = 0
-    //change bg -> rs frame
-    @Published var currentFrameID: String?
-    @Published var defaultPreview: UIImage? = nil
-    // lưu project
-    @Published var projects: [Frame] = []  // lưu danh sách project
-    @Published  var isImageLoaded = false
     
-    @Published var currentProjectID: UUID?
-    @Published var currentProject: MainModel?   // project đang edit
-    @Published var project: MainModel = MainModel()
+    @Published var currentFrameID: String?
+//    @Published var projects: [Frame] = []  // lưu danh sách project
+    @Published  var isImageLoaded = false
+//    @Published var project: MainModel = MainModel()
     @Published var filteredImage: UIImage?
     @Published var selectedFilter: FilterType = .none
     @Published var hasLoadedFiltered = false
     @Published var thumbnails: [FilterType: UIImage] = [:]
     private let context = CIContext()
     private let processingQueue = DispatchQueue(label: "FilterProcessingQueue", qos: .userInitiated)
+    
     @Published var baseImage: UIImage? {
         //base change là cái này cũng change
         didSet {
@@ -43,7 +39,6 @@ class BackgroundEditorViewModel: ObservableObject {
     }
 
     func updatePreviewForNewBaseImage(_ newImage: UIImage) {
-        self.defaultPreview = newImage
         self.filteredImage = newImage
         self.thumbnails.removeAll()
         
@@ -91,15 +86,12 @@ class BackgroundEditorViewModel: ObservableObject {
             }
             return
         }
-        
         // Xử lý filter ở background thread
         DispatchQueue.global(qos: .userInitiated).async {
             guard let output = self.applyFilter(currentFilter, to: baseImage) else { return }
             
             DispatchQueue.main.async {
-                withAnimation(animated ? .easeInOut(duration: 0.25) : nil) {
                     self.filteredImage = output
-                }
             }
         }
     }
@@ -176,29 +168,12 @@ class BackgroundEditorViewModel: ObservableObject {
                let data = try? Data(contentsOf: originalURL),
                let originalImage = UIImage(data: data) {
                 baseImage = originalImage
-                defaultPreview = originalImage
             } else {
                 print(" Không tìm thấy original.jpg cho project \(project.id)")
             }
         }
 
-        // Load filtered image nếu có
-        if let filteredName = project.filteredImagePath {
-            let filteredURL = folderURL.appendingPathComponent(filteredName)
-            if FileManager.default.fileExists(atPath: filteredURL.path),
-               let data = try? Data(contentsOf: filteredURL),
-               let filteredImg = UIImage(data: data) {
-                filteredImage = filteredImg
-                print(" Loaded filtered.jpg preview")
-            }
-        } else {
-            // Nếu không có filtered thì tự apply lại
-            if selectedFilter != .none {
-                applySelectedFilter(animated: false)
-            } else {
-                filteredImage = baseImage
-            }
-        }
+      
     }
     
     func createEmptyProject() -> MainModel {

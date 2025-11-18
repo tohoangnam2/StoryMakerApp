@@ -20,15 +20,13 @@ struct MainModel: Identifiable, Codable {
     var selectedFilter: String?
     var previewImagePath: String?
     var originalImagePath: String?
-    var filteredImagePath : String?
 
     // Không encode UIImage
     var previewImage: UIImage?
-    var filteredImage: UIImage?
     var baseImage: UIImage?
 
     enum CodingKeys: String, CodingKey {
-        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation, selectedFilter, previewImagePath, originalImagePath,filteredImagePath
+        case id, textLayers, frame, blur, shadow, opacity, lightness, saturation, selectedFilter, previewImagePath, originalImagePath
     }
     init(id: UUID = UUID()) {
         self.id = id

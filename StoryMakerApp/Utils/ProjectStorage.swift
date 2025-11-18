@@ -20,7 +20,7 @@ struct ProjectStorage {
         return getDocumentsDirectory().appendingPathComponent("project_\(projectID)")
     }
     
-    static func saveProject(_ project: MainModel,previewImage: UIImage?,baseImage: UIImage? = nil,filteredImage: UIImage? = nil) {
+    static func saveProject(_ project: MainModel,previewImage: UIImage?,baseImage: UIImage? = nil) {
         //check thư mục lưuu proj
         let folderURL = projectFolder(for: project.id)
         do {
@@ -45,13 +45,7 @@ struct ProjectStorage {
             }
             projectToSave.originalImagePath = originalFileName
 
-            if let filtered = filteredImage,
-               let filteredData = filtered.jpegData(compressionQuality: 0.9) {
-                let filteredFileName = "filtered.jpg"
-                let filteredURL = folderURL.appendingPathComponent(filteredFileName)
-                try? filteredData.write(to: filteredURL)
-                projectToSave.filteredImagePath = filteredFileName
-            }
+        
 
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
             //encode projectToSave thành json
