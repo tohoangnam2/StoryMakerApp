@@ -12,13 +12,10 @@ import SwiftUI
 struct EditorView: View {
     
     @State var project: MainModel?
-    @State var openedProjectID: UUID? = nil
     var isNewProject: Bool = false
     @StateObject  var overlayVM = OverlayTextViewModel()
     @StateObject var vm = BackgroundEditorViewModel()
-
     @Environment(\.presentationMode) var presentationMode
-    @State private var selectedTab: Int? = nil
     @State  var isShowBackgroundPicker = false
     @State  var showBackgroundEdit = false
     @State var frame: Frame?
@@ -27,7 +24,6 @@ struct EditorView: View {
     @State  var showTextField: Bool = false
     @State var isSelected : Bool = false
     @State var isEditingText = false
-    @State var isClick : Bool = false
     //bg text
     //edit text
     @State var selectedEditText : OverlayTextEditEnum = .none
@@ -46,10 +42,8 @@ struct EditorView: View {
     @State private var showExport = false
     @State private var goHome = false
     @State var lastEdit: BackGroundEditEditEnum = .filter
-    
     @State var tempText: String = ""
     @State var isCreateText : Bool = false
-    
     var onDismiss: (() -> Void)?
     
     var body: some View {
@@ -112,10 +106,11 @@ struct EditorView: View {
                                 isInitialized = true
 
                                 if let existingProject = project {
-                                    print("Khôi phục project cũ:", existingProject.id)
+                                    print("Khôi phục project:", existingProject.id)
                                     overlayVM.overlays = existingProject.textLayers
                                     frame = existingProject.frame
                                     vm.loadFromProject(existingProject)
+                                    //gán id của project đang edit = vm.curentframeid này
                                     if let f = existingProject.frame {
                                           vm.currentFrameID = f.backgroundID
                                     }
@@ -128,7 +123,6 @@ struct EditorView: View {
                         if  selectedEditText != .none {
                             VStack(spacing: 0) {
                                 VStack {
-                                    
                                     HStack {
                                         Button(action: {}) {
                                             Image("img_edit1_keyboard")
@@ -437,11 +431,6 @@ struct EditorView: View {
               handleBackgroundPicked(frame: pickedFrame, image: pickedImage)
             }
         }
-        .onChange(of: frame?.id) { _ in
-            if selectedTab == 1 {
-                showTextField = false
-            }
-        }
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
@@ -491,10 +480,6 @@ struct EditorView: View {
                 return
             }
             
-            // Ảnh snapshot / filtered / default
-            let snap = snapshotImage
-            let filteredImage = snap
-            
             // Cập nhật các thuộc tính chỉnh sửa
             currentProject.textLayers = overlayVM.overlays
             currentProject.frame      = frame
@@ -504,12 +489,12 @@ struct EditorView: View {
             currentProject.lightness  = vm.lightness
             currentProject.saturation = vm.saturation
             currentProject.selectedFilter = vm.selectedFilter.rawValue
-            currentProject.previewImage   = snap
+            currentProject.previewImage   = snapshotImage
 
             // Lưu project vào file
             ProjectStorage.saveProject(
                 currentProject,
-                previewImage: snap,
+                previewImage: snapshotImage,
                 baseImage: vm.baseImage,
             )
             
@@ -518,7 +503,6 @@ struct EditorView: View {
             print(" Saved full project with snapshot & overlays")
             ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
             
-
             completion()
         }
     }
@@ -541,33 +525,35 @@ struct EditorView: View {
     }
     func handleBackgroundPicked(frame pickedFrame: Frame? ,image pickedImage: UIImage?) {
         if let newFrame = pickedFrame {
-                ensureProject()
-                if vm.currentFrameID != newFrame.backgroundID {
+            ensureProject()
+            if vm.currentFrameID != newFrame.backgroundID {
                 vm.currentFrameID = newFrame.backgroundID
                 vm.resetFilterState()
                 
-                if let url = newFrame.backgroundURL,
-                   let data = try? Data(contentsOf: url),
-                   let uiImage = UIImage(data: data) {
-                    
-                    vm.baseImage = uiImage
-                    vm.generateThumbnails()
-                    
-                    if var current = self.project {
-                        current.frame = newFrame
-                        current.previewImage = uiImage
-                        current.selectedFilter = FilterType.none.rawValue
+                if let url = newFrame.backgroundURL {
+                    URLSession.shared.dataTask(with: url) { data, _, _ in
+                        guard let data = data, let uiImage = UIImage(data: data) else { return }
                         
-                        ProjectStorage.saveProject(
-                            current,
-                            previewImage: uiImage,
-                            baseImage: uiImage,
-                        )
-                        
-                        self.project = current
-                        
-                    }
+                        DispatchQueue.main.async {
+                            vm.baseImage = uiImage
+                            vm.generateThumbnails()
+                            
+                            if var current = self.project {
+                                current.frame = newFrame
+                                current.previewImage = uiImage
+                                current.selectedFilter = FilterType.none.rawValue
+                                
+                                ProjectStorage.saveProject(
+                                    current,
+                                    previewImage: uiImage,
+                                    baseImage: uiImage
+                                )
+                                self.project = current
+                            }
+                        }
+                    }.resume()
                 }
+                
             }
         }
         else if let uiImage = pickedImage {

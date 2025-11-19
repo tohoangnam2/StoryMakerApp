@@ -24,33 +24,26 @@ struct OverlayTextModel: Identifiable , Codable {
     //rotate
     //  Biến trạng thái để lưu góc xoay
     var currentRotation: Double = 0
-    
     // Biến tạm để lưu góc ban đầu khi bắt đầu kéo
     var startAngle: Double = 0
-    
     // Biến tạm để lưu vị trí ban đầu của ngón tay
     var startLocation: CGPoint?
     
-    // 2. Biến trạng thái để lưu zoom
+    //Biến trạng thái để lưu zoom
     var currentScale: CGFloat = 1.0
-    
     // Biến tạm để lưu scale ban đầu
     var startScale: CGFloat = 1.0
-    
     // Biến tạm để lưu khoảng cách ban đầu từ tâm khi zoom
     var startDistance: CGFloat = 0.0
-
-    var isSelected: Bool = false
-    var isEditingText: Bool = false
-
-    var activeGesture: OverlayGestureType = .none
-    
     var startAngleToCenter: Double?
-    //zoom
-    
     var currentZoom: CGFloat = 1
     var displayZoom: CGFloat = 1
+    var startCenter: CGPoint = .zero
+
     
+    var isSelected: Bool = false
+    var isEditingText: Bool = false
+    var activeGesture: OverlayGestureType = .none
     //font size
     var value : Double
     
@@ -101,10 +94,6 @@ struct OverlayTextModel: Identifiable , Codable {
     var blurSD: Double = 1
     var opacitySD: Double = 1
     var shawDowColor: String = "#FFFFFF"
-    
-    //move
-    var startCenter: CGPoint = .zero
-
 }
 
 enum OverlayTextEditEnum : Equatable , CaseIterable {
@@ -204,7 +193,6 @@ enum FontFmailyEnum : String , CaseIterable , Codable {
             return "ff11"
         case .ff12:
             return "ff12"
-            
         }
     }
     

@@ -169,8 +169,8 @@
 				544C17822E8FC99F00999A9B /* Export */,
 				544C177B2E8FC0A200999A9B /* Editor */,
 				544C17792E8FBFF900999A9B /* Home */,
-				546968A02E6E8C2E00BD2B77 /* Splash */,
 				546968A22E6E8C2E00BD2B77 /* Subcription */,
+				546968A02E6E8C2E00BD2B77 /* Splash */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -179,7 +179,6 @@
 			isa = PBXGroup;
 			children = (
 				5469689B2E6E8C2E00BD2B77 /* HomeView.swift */,
-				546489B22EBD8E8300818483 /* HomeViewModel.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -187,11 +186,11 @@
 		544C177B2E8FC0A200999A9B /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				5469689A2E6E8C2E00BD2B77 /* EditorView.swift */,
+				5454444C2E7A6A780080D518 /* EditorCanvasView.swift */,
 				544C17802E8FC95900999A9B /* Background */,
 				544C17582E8FBF0200999A9B /* Color */,
 				544C177C2E8FC0FA00999A9B /* Text */,
-				5469689A2E6E8C2E00BD2B77 /* EditorView.swift */,
-				5454444C2E7A6A780080D518 /* EditorCanvasView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -200,7 +199,6 @@
 			isa = PBXGroup;
 			children = (
 				546968A32E6E8C2E00BD2B77 /* TextView.swift */,
-				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
 			);
 			path = Text;
 			sourceTree = "<group>";
@@ -235,11 +233,9 @@
 		544C17802E8FC95900999A9B /* Background */ = {
 			isa = PBXGroup;
 			children = (
-				544C17652E8FBF0A00999A9B /* Filter */,
 				546968DC2E71625600BD2B77 /* BackgroundEditorView.swift */,
 				546968912E6E8C2E00BD2B77 /* BackGroundView.swift */,
-				546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */,
-				546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */,
+				544C17652E8FBF0A00999A9B /* Filter */,
 			);
 			path = Background;
 			sourceTree = "<group>";
@@ -249,7 +245,6 @@
 			children = (
 				544C176B2E8FBF1600999A9B /* ExportingView.swift */,
 				544C176C2E8FBF1600999A9B /* HomePreview.swift */,
-				544C17682E8FBF1600999A9B /* ExportingViewModel.swift */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -275,19 +270,23 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
-		5469689E2E6E8C2E00BD2B77 /* IntroView */ = {
+		54659D792ECD89C800A89E47 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				5469689D2E6E8C2E00BD2B77 /* IntroView.swift */,
+				546489B22EBD8E8300818483 /* HomeViewModel.swift */,
+				546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */,
+				546968DE2E71701D00BD2B77 /* BackgroundEditorViewModel.swift */,
+				544C17682E8FBF1600999A9B /* ExportingViewModel.swift */,
+				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
 			);
-			path = IntroView;
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		546968A02E6E8C2E00BD2B77 /* Splash */ = {
 			isa = PBXGroup;
 			children = (
+				5469689D2E6E8C2E00BD2B77 /* IntroView.swift */,
 				5469689F2E6E8C2E00BD2B77 /* SplashView.swift */,
-				5469689E2E6E8C2E00BD2B77 /* IntroView */,
 			);
 			path = Splash;
 			sourceTree = "<group>";
@@ -309,6 +308,7 @@
 				546968A82E6E8C2E00BD2B77 /* StoryMakerAppApp.swift */,
 				544C177E2E8FC87800999A9B /* Resources */,
 				544C177D2E8FC80800999A9B /* Models */,
+				54659D792ECD89C800A89E47 /* ViewModels */,
 				544C17782E8FBFC300999A9B /* Views */,
 				544C175E2E8FBF0600999A9B /* Extensions */,
 				545B40222EA22CED00C1CA05 /* Network */,

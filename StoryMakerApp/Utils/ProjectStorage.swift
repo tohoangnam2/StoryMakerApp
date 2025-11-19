@@ -45,8 +45,6 @@ struct ProjectStorage {
             }
             projectToSave.originalImagePath = originalFileName
 
-        
-
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
             //encode projectToSave thành json
             let data = try JSONEncoder().encode(projectToSave)
@@ -54,7 +52,7 @@ struct ProjectStorage {
             try data.write(to: jsonURL)
             
 
-            print(" Saved project: JSON + preview + original + filtered ")
+            print(" Saved project: JSON + preview + original ")
         } catch {
             print(" Error saving project: \(error)")
         }
@@ -101,7 +99,7 @@ struct ProjectStorage {
                 print(" Lỗi đọc JSON:", error)
             }
         }
-    // Xoá project
+    
     static func deleteProject(_ project: MainModel) {
         deleteProject(id: project.id)
     }
@@ -117,8 +115,6 @@ struct ProjectStorage {
             print(" Failed to delete project: \(error)")
         }
     }
-
-    
 }
 
 

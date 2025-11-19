@@ -46,7 +46,6 @@ struct BackgroundEditorView: View {
                     
                     HStack(spacing: 20) {
                         Button(action: {
-                            editEnum = .none
                             isShowBackgroundPicker = true
                             showBackgroundEdit = false
                         }) {
