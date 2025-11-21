@@ -46,9 +46,13 @@ struct EditorView: View {
     @State var isCreateText : Bool = false
     var onDismiss: (() -> Void)?
     
+    @State var panel : EditorPanelEnum = .default1
+    @State var editingText : String = ""
+    
+        
     var body: some View {
         NavigationView {
-            ZStack(alignment: .bottom){
+            ZStack{
                 VStack{
                     //top bar
                     HStack{
@@ -94,11 +98,13 @@ struct EditorView: View {
                                 isEditingText: $isEditingText,
                                 onAddTap: { isShowBackgroundPicker = true },
                                 onTapOutside: { resetEditState() },
-                                onOpenBackgroundEditor: { showBackgroundEdit = true },
+                                onOpenBackgroundEditor: {panel = .backgroundEditor  },
                                 isShowBackgroundPicker: $isShowBackgroundPicker,
                                 showBackgroundEdit: $showBackgroundEdit,
                                 vm: vm,
-                                project: $project, tempText: $tempText, isCreateText: $isCreateText
+                                project: $project, tempText: $tempText, isCreateText: $isCreateText,panel: $panel,editingText: $editingText,onTextDone: { text, isNew in
+                                    handleTextDone(text, isNew: isNew)
+                                }
                             )
                             .onAppear {
                                 print("onapear")
@@ -119,263 +125,40 @@ struct EditorView: View {
                         }
                         .modifier(SnapshotWrapper(isExport: isExport, snapshot: $snapshotImage, trigger: $triggerSnapshot))
                         
-                        //view editor
-                        if  selectedEditText != .none {
-                            VStack(spacing: 0) {
-                                VStack {
-                                    HStack {
-                                        Button(action: {}) {
-                                            Image("img_edit1_keyboard")
-                                        }
-                                        Spacer()
-                                        Text(selectedEditText.title)
-                                            .font(.system(size: 16, weight: .medium))
-                                        Spacer()
-                                        Button(action: {
-                                            selectedEditText = .none
-                                        }) {
-                                            Image("img_bg_check")
-                                        }
-                                        .background(.white)
-                                    }
-                                    .padding(.top, 10)
-                                    .padding(.horizontal)
-                                    
-                                    HStack(spacing: 20) {
-                                        iconButton("img_edit1_text", .fontSize)
-                                        iconButton("img_edit1_size", .fontFamily)
-                                        iconButton("img_edit1_color", .colorSolid)
-                                        iconButton("img_edit1_gradient", .gradient)
-                                        iconButton("img_edit1_stroke", .stroke)
-                                        iconButton("img_edit1_align", .align)
-                                        iconButton("img_edit1_shadow", .shadow)
-                                        iconButton("img_edit1_bg", .background)
-                                    }
-                                    .padding(10)
-                                    .padding(.horizontal, 12)
-                                    .background(Color.gray.opacity(0.2).cornerRadius(70))
-                                    
+                        // view editor
+                        switch panel {
+                        case .textDetail:
+                            TextDetailPanel(tool: $selectedEditText, overlayVM: overlayVM, panel: $panel)
+                            
+                        case .default1:
+                            DefaultPanel(
+                                onAddText: {
+                                    guard vm.baseImage != nil else { return }
+                                    panel = .keyboard(text: "", isNew: true)
+                                    editingText = ""
+                                },
+                                onBackground: {
+                                    isShowBackgroundPicker = true
                                 }
-                                ZStack {
-                                    if selectedEditText != .none {
-                                        Group {
-                                            switch selectedEditText {
-                                            case .fontSize:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .fontSize)
-                                            case .fontFamily:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .fontFamily)
-                                            case .colorSolid:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .colorSolid)
-                                            case .gradient:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .gradient)
-                                            case .stroke:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .stroke)
-                                            case .align:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .align)
-                                            case .shadow:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .shadow)
-                                            case .background:
-                                                TextView(overlayVM: overlayVM, selectedEditText: .background)
-                                            case .none:
-                                                EmptyView()
-                                            }
-                                        }
-                                        .transition(.asymmetric(
-                                            insertion: .move(edge: .bottom).combined(with: .opacity),
-                                            removal: .move(edge: .bottom).combined(with: .opacity)
-                                        ))
-                                        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: selectedEditText)
-                                    }
+                            )
+                            
+                        case .textToolBar:
+                            TextToolbarPanel(onSelectTool: {tool in
+                                selectedEditText = tool
+                                panel = .textDetail(tool)
+                            })
+                            
+                        case .keyboard(let text, let isNew):
+                            KeyboardPanel(
+                                text: $editingText,
+                                isNew: isNew,
+                                onDone: { text, isNew in
+                                    handleTextDone(text, isNew: isNew)
                                 }
-                                .id(selectedEditText)
-                            }
-                            .background(Color.white)
-                        }
-                        else {
-                            if !isTextFieldFocused  {
-                                if !isSelected {
-                                    HStack {
-                                        Spacer()
-                                        Button(action: {
-                                            guard vm.baseImage != nil else { return }
-                                            tempText = ""
-                                            isCreateText = true
-                                            isTextFieldFocused = true
-                                            showTextField = true
-                                            isSelected = true
-                                        }) {
-                                            VStack {
-                                                Image("home_tabbartext")
-                                                Text("Add Text")
-                                            }
-                                            .foregroundColor(.black.opacity(0.8))
-                                        }
-                                        Spacer()
-                                        
-                                        Button(action: {
-                                            isShowBackgroundPicker = true
-                                        }) {
-                                            VStack {
-                                                Image("home_tabbarbg")
-                                                Text("Background")
-                                            }
-                                            .foregroundColor(.black.opacity(0.8))
-                                        }
-                                        Spacer()
-                                    }
-                                    .padding(.top)
-                                    .background(ignoresSafeAreaEdges: .bottom)
-                                    
-                                } else {
-                                    ScrollView(.horizontal,showsIndicators: false){
-                                        HStack (spacing: 16) {
-                                            Spacer().frame(width: 16)
-                                            Button(action: {
-                                                selectedEditText = .fontSize
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_text")
-                                                    Text("Edit")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .fontFamily
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_size")
-                                                    Text("Size")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .colorSolid
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_color")
-                                                    Text("Color")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .gradient
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_gradient")
-                                                    Text("Gradient")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .stroke
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_stroke")
-                                                    Text("Stroke")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .align
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_align")
-                                                    Text("Align")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .shadow
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_shadow")
-                                                    Text("Shadow")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                selectedEditText = .background
-                                            }) {
-                                                VStack {
-                                                    Image("img_edit1_bg")
-                                                    Text("BackGround")
-                                                }
-                                                .foregroundColor(.black.opacity(0.8))
-                                            }
-                                            Spacer()
-                                                .frame(width: 16)
-                                        }
-                                        .padding(.top)
-                                        .background(ignoresSafeAreaEdges: .bottom)
-                                        .background(.white)
-                                    }
-                                    .background(.white)
-                                }
-                            }
-                            else {
-                                HStack {
-                                    Button(action: {
-                                    }) {
-                                        Image("img_textEdit")
-                                            .opacity(0)
-                                    }
-                                    Spacer()
-                                    
-                                    Text("Text Edit")
-                                        .font(.system(size: 16, weight: .medium, design: .default))
-                                    Spacer()
-                                    
-                                    Button(action: {
-                                        //xoá đàu cuối
-                                        let trimmed = tempText.trimmingCharacters(in: .whitespacesAndNewlines)
-                                        //rỗng ko tạo gì cả
-                                           guard !trimmed.isEmpty else {
-                                               // bạn có thể show alert nếu muốn
-                                               showTextField = false
-                                               isCreateText = false
-                                               isSelected = false
-                                               isTextFieldFocused = false
-                                               return
-                                           }
-                                        if isCreateText {
-                                            let newOverlay = overlayVM.addOverlay(trimmed)
-                                            overlayVM.selectOverlay(newOverlay.id)
-                                        }else{
-                                            if let id = overlayVM.selectedOverlayID,
-                                               let idx = overlayVM.overlays.firstIndex(where: { $0.id == id }) {
-                                                overlayVM.overlays[idx].text = trimmed
-                                            }
-                                        }
-
-                                           // reset state
-                                           tempText = ""
-                                           isCreateText = false
-                                           showTextField = false
-                                           isTextFieldFocused = false
-                                           isSelected = true
-                                    }) {
-                                        Image("img_bg_check")
-                                    }
-                                    .background(.white)
-                                }
-                                .padding(.top, 8)
-                                .padding(.horizontal,20)
-                                .background(.white)
-                            }
+                            )
+                            
+                        case .backgroundEditor:
+                            EmptyView()
                         }
                     }
                     .frame(maxWidth: .infinity,maxHeight: .infinity)
@@ -387,13 +170,13 @@ struct EditorView: View {
                         .transition(.opacity)
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                showBackgroundEdit = false
+                                panel = .default1
                                 isSelected = false
                             }
                         }
-                    BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker,showBackgroundEdit:$showBackgroundEdit,isSelected:$isSelected,project:$project,editEnum:$lastEdit)
+                    BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker,showBackgroundEdit:$showBackgroundEdit,isSelected:$isSelected,project:$project,editEnum:$lastEdit, panel: $panel)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .animation(.easeInOut(duration: 0.2), value: showBackgroundEdit)
+                        .animation(.easeInOut(duration: 0.2), value: panel)
                 }
             }
             .onDisappear{
@@ -441,7 +224,7 @@ struct EditorView: View {
                           isEditingText: $isEditingText,
                           onAddTap: { isShowBackgroundPicker = true },
                           onTapOutside: {  },
-                          onOpenBackgroundEditor: { showBackgroundEdit = true },
+                          onOpenBackgroundEditor: { panel = .backgroundEditor },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
                           showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, project: $project,goHome:$goHome)
         }
@@ -451,16 +234,20 @@ struct EditorView: View {
                 presentationMode.wrappedValue.dismiss()
             }
         }
+        .onChange(of: panel) { newValue in
+            withAnimation {
+                showBackgroundEdit = (newValue == .backgroundEditor)
+            }
+        }
     }
     
     //reset
     func resetEditState() {
-        selectedEditText = .none
-        showTextField = false
-        isTextFieldFocused = false
         isSelected = false
+        selectedEditText = .none
         overlayVM.deselect()
-        showBackgroundEdit = false
+        panel = .default1
+        
     }
     
     func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
@@ -507,15 +294,6 @@ struct EditorView: View {
         }
     }
 
-    // Helper để tạo nút icon
-    @ViewBuilder
-    private func iconButton(_ imageName: String, _ type: OverlayTextEditEnum) -> some View {
-        Image(imageName)
-            .foregroundColor(selectedEditText == type ? .red : .black)
-            .onTapGesture {
-                selectedEditText = type
-            }
-    }
     private func ensureProject() {
         if project == nil {
             let newProject = vm.createEmptyProject()
@@ -578,6 +356,28 @@ struct EditorView: View {
             }
         }
     }
+    
+    public func handleTextDone(_ text: String, isNew: Bool) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            panel = .default1
+            return
+        }
+
+        if isNew {
+            let newOverlay = overlayVM.addOverlay(trimmed)
+            overlayVM.selectOverlay(newOverlay.id)
+        } else {
+            if let id = overlayVM.selectedOverlayID,
+               let idx = overlayVM.overlays.firstIndex(where: { $0.id == id }) {
+                overlayVM.overlays[idx].text = trimmed
+            }
+        }
+        overlayVM.editingOverlayID = nil
+        panel = .textToolBar
+        editingText = ""
+    }
+
 }
 
 //snapshoot view con

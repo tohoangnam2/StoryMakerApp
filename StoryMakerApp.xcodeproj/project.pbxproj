@@ -31,6 +31,11 @@
 		546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489AD2EB9AB7900818483 /* ExtensionTextView.swift */; };
 		546489B12EBB494200818483 /* AppUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489B02EBB493300818483 /* AppUsage.swift */; };
 		546489B32EBD8E8300818483 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546489B22EBD8E8300818483 /* HomeViewModel.swift */; };
+		54659D7B2ECDA7FD00A89E47 /* EditorPanelEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54659D7A2ECDA7E900A89E47 /* EditorPanelEnum.swift */; };
+		54659D7F2ECDAF3900A89E47 /* DefaultPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54659D7E2ECDAF2C00A89E47 /* DefaultPanel.swift */; };
+		54659D812ECDB27100A89E47 /* KeyBoardPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54659D802ECDB27100A89E47 /* KeyBoardPanel.swift */; };
+		54659D832ECDB2AC00A89E47 /* TextToolBarPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54659D822ECDB2AC00A89E47 /* TextToolBarPanel.swift */; };
+		54659D852ECDB3C000A89E47 /* TextDetailPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54659D842ECDB3C000A89E47 /* TextDetailPanel.swift */; };
 		546968AB2E6E8C2E00BD2B77 /* BackGroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */; };
 		546968AC2E6E8C2E00BD2B77 /* BackGroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968912E6E8C2E00BD2B77 /* BackGroundView.swift */; };
 		546968AD2E6E8C2E00BD2B77 /* BackGroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */; };
@@ -87,6 +92,11 @@
 		546489AD2EB9AB7900818483 /* ExtensionTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionTextView.swift; sourceTree = "<group>"; };
 		546489B02EBB493300818483 /* AppUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsage.swift; sourceTree = "<group>"; };
 		546489B22EBD8E8300818483 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		54659D7A2ECDA7E900A89E47 /* EditorPanelEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorPanelEnum.swift; sourceTree = "<group>"; };
+		54659D7E2ECDAF2C00A89E47 /* DefaultPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultPanel.swift; sourceTree = "<group>"; };
+		54659D802ECDB27100A89E47 /* KeyBoardPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyBoardPanel.swift; sourceTree = "<group>"; };
+		54659D822ECDB2AC00A89E47 /* TextToolBarPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToolBarPanel.swift; sourceTree = "<group>"; };
+		54659D842ECDB3C000A89E47 /* TextDetailPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDetailPanel.swift; sourceTree = "<group>"; };
 		5469688F2E6E8C2E00BD2B77 /* BackGroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundModel.swift; sourceTree = "<group>"; };
 		546968912E6E8C2E00BD2B77 /* BackGroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundView.swift; sourceTree = "<group>"; };
 		546968932E6E8C2E00BD2B77 /* BackGroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackGroundViewModel.swift; sourceTree = "<group>"; };
@@ -188,6 +198,7 @@
 			children = (
 				5469689A2E6E8C2E00BD2B77 /* EditorView.swift */,
 				5454444C2E7A6A780080D518 /* EditorCanvasView.swift */,
+				54659D7D2ECDAF2600A89E47 /* Controls */,
 				544C17802E8FC95900999A9B /* Background */,
 				544C17582E8FBF0200999A9B /* Color */,
 				544C177C2E8FC0FA00999A9B /* Text */,
@@ -225,6 +236,7 @@
 		544C177F2E8FC8C500999A9B /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				54659D7A2ECDA7E900A89E47 /* EditorPanelEnum.swift */,
 				543401102E83CF980047336A /* ProjectStorage.swift */,
 			);
 			path = Utils;
@@ -280,6 +292,17 @@
 				546968982E6E8C2E00BD2B77 /* OverlayTextViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		54659D7D2ECDAF2600A89E47 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				54659D7E2ECDAF2C00A89E47 /* DefaultPanel.swift */,
+				54659D802ECDB27100A89E47 /* KeyBoardPanel.swift */,
+				54659D822ECDB2AC00A89E47 /* TextToolBarPanel.swift */,
+				54659D842ECDB3C000A89E47 /* TextDetailPanel.swift */,
+			);
+			path = Controls;
 			sourceTree = "<group>";
 		};
 		546968A02E6E8C2E00BD2B77 /* Splash */ = {
@@ -452,11 +475,13 @@
 				546968AE2E6E8C2E00BD2B77 /* OverlayTextModel.swift in Sources */,
 				543F83B12EB2080700354EDB /* FilterDemoView.swift in Sources */,
 				544C17662E8FBF0A00999A9B /* BrightNessBGView.swift in Sources */,
+				54659D832ECDB2AC00A89E47 /* TextToolBarPanel.swift in Sources */,
 				546968AF2E6E8C2E00BD2B77 /* OverlayTextViewModel.swift in Sources */,
 				544C175F2E8FBF0600999A9B /* Color.swift in Sources */,
 				544C17602E8FBF0600999A9B /* Shimmering.swift in Sources */,
 				546489B12EBB494200818483 /* AppUsage.swift in Sources */,
 				544C17612E8FBF0600999A9B /* Snapshot.swift in Sources */,
+				54659D852ECDB3C000A89E47 /* TextDetailPanel.swift in Sources */,
 				544C17622E8FBF0600999A9B /* UIImage+LUT.swift in Sources */,
 				546968B02E6E8C2E00BD2B77 /* EditorView.swift in Sources */,
 				546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */,
@@ -470,7 +495,10 @@
 				546968DF2E71702200BD2B77 /* BackgroundEditorViewModel.swift in Sources */,
 				544C17712E8FBF1600999A9B /* ExportingViewModel.swift in Sources */,
 				544C17732E8FBF1600999A9B /* ExportingView.swift in Sources */,
+				54659D7B2ECDA7FD00A89E47 /* EditorPanelEnum.swift in Sources */,
+				54659D812ECDB27100A89E47 /* KeyBoardPanel.swift in Sources */,
 				544C17742E8FBF1600999A9B /* HomePreview.swift in Sources */,
+				54659D7F2ECDAF3900A89E47 /* DefaultPanel.swift in Sources */,
 				544C17752E8FBF1600999A9B /* TestPreview.swift in Sources */,
 				544C17762E8FBF1600999A9B /* TestPreview1.swift in Sources */,
 				543F83B92EB4A18D00354EDB /* TestPhotopicker.swift in Sources */,

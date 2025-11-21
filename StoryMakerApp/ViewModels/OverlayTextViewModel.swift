@@ -12,6 +12,9 @@ import Foundation
 class OverlayTextViewModel: ObservableObject {
     @Published var overlays: [OverlayTextModel] = []
     @Published var selectedOverlayID: UUID? = nil
+    
+    @Published var editingOverlayID: UUID? = nil
+
 
     func selectOverlay(_ id: UUID) {
         selectedOverlayID = id

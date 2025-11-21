@@ -20,6 +20,8 @@ struct BackgroundEditorView: View {
     @Binding var project: MainModel?
     @Binding var editEnum: BackGroundEditEditEnum
     
+    @Binding var panel: EditorPanelEnum
+    
     var body: some View {
         ZStack{
             VStack {
@@ -35,7 +37,7 @@ struct BackgroundEditorView: View {
                             .font(.system(size: 16, weight: .medium))
                         Spacer()
                         Button(action: {
-                            showBackgroundEdit = false
+                            panel = .default1
                         }) {
                             Image("img_bg_check")
                         }
@@ -47,7 +49,8 @@ struct BackgroundEditorView: View {
                     HStack(spacing: 20) {
                         Button(action: {
                             isShowBackgroundPicker = true
-                            showBackgroundEdit = false
+                            panel = .default1
+                            
                         }) {
                             Image("none")
                                 .foregroundColor(editEnum == .none ? .red : .black)
