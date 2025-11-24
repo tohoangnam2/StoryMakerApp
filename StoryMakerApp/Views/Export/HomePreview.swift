@@ -8,25 +8,19 @@
 import SwiftUI
 
 struct HomePreview: View {
+    
     @ObservedObject var exportingVM: ExportingViewModel
     @Environment(\.dismiss) var dismiss
-    
     @ObservedObject var overlayVM: OverlayTextViewModel
-    @StateObject private var bgoverrlayVM = BackGroundViewModel()
     let frame: Frame?
-    
-    @Binding var showTextField: Bool
     @FocusState.Binding var isTextFieldFocused: Bool
-    @Binding var isSelected : Bool
     @Binding var isEditingText : Bool
     
     let onAddTap: () -> Void
     let onTapOutside: () -> Void
     let onOpenBackgroundEditor: () -> Void
 
-    @Binding var isShowBackgroundPicker: Bool
-    @Binding var showBackgroundEdit: Bool
-    
+    @Binding var isShowBackgroundPicker: Bool    
     @State private var isImageLoaded = false
     @FocusState private var fakeFocus: Bool
     

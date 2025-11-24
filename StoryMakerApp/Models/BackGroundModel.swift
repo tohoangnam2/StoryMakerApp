@@ -81,6 +81,7 @@ struct Category: Codable ,Equatable{
 
 
 struct Frame: Codable, Identifiable {
+    //sinh ra id duy nhất cho 1 frame
     let id =  UUID()
     let category: String
     let thumb: String

@@ -41,7 +41,13 @@ struct BackGroundView: View {
                 }
                 
                 Button(action: {
-                    onPicked(selectedFrame, pickedImage)
+                    var fullImage: UIImage? = nil
+
+                     if let frame = selectedFrame,
+                        let url = frame.backgroundURL {
+                         fullImage = vm.cachedImage(for: url)   // lấy ảnh gốc từ cache
+                     }
+                    onPicked(selectedFrame, pickedImage ?? fullImage)
                     dismiss()
                 }) {
                     Image("img_bg_check")
@@ -82,6 +88,10 @@ struct BackGroundView: View {
                                         .onTapGesture {
                                             selectedFrame = frame
                                             pickedImage = nil
+                                            //khi chọn frame thì cho nó tải luôn fullimage luôn
+                                            if let url = frame.backgroundURL {
+                                                loadFullImageIfNeeded(url: url)
+                                            }
                                         }
                                     }
                                 }
@@ -92,7 +102,7 @@ struct BackGroundView: View {
                             }
                         }
                     }
-                    if isTransferring {
+                    if vm.isLoadingFullImage {
                         ZStack {
                             Color.white.opacity(0.25)
                                 .edgesIgnoringSafeArea(.bottom)
@@ -139,6 +149,26 @@ struct BackGroundView: View {
                 }
             }
         }
+    }
+    
+    func loadFullImageIfNeeded(url: URL) {
+        //nếu ảnh tải rồi thì thôi
+        if vm.cachedImage(for: url) != nil { return }
+
+        vm.isLoadingFullImage = true
+        //load bằng url xong lưu vào cache -> chỉ load 1 lần
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            DispatchQueue.main.async {
+                vm.isLoadingFullImage = false
+            }
+            
+            guard let data = data,
+                  let img = UIImage(data: data) else { return }
+
+            DispatchQueue.main.async {
+                vm.saveToCache(url: url, image: img)
+            }
+        }.resume()
     }
 }
 

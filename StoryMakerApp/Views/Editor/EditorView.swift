@@ -17,12 +17,9 @@ struct EditorView: View {
     @StateObject var vm = BackgroundEditorViewModel()
     @Environment(\.presentationMode) var presentationMode
     @State  var isShowBackgroundPicker = false
-    @State  var showBackgroundEdit = false
     @State var frame: Frame?
     //show bàn phím
     @FocusState private var isTextFieldFocused: Bool
-    @State  var showTextField: Bool = false
-    @State var isSelected : Bool = false
     @State var isEditingText = false
     //bg text
     //edit text
@@ -42,7 +39,6 @@ struct EditorView: View {
     @State private var showExport = false
     @State private var goHome = false
     @State var lastEdit: BackGroundEditEditEnum = .filter
-    @State var tempText: String = ""
     @State var isCreateText : Bool = false
     var onDismiss: (() -> Void)?
     
@@ -52,19 +48,14 @@ struct EditorView: View {
         
     var body: some View {
         NavigationView {
-            ZStack{
+            ZStack(alignment: .bottom){
                 VStack{
                     //top bar
                     HStack{
                         Button(action: {
-                            saveAndExitExport(
-                                project: project,
-                                overlayVM: overlayVM,
-                                vm: vm
-                            ) {
+                            saveAndExitExport(project: project,overlayVM: overlayVM,vm: vm) {
                                 presentationMode.wrappedValue.dismiss()
                             }
-                            
                         }) {
                             Image("home_back")
                         }
@@ -72,11 +63,7 @@ struct EditorView: View {
                         
                         Button {
                             if vm.baseImage != nil {
-                                saveAndExitExport(
-                                    project: project,
-                                    overlayVM: overlayVM,
-                                    vm: vm
-                                ) {
+                                saveAndExitExport(project: project,overlayVM: overlayVM,vm: vm) {
                                     showPreview = true
                                 }
                             }
@@ -92,19 +79,14 @@ struct EditorView: View {
                             EditorCanvasView(
                                 overlayVM: overlayVM,
                                 frame: frame,
-                                showTextField: $showTextField,
                                 isTextFieldFocused: $isTextFieldFocused,
-                                isSelected: $isSelected,
                                 isEditingText: $isEditingText,
                                 onAddTap: { isShowBackgroundPicker = true },
                                 onTapOutside: { resetEditState() },
-                                onOpenBackgroundEditor: {panel = .backgroundEditor  },
+                                onOpenBackgroundEditor: {panel = .backgroundEditor},
                                 isShowBackgroundPicker: $isShowBackgroundPicker,
-                                showBackgroundEdit: $showBackgroundEdit,
                                 vm: vm,
-                                project: $project, tempText: $tempText, isCreateText: $isCreateText,panel: $panel,editingText: $editingText,onTextDone: { text, isNew in
-                                    handleTextDone(text, isNew: isNew)
-                                }
+                                project: $project, isCreateText: $isCreateText,panel: $panel,editingText: $editingText
                             )
                             .onAppear {
                                 print("onapear")
@@ -127,54 +109,53 @@ struct EditorView: View {
                         
                         // view editor
                         switch panel {
-                        case .textDetail:
-                            TextDetailPanel(tool: $selectedEditText, overlayVM: overlayVM, panel: $panel)
+                            case .default1:
+                                DefaultPanel(
+                                    onAddText: {
+                                        guard vm.baseImage != nil else { return }
+                                        panel = .keyboard(text: "", isNew: true)
+                                        editingText = ""
+                                    },
+                                    onBackground: {
+                                        isShowBackgroundPicker = true
+                                    }
+                                )
                             
-                        case .default1:
-                            DefaultPanel(
-                                onAddText: {
-                                    guard vm.baseImage != nil else { return }
-                                    panel = .keyboard(text: "", isNew: true)
-                                    editingText = ""
-                                },
-                                onBackground: {
-                                    isShowBackgroundPicker = true
-                                }
-                            )
+                            case .keyboard(let text, let isNew):
+                                KeyboardPanel(
+                                    text: $editingText,
+                                    isNew: isNew,
+                                    onDone: { text, isNew in
+                                        handleTextDone(text, isNew: isNew)
+                                    }
+                                )
                             
-                        case .textToolBar:
-                            TextToolbarPanel(onSelectTool: {tool in
-                                selectedEditText = tool
-                                panel = .textDetail(tool)
-                            })
+                            case .textToolBar:
+                                TextToolbarPanel(onSelectTool: {tool in
+                                    selectedEditText = tool
+                                    panel = .textDetail(tool)
+                                })
                             
-                        case .keyboard(let text, let isNew):
-                            KeyboardPanel(
-                                text: $editingText,
-                                isNew: isNew,
-                                onDone: { text, isNew in
-                                    handleTextDone(text, isNew: isNew)
-                                }
-                            )
-                            
-                        case .backgroundEditor:
-                            EmptyView()
+                            case .textDetail:
+                                TextDetailPanel(tool: $selectedEditText, overlayVM: overlayVM, panel: $panel)
+                            case .backgroundEditor:
+                                EmptyView()
                         }
                     }
                     .frame(maxWidth: .infinity,maxHeight: .infinity)
                 }
                 //view backgroundedit
-                if showBackgroundEdit {
+                if panel == .backgroundEditor {
                     Color.white.opacity(0.01)
                         .ignoresSafeArea()
                         .transition(.opacity)
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 panel = .default1
-                                isSelected = false
                             }
                         }
-                    BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker,showBackgroundEdit:$showBackgroundEdit,isSelected:$isSelected,project:$project,editEnum:$lastEdit, panel: $panel)
+                    BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker
+                                         ,project:$project,editEnum:$lastEdit, panel: $panel)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .animation(.easeInOut(duration: 0.2), value: panel)
                 }
@@ -216,17 +197,20 @@ struct EditorView: View {
         }
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
-            HomePreview(  exportingVM: exportingVM, overlayVM: overlayVM,
+            HomePreview(  exportingVM: exportingVM,
+                          overlayVM: overlayVM,
                           frame: frame,
-                          showTextField: $showTextField,
                           isTextFieldFocused: $isTextFieldFocused,
-                          isSelected: $isSelected,
                           isEditingText: $isEditingText,
                           onAddTap: { isShowBackgroundPicker = true },
                           onTapOutside: {  },
                           onOpenBackgroundEditor: { panel = .backgroundEditor },
                           isShowBackgroundPicker: $isShowBackgroundPicker,
-                          showBackgroundEdit: $showBackgroundEdit, snapshotImage: $snapshotImage, triggerSnapshot:$triggerSnapshot, vm: vm, project: $project,goHome:$goHome)
+                          snapshotImage: $snapshotImage,
+                          triggerSnapshot:$triggerSnapshot,
+                          vm: vm,
+                          project: $project,
+                          goHome:$goHome)
         }
         //back về rôt home
         .onChange(of: goHome) { newValue in
@@ -234,16 +218,10 @@ struct EditorView: View {
                 presentationMode.wrappedValue.dismiss()
             }
         }
-        .onChange(of: panel) { newValue in
-            withAnimation {
-                showBackgroundEdit = (newValue == .backgroundEditor)
-            }
-        }
     }
     
     //reset
     func resetEditState() {
-        isSelected = false
         selectedEditText = .none
         overlayVM.deselect()
         panel = .default1
@@ -251,7 +229,6 @@ struct EditorView: View {
     }
     
     func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-       
         isExport = true
         resetEditState()
         // bật trigger snapshot
@@ -302,61 +279,43 @@ struct EditorView: View {
         }
     }
     func handleBackgroundPicked(frame pickedFrame: Frame? ,image pickedImage: UIImage?) {
+        //khi pick 1 ảnh xong thì mới tạo project , nếu chưa pick gì thì chưa tạo
+        ensureProject()
         if let newFrame = pickedFrame {
-            ensureProject()
             if vm.currentFrameID != newFrame.backgroundID {
                 vm.currentFrameID = newFrame.backgroundID
                 vm.resetFilterState()
                 
-                if let url = newFrame.backgroundURL {
-                    URLSession.shared.dataTask(with: url) { data, _, _ in
-                        guard let data = data, let uiImage = UIImage(data: data) else { return }
-                        
-                        DispatchQueue.main.async {
-                            vm.baseImage = uiImage
-                            vm.generateThumbnails()
-                            
-                            if var current = self.project {
-                                current.frame = newFrame
-                                current.previewImage = uiImage
-                                current.selectedFilter = FilterType.none.rawValue
-                                
-                                ProjectStorage.saveProject(
-                                    current,
-                                    previewImage: uiImage,
-                                    baseImage: uiImage
-                                )
-                                self.project = current
-                            }
-                        }
-                    }.resume()
-                }
+                let finalImage = pickedImage ?? UIImage(named: "placeholder")!
                 
+                vm.baseImage = finalImage
+                vm.generateThumbnails()
+                
+                updateProjectSaving(frame: newFrame, image: finalImage)
+                return
             }
         }
         else if let uiImage = pickedImage {
-            ensureProject()
-            // xử lý ảnh từ máy
             vm.baseImage = uiImage
             vm.generateThumbnails()
-            
-            if var current = self.project {
-                current.frame = nil
-                current.previewImage = uiImage
-                current.selectedFilter = FilterType.none.rawValue
-                
-                ProjectStorage.saveProject(
-                    current,
-                    previewImage: uiImage,
-                    baseImage: uiImage,
-                )
-                
-                self.project = current
-                
-            }
+            updateProjectSaving(frame: nil, image: uiImage)
         }
     }
-    
+    private func updateProjectSaving(frame: Frame?, image: UIImage) {
+        if var current = self.project {
+            current.frame = frame
+            current.previewImage = image
+            current.selectedFilter = FilterType.none.rawValue
+
+            ProjectStorage.saveProject(
+                current,
+                previewImage: image,
+                baseImage: image
+            )
+            self.project = current
+        }
+    }
+
     public func handleTextDone(_ text: String, isNew: Bool) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {

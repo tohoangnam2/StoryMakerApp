@@ -56,7 +56,7 @@ class HomeViewModel: ObservableObject {
                 .attributesOfItem(atPath: rJSON.path)[.modificationDate] as? Date) ?? .distantPast
             return (lDate ?? .distantPast) > (rDate ?? .distantPast)
         }
-
+        //show ui 
         DispatchQueue.main.asyncAfter(deadline: .now()+0.15) {
             self.mainprojects = loaded
             self.isLoading = false

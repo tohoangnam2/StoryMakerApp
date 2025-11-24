@@ -49,7 +49,7 @@ struct FilterEditorCIView: View {
                             .onTapGesture {
                                 guard vm.selectedFilter != filter else { return }
                                 vm.selectedFilter = filter
-                                vm.applySelectedFilter(animated: true)
+                                vm.applySelectedFilter()
                             }
                         }
                        

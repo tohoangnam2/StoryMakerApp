@@ -39,9 +39,6 @@ struct OverlayTextModel: Identifiable , Codable {
     var currentZoom: CGFloat = 1
     var displayZoom: CGFloat = 1
     var startCenter: CGPoint = .zero
-
-    
-    var isSelected: Bool = false
     var isEditingText: Bool = false
     var activeGesture: OverlayGestureType = .none
     //font size
@@ -54,7 +51,6 @@ struct OverlayTextModel: Identifiable , Codable {
     
     // Font family
     var selectedFontFamily: FontFmailyEnum = .ff7
-    
     
     // Align
     var selectedAlign: AlignEnum = .none
@@ -80,7 +76,6 @@ struct OverlayTextModel: Identifiable , Codable {
     // Stroke
     var strokeWidth: Double = 15
     var hasStroke: Bool = false
-
     
     // Background
     var paddingBG: Double = 10

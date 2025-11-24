@@ -17,31 +17,21 @@ enum EditMode {
 struct EditorCanvasView: View {
     
     @ObservedObject var overlayVM: OverlayTextViewModel
-    @StateObject private var bgoverrlayVM = BackGroundViewModel()
     let frame: Frame?
-    @Binding var showTextField: Bool
     @FocusState.Binding var isTextFieldFocused: Bool
-    @Binding var isSelected : Bool
     @Binding var isEditingText : Bool
     let onAddTap: () -> Void
     let onTapOutside: () -> Void
     let onOpenBackgroundEditor: () -> Void
     @Binding var isShowBackgroundPicker: Bool
-    @Binding var showBackgroundEdit: Bool
     @ObservedObject var vm: BackgroundEditorViewModel
     @State private var isImageLoaded = false
     @Binding var project : MainModel?
-
-    @Binding var tempText: String
     @Binding var isCreateText: Bool
-
     @Binding var panel : EditorPanelEnum
     @Binding var editingText : String
-    
-    let onTextDone: (String,Bool) -> Void
     @State private var didJustDeselect = false
 
-    
     var body: some View {
         NavigationView {
             ZStack {
@@ -57,29 +47,11 @@ struct EditorCanvasView: View {
                             backgroundView(uiImage: uiImage, projectID: project.id)
                         
                     } else {
-                        Color.colHomeBg
-                        VStack(spacing: 16){
-                            Button(action: onAddTap)
-                            {
-                                Image("home_add")
-                                    .frame(width: 50,height: 50)
-                            }
-                            Text("Tap to add Background")
-                                .font(.system(size: 16, weight: .regular, design: .default))
-                        }
+                        emptyBackgroundView()
                     }
                 }
                 else{
-                    Color.colHomeBg
-                    VStack(spacing: 16){
-                        Button(action: onAddTap)
-                        {
-                            Image("home_add")
-                                .frame(width: 50,height: 50)
-                        }
-                        Text("Tap to add Background")
-                            .font(.system(size: 16, weight: .regular, design: .default))
-                    }
+                    emptyBackgroundView()
                 }
             }
         }
@@ -96,7 +68,19 @@ struct EditorCanvasView: View {
         .ignoresSafeArea(.keyboard,edges: .bottom)
         .navigationBarBackButtonHidden(true)
     }
-    
+    @ViewBuilder
+    private func emptyBackgroundView() -> some View {
+        Color.colHomeBg
+        VStack(spacing: 16) {
+            Button(action: onAddTap) {
+                Image("home_add")
+                    .frame(width: 50, height: 50)
+            }
+            Text("Tap to add Background")
+                .font(.system(size: 16, weight: .regular))
+        }
+    }
+
     // View dựng background + filter + overlay text
     @ViewBuilder
     private func backgroundView(uiImage: UIImage, projectID: UUID) -> some View {
@@ -119,7 +103,6 @@ struct EditorCanvasView: View {
                             onOpenBackgroundEditor()
                         }
                     }
-
                     // Lớp text overlay
                     .overlay(
                         Group {
@@ -139,6 +122,7 @@ struct EditorCanvasView: View {
                              default:
                                 EmptyView()
                             }
+                            
                             ForEach($overlayVM.overlays){ $overlay in
                                 if overlayVM.editingOverlayID == overlay.id { EmptyView() }
                                 else{
@@ -401,14 +385,6 @@ struct EditorCanvasView: View {
                             .coordinateSpace(name: "canvas")
                         }
                     )
-    }
-    
-    // Hàm tính góc giữa 2 điểm (giúp tính toán góc xoay)
-    func angleBetween(start: CGPoint, current: CGPoint) -> Angle {
-        let deltaX = current.x - start.x
-        let deltaY = current.y - start.y
-        let radians = atan2(deltaY, deltaX)
-        return Angle(radians: radians)
     }
 }
 

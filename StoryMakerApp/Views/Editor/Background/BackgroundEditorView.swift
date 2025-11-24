@@ -15,18 +15,14 @@ struct BackgroundEditorView: View {
     @Environment(\.dismiss) private var dismiss
     let frame: Frame?
     @Binding var isShowBackgroundPicker : Bool
-    @Binding var showBackgroundEdit : Bool
-    @Binding var isSelected : Bool
     @Binding var project: MainModel?
     @Binding var editEnum: BackGroundEditEditEnum
-    
     @Binding var panel: EditorPanelEnum
     
     var body: some View {
         ZStack{
             VStack {
                 VStack{
-                    
                     HStack {
                         Button(action: {}) {
                             Image("img_edit1_keyboard")
@@ -36,6 +32,7 @@ struct BackgroundEditorView: View {
                         Text(editEnum.title)
                             .font(.system(size: 16, weight: .medium))
                         Spacer()
+                        
                         Button(action: {
                             panel = .default1
                         }) {
@@ -50,7 +47,6 @@ struct BackgroundEditorView: View {
                         Button(action: {
                             isShowBackgroundPicker = true
                             panel = .default1
-                            
                         }) {
                             Image("none")
                                 .foregroundColor(editEnum == .none ? .red : .black)
@@ -65,7 +61,6 @@ struct BackgroundEditorView: View {
                         
                         Button(action: {
                             editEnum = .brightness
-                            
                         }) {
                             Image("ic_brightness")
                                 .foregroundColor(editEnum == .brightness ? .red : .black)
@@ -100,7 +95,6 @@ struct BackgroundEditorView: View {
                 .id(editEnum)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: editEnum)
-
             }
         }
         .background(.white)
