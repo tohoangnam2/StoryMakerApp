@@ -40,25 +40,28 @@ struct BackGroundView: View {
                         .frame(width: 24, height: 24)
                 }
                 
-                Button(action: {
-                    var fullImage: UIImage? = nil
-
-                     if let frame = selectedFrame,
-                        let url = frame.backgroundURL {
-                         fullImage = vm.cachedImage(for: url)   // lấy ảnh gốc từ cache
-                     }
-                    onPicked(selectedFrame, pickedImage ?? fullImage)
-                    dismiss()
-                }) {
+                Button {
+                    guard let frame = selectedFrame else { return }
+                    //lấy url rồi bật loading
+                    if let url = frame.backgroundURL {
+                        vm.isLoadingFullImage = true
+                        //chạy xong cái hàm rồi tắt loading
+                        loadFullImageIfNeeded(url: url) { fullImage in
+                            vm.isLoadingFullImage = false
+                            //trả về ảnh check đk rồi truyền sang
+                            let final = fullImage ?? UIImage(named: "placeholder")!
+                            onPicked(frame, final)
+                            dismiss()
+                        }
+                    }
+                } label: {
                     Image("img_bg_check")
-                        .foregroundColor(selectedFrame != nil || pickedImage != nil ? .green : .gray)
                 }
-                
+
+
             }
             .padding(.horizontal)
-            
-            Divider().padding(.vertical, 4)
-            
+                        
             // Body
             ZStack{
                 VStack {
@@ -88,10 +91,7 @@ struct BackGroundView: View {
                                         .onTapGesture {
                                             selectedFrame = frame
                                             pickedImage = nil
-                                            //khi chọn frame thì cho nó tải luôn fullimage luôn
-                                            if let url = frame.backgroundURL {
-                                                loadFullImageIfNeeded(url: url)
-                                            }
+                                           
                                         }
                                     }
                                 }
@@ -151,25 +151,37 @@ struct BackGroundView: View {
         }
     }
     
-    func loadFullImageIfNeeded(url: URL) {
-        //nếu ảnh tải rồi thì thôi
-        if vm.cachedImage(for: url) != nil { return }
+    func loadFullImageIfNeeded(url: URL, completion: @escaping (UIImage?) -> Void) {
+
+        // nếu cache đã có → trả về ngay
+        if let cached = vm.cachedImage(for: url) {
+            completion(cached)
+            return
+        }
 
         vm.isLoadingFullImage = true
-        //load bằng url xong lưu vào cache -> chỉ load 1 lần
+
         URLSession.shared.dataTask(with: url) { data, _, _ in
             DispatchQueue.main.async {
                 vm.isLoadingFullImage = false
             }
-            
+            //dữ liệu mà lỗi -> nil
             guard let data = data,
-                  let img = UIImage(data: data) else { return }
-
+                  let img = UIImage(data: data) else {
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+                return
+            }
+            //lưu vào cache rồi trả về editor
             DispatchQueue.main.async {
                 vm.saveToCache(url: url, image: img)
+                completion(img)
             }
+
         }.resume()
     }
+
 }
 
 // Category tags

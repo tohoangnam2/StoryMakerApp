@@ -15,8 +15,11 @@ class BackgroundEditorViewModel: ObservableObject {
     @Published  var isImageLoaded = false
     @Published var filteredImage: UIImage?
     @Published var selectedFilter: FilterType = .none
+    @Published var hasLoadedFiltered = false
     @Published var thumbnails: [FilterType: UIImage] = [:]
     private let context = CIContext()
+    private let processingQueue = DispatchQueue(label: "FilterProcessingQueue", qos: .userInitiated)
+    
     @Published var baseImage: UIImage? {
         //base change là cái này cũng change
         didSet {
@@ -40,7 +43,7 @@ class BackgroundEditorViewModel: ObservableObject {
             self.generateThumbnails()
             //nếu có filter nào được chọn sẵn thì apply lên luôn
             if self.selectedFilter != .none {
-                self.applySelectedFilter()
+                self.applySelectedFilter(animated: false)
             }
             self.isImageLoaded = true
         }
@@ -67,15 +70,16 @@ class BackgroundEditorViewModel: ObservableObject {
             }
         }
     }
-
     //  luồng xử lí
-    func applySelectedFilter() {
+    func applySelectedFilter(animated: Bool = true) {
         guard let baseImage = baseImage else { return }
         let currentFilter = selectedFilter
         
         // Nếu user chọn "none" thì reset về ảnh gốc
         if currentFilter == .none {
-            self.filteredImage = baseImage
+            withAnimation(animated ? .easeInOut(duration: 0.25) : nil) {
+                self.filteredImage = baseImage
+            }
             return
         }
         // Xử lý filter ở background thread
@@ -150,19 +154,22 @@ class BackgroundEditorViewModel: ObservableObject {
         lightness = project.lightness
         saturation = project.saturation
         selectedFilter = FilterType(rawValue: project.selectedFilter ?? "") ?? .none
+
+        let folderURL = ProjectStorage.projectFolder(for: project.id)
         
         // Load original base image
         if let originalName = project.originalImagePath {
-            let folderURL = ProjectStorage.projectFolder(for: project.id)
-            let localImageURL = folderURL.appendingPathComponent("original.jpg")
-            
-            if FileManager.default.fileExists(atPath: localImageURL.path),
-               let uiImage = UIImage(contentsOfFile: localImageURL.path) {
-                baseImage = uiImage
+            let originalURL = folderURL.appendingPathComponent(originalName)
+            if FileManager.default.fileExists(atPath: originalURL.path),
+               let data = try? Data(contentsOf: originalURL),
+               let originalImage = UIImage(data: data) {
+                baseImage = originalImage
             } else {
                 print(" Không tìm thấy original.jpg cho project \(project.id)")
             }
         }
+
+      
     }
     
     func createEmptyProject() -> MainModel {
@@ -170,6 +177,8 @@ class BackgroundEditorViewModel: ObservableObject {
         ProjectStorage.saveProject(newProject, previewImage: nil)
         return newProject
     }
+    
+    
+
+
 }
-
-

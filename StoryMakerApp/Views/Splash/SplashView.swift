@@ -50,7 +50,7 @@ struct SplashView: View {
             }
             .onAppear {
                 if AppUsage.shared.hasSeenIntro {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         screen = .home
                     }
                 }

@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 struct EditorView: View {
     
     @State var project: MainModel?
@@ -21,7 +19,6 @@ struct EditorView: View {
     //show bàn phím
     @FocusState private var isTextFieldFocused: Bool
     @State var isEditingText = false
-    //bg text
     //edit text
     @State var selectedEditText : OverlayTextEditEnum = .none
     @State var selectedFontFamily : FontFmailyEnum? = nil
@@ -41,11 +38,9 @@ struct EditorView: View {
     @State var lastEdit: BackGroundEditEditEnum = .filter
     @State var isCreateText : Bool = false
     var onDismiss: (() -> Void)?
-    
     @State var panel : EditorPanelEnum = .default1
     @State var editingText : String = ""
     
-        
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom){
@@ -86,7 +81,10 @@ struct EditorView: View {
                                 onOpenBackgroundEditor: {panel = .backgroundEditor},
                                 isShowBackgroundPicker: $isShowBackgroundPicker,
                                 vm: vm,
-                                project: $project, isCreateText: $isCreateText,panel: $panel,editingText: $editingText
+                                project: $project,
+                                isCreateText: $isCreateText,
+                                panel: $panel,
+                                editingText: $editingText
                             )
                             .onAppear {
                                 print("onapear")
@@ -114,15 +112,16 @@ struct EditorView: View {
                                     onAddText: {
                                         guard vm.baseImage != nil else { return }
                                         panel = .keyboard(text: "", isNew: true)
+                                        // gán trị ban đầu
                                         editingText = ""
                                     },
                                     onBackground: {
                                         isShowBackgroundPicker = true
                                     }
                                 )
-                            
                             case .keyboard(let text, let isNew):
                                 KeyboardPanel(
+                                    //gán cho giá trị đang hiện thị trực tiếp của textfield
                                     text: $editingText,
                                     isNew: isNew,
                                     onDone: { text, isNew in
@@ -138,7 +137,7 @@ struct EditorView: View {
                             
                             case .textDetail:
                                 TextDetailPanel(tool: $selectedEditText, overlayVM: overlayVM, panel: $panel)
-                            case .backgroundEditor:
+                            default:
                                 EmptyView()
                         }
                     }
@@ -154,8 +153,7 @@ struct EditorView: View {
                                 panel = .default1
                             }
                         }
-                    BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker
-                                         ,project:$project,editEnum:$lastEdit, panel: $panel)
+                    BackgroundEditorView(vm: vm,frame: frame,isShowBackgroundPicker: $isShowBackgroundPicker,project:$project,editEnum:$lastEdit, panel: $panel)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .animation(.easeInOut(duration: 0.2), value: panel)
                 }
@@ -189,7 +187,6 @@ struct EditorView: View {
                 }
             }
         }
-        
         .fullScreenCover(isPresented: $isShowBackgroundPicker) {
             BackGroundView { pickedFrame, pickedImage in
               handleBackgroundPicked(frame: pickedFrame, image: pickedImage)
@@ -198,17 +195,8 @@ struct EditorView: View {
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
             HomePreview(  exportingVM: exportingVM,
-                          overlayVM: overlayVM,
-                          frame: frame,
-                          isTextFieldFocused: $isTextFieldFocused,
-                          isEditingText: $isEditingText,
-                          onAddTap: { isShowBackgroundPicker = true },
-                          onTapOutside: {  },
-                          onOpenBackgroundEditor: { panel = .backgroundEditor },
-                          isShowBackgroundPicker: $isShowBackgroundPicker,
                           snapshotImage: $snapshotImage,
                           triggerSnapshot:$triggerSnapshot,
-                          vm: vm,
                           project: $project,
                           goHome:$goHome)
         }
@@ -220,12 +208,10 @@ struct EditorView: View {
         }
     }
     
-    //reset
     func resetEditState() {
         selectedEditText = .none
         overlayVM.deselect()
         panel = .default1
-        
     }
     
     func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
@@ -235,7 +221,6 @@ struct EditorView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             triggerSnapshot = true
         }
-        
         //đợi chụp xong rồi mới save
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             guard var currentProject = project else {
@@ -243,7 +228,6 @@ struct EditorView: View {
                 completion()
                 return
             }
-            
             // Cập nhật các thuộc tính chỉnh sửa
             currentProject.textLayers = overlayVM.overlays
             currentProject.frame      = frame
@@ -254,14 +238,12 @@ struct EditorView: View {
             currentProject.saturation = vm.saturation
             currentProject.selectedFilter = vm.selectedFilter.rawValue
             currentProject.previewImage   = snapshotImage
-
             // Lưu project vào file
             ProjectStorage.saveProject(
                 currentProject,
                 previewImage: snapshotImage,
                 baseImage: vm.baseImage,
             )
-            
             //  Cập nhật state cục bộ trong EditorView
             self.project = currentProject
             print(" Saved full project with snapshot & overlays")
@@ -278,6 +260,7 @@ struct EditorView: View {
             frame = newProject.frame
         }
     }
+    
     func handleBackgroundPicked(frame pickedFrame: Frame? ,image pickedImage: UIImage?) {
         //khi pick 1 ảnh xong thì mới tạo project , nếu chưa pick gì thì chưa tạo
         ensureProject()
@@ -285,12 +268,9 @@ struct EditorView: View {
             if vm.currentFrameID != newFrame.backgroundID {
                 vm.currentFrameID = newFrame.backgroundID
                 vm.resetFilterState()
-                
                 let finalImage = pickedImage ?? UIImage(named: "placeholder")!
-                
                 vm.baseImage = finalImage
                 vm.generateThumbnails()
-                
                 updateProjectSaving(frame: newFrame, image: finalImage)
                 return
             }
@@ -301,17 +281,13 @@ struct EditorView: View {
             updateProjectSaving(frame: nil, image: uiImage)
         }
     }
+    
     private func updateProjectSaving(frame: Frame?, image: UIImage) {
         if var current = self.project {
             current.frame = frame
             current.previewImage = image
             current.selectedFilter = FilterType.none.rawValue
-
-            ProjectStorage.saveProject(
-                current,
-                previewImage: image,
-                baseImage: image
-            )
+            ProjectStorage.saveProject(current,previewImage: image,baseImage: image)
             self.project = current
         }
     }
@@ -322,7 +298,6 @@ struct EditorView: View {
             panel = .default1
             return
         }
-
         if isNew {
             let newOverlay = overlayVM.addOverlay(trimmed)
             overlayVM.selectOverlay(newOverlay.id)
@@ -332,11 +307,11 @@ struct EditorView: View {
                 overlayVM.overlays[idx].text = trimmed
             }
         }
+        //reset
         overlayVM.editingOverlayID = nil
         panel = .textToolBar
         editingText = ""
     }
-
 }
 
 //snapshoot view con

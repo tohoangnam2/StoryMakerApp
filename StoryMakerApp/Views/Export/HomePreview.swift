@@ -9,35 +9,18 @@ import SwiftUI
 
 struct HomePreview: View {
     
+    //export
     @ObservedObject var exportingVM: ExportingViewModel
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var overlayVM: OverlayTextViewModel
-    let frame: Frame?
-    @FocusState.Binding var isTextFieldFocused: Bool
-    @Binding var isEditingText : Bool
-    
-    let onAddTap: () -> Void
-    let onTapOutside: () -> Void
-    let onOpenBackgroundEditor: () -> Void
-
-    @Binding var isShowBackgroundPicker: Bool    
-    @State private var isImageLoaded = false
-    @FocusState private var fakeFocus: Bool
-    
-    //export
     @Binding  var snapshotImage: UIImage?
     @Binding var triggerSnapshot : Bool
-    @ObservedObject var vm: BackgroundEditorViewModel
+    
     @Binding var project: MainModel?
-    
     @Binding var goHome: Bool
-
-    
 
     var body: some View {
         NavigationView {
             ZStack{
-              
                 VStack {
                     HStack {
                         Button(action: { dismiss() }) {
@@ -54,8 +37,6 @@ struct HomePreview: View {
                             Image(systemName: "house")
                                 .foregroundColor(.black)
                         }
-
-                            
                     }
                     .padding(.horizontal,10)
                     //main view

@@ -24,14 +24,17 @@ struct ProjectStorage {
         //check thư mục lưuu proj
         let folderURL = projectFolder(for: project.id)
         do {
+            //nếu chưa có tạo luôn
             try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
             //bản sao
             var projectToSave = project
 
             if let img = previewImage,
+               //có preview thì convert sang jpeg 0.9
                let imgData = img.jpegData(compressionQuality: 0.9) {
                 let previewFileName = "project_\(project.id).jpg"
                 let previewURL = folderURL.appendingPathComponent(previewFileName)
+                //thêm đường dẫn
                 try imgData.write(to: previewURL)
                 //gán vào model
                 projectToSave.previewImagePath = previewFileName
@@ -48,10 +51,7 @@ struct ProjectStorage {
             let jsonURL = folderURL.appendingPathComponent("project_\(project.id).json")
             //encode projectToSave thành json
             let data = try JSONEncoder().encode(projectToSave)
-            
             try data.write(to: jsonURL)
-            
-
             print(" Saved project: JSON + preview + original ")
         } catch {
             print(" Error saving project: \(error)")
@@ -59,15 +59,18 @@ struct ProjectStorage {
     }
     // Load tất cả project từ Documents
     static func loadAllProjects() -> [MainModel] {
+        // lấy đường dẫn thư mục
         let documentsURL = getDocumentsDirectory()
         
         do {
+            //lấy ds fullitem trong docs
             let folders = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+            //lọc thư mục có project
                 .filter { $0.lastPathComponent.hasPrefix("project_") }
-            
+            //tìm file json bên trong
             return folders.compactMap { folderURL in
                 let jsonURL = folderURL.appendingPathComponent("\(folderURL.lastPathComponent).json")
-                
+                //đọc dữ liệu và decode thành mode
                 guard let data = try? Data(contentsOf: jsonURL),
                       var project = try? JSONDecoder().decode(MainModel.self, from: data) else {
                     return nil

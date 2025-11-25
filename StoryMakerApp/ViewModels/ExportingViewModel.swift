@@ -5,6 +5,7 @@ import UIKit
 import Photos
 
 class ExportingViewModel: ObservableObject {
+    
     @Published var isExporting: Bool = false
     @Published var progress: Double = 0.0
     @Published var isDone: Bool = false

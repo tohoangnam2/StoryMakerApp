@@ -30,7 +30,6 @@ struct EditorCanvasView: View {
     @Binding var isCreateText: Bool
     @Binding var panel : EditorPanelEnum
     @Binding var editingText : String
-    @State private var didJustDeselect = false
 
     var body: some View {
         NavigationView {
@@ -65,7 +64,6 @@ struct EditorCanvasView: View {
                 }
             }
         }
-        .ignoresSafeArea(.keyboard,edges: .bottom)
         .navigationBarBackButtonHidden(true)
     }
     @ViewBuilder
