@@ -18,6 +18,8 @@ struct BackgroundEditorView: View {
     @Binding var project: MainModel?
     @Binding var editEnum: BackGroundEditEditEnum
     @Binding var panel: EditorPanelEnum
+    @EnvironmentObject var language: LanguageManager
+
     
     var body: some View {
         ZStack{
@@ -29,7 +31,7 @@ struct BackgroundEditorView: View {
                                 .opacity(0)
                         }
                         Spacer()
-                        Text(editEnum.title)
+                        Text(language.currentLanguage == .english ? editEnum.title : editEnum.titleVN)
                             .font(.system(size: 16, weight: .medium))
                         Spacer()
                         

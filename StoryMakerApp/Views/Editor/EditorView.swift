@@ -41,6 +41,8 @@ struct EditorView: View {
     @State var panel : EditorPanelEnum = .default1
     @State var editingText : String = ""
     
+    @EnvironmentObject var language: LanguageManager
+
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom){

@@ -34,6 +34,16 @@ enum BackGroundEditEditEnum : CaseIterable {
             return ""
         }
     }
+    var titleVN : String {
+        switch self {
+        case .filter:
+            return "Bộ lọc"
+        case .brightness:
+            return "Độ sáng"
+        case .none:
+            return ""
+        }
+    }
 }
 
 struct CategoryResponse: Codable {

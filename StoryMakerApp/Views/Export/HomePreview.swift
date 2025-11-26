@@ -17,6 +17,7 @@ struct HomePreview: View {
     
     @Binding var project: MainModel?
     @Binding var goHome: Bool
+    @EnvironmentObject var language: LanguageManager
 
     var body: some View {
         NavigationView {
@@ -27,7 +28,7 @@ struct HomePreview: View {
                             Image("home_back")
                         }
                         Spacer()
-                        Text("Preview")
+                        Text(language.localized("Preview", "Xem trước"))
                             .font(.system(size: 16, weight: .medium))
                         Spacer()
                         Button(action: {
@@ -149,7 +150,7 @@ struct HomePreview: View {
                                 }
                             }) {
                                 HStack {
-                                    Text("Export Photo")
+                                    Text(language.localized("Export Photo", "Xuất Ảnh"))
                                         .foregroundColor(.white)
                                     Image("ic_right")
                                 }

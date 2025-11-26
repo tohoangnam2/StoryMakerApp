@@ -12,6 +12,8 @@ struct TextDetailPanel: View {
     @Binding var tool: OverlayTextEditEnum
     @ObservedObject var overlayVM: OverlayTextViewModel
     @Binding var panel : EditorPanelEnum
+    @EnvironmentObject var language: LanguageManager
+
     
     var body: some View {
         VStack(spacing: 0) {
@@ -20,7 +22,7 @@ struct TextDetailPanel: View {
                     Image("img_edit1_keyboard")
                 }
                 Spacer()
-                Text(tool.title)
+                Text(language.currentLanguage == .english ? tool.title : tool.titleVN)
                     .font(.system(size: 16, weight: .medium))
                 Spacer()
                 Button {

@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var selectedProject: MainModel? = nil
     @State var isShowPremium: Bool = true
     var isNewProject: Bool = false
+    @ObservedObject var language = LanguageManager.shared
 
     var body: some View {
         ZStack {
@@ -23,10 +24,13 @@ struct HomeView: View {
                             //view tabbar
                             VStack(spacing: 25){
                                 HStack{
-                                    Image("home_ictabbar")
+                                    NavigationLink(destination: SettingView()) {
+                                        Image("home_ictabbar")
+
+                                    }
                                     Spacer()
                                     
-                                    Text("Art story".uppercased())
+                                    Text(language.currentLanguage == .english ? "Art story".uppercased(): "Bộ Sưu Tập Ảnh".uppercased())
                                         .font(.system(size: 18, weight: .bold, design: .default))
                                     Spacer()
                                     
@@ -42,8 +46,8 @@ struct HomeView: View {
                                     
                                 }
                                 .padding(.horizontal,20)
-                                Text("Recent Project".uppercased())
-                                    .font(.system(size: 18, weight: .bold, design: .default))
+                                Text(language.currentLanguage == .english ? "Recent Project" : "Dự án gần đây")
+                                    .font(.system(size: 16, weight: .bold, design: .default))
                                     .frame(maxWidth: .infinity, alignment: .topLeading)
                                     .padding(.leading,25)
                             }
@@ -87,12 +91,12 @@ struct HomeView: View {
                                                         Button(role: .destructive) {
                                                             homeVM.deleteProject(project)
                                                         } label: {
-                                                            Label("Delete", systemImage: "trash")
+                                                            Label(language.currentLanguage == .english ? "Delete" : "Xoá", systemImage: "trash")
                                                         }
                                                         Button {
                                                             selectedProject = project
                                                         } label: {
-                                                            Label("Edit", systemImage: "pencil")
+                                                            Label(language.currentLanguage == .english ? "Edit" : "Chỉnh sửa", systemImage: "pencil")
                                                         }
                                                     } label: {
                                                         Image(systemName: "ellipsis.circle")

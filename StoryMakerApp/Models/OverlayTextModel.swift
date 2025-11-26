@@ -124,6 +124,29 @@ enum OverlayTextEditEnum : Equatable , CaseIterable {
             return "ShaDow"
         }
     }
+    var titleVN: String {
+        switch self {
+        case .fontSize:
+            return "Cỡ chữ"
+        case .fontFamily:
+            return "Kiểu chữ"
+        case .colorSolid:
+            return "Màu chữ"
+        case .gradient:
+            return "Hiệu ứng chuyển màu"
+        case .stroke:
+            return "Viền chữ"
+        case .align:
+            return "Căn chỉnh"
+        case .background:
+            return "Nền chữ"
+        case .shadow:
+            return "Đổ bóng"
+        case .none:
+            return "Đổ bóng"
+        }
+    }
+
     
     var img: String {
         switch self {

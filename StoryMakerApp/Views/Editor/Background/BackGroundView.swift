@@ -17,7 +17,8 @@ struct BackGroundView: View {
     let onPicked: (Frame?, UIImage?) -> Void // callback trả Frame hoặc UIImage
     
     @State var isTransferring = false
-    
+    @EnvironmentObject var language: LanguageManager
+
     var body: some View {
         VStack(spacing: 0) {
             // Top Bar
@@ -27,7 +28,7 @@ struct BackGroundView: View {
                 }
                 
                 Spacer()
-                Text("Background")
+                Text(language.localized("Background", "Hình Nền"))
                     .font(.system(size: 18, weight: .medium))
                 Spacer()
                 

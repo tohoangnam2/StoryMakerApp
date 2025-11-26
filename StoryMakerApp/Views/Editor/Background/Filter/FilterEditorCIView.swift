@@ -10,10 +10,11 @@ import SwiftUI
 struct FilterEditorCIView: View {
     
     @ObservedObject var vm: BackgroundEditorViewModel
+    @EnvironmentObject var language: LanguageManager
 
     var body: some View {
         VStack(spacing: 12) {
-            CustomSliderOpacity(title: "Opacity", valueOpacity:$vm.opacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+            CustomSliderOpacity(title: language.localized("Opacity", "Độ mờ"), valueOpacity:$vm.opacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
 
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {

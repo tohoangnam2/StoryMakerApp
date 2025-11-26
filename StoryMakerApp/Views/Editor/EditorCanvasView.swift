@@ -30,6 +30,9 @@ struct EditorCanvasView: View {
     @Binding var isCreateText: Bool
     @Binding var panel : EditorPanelEnum
     @Binding var editingText : String
+    
+    @ObservedObject var language = LanguageManager.shared
+
 
     var body: some View {
         NavigationView {
@@ -74,7 +77,7 @@ struct EditorCanvasView: View {
                 Image("home_add")
                     .frame(width: 50, height: 50)
             }
-            Text("Tap to add Background")
+            Text( language.currentLanguage == .english ? "Tap to add Background" : "Bấm vào để thêm Background")
                 .font(.system(size: 16, weight: .regular))
         }
     }
@@ -106,7 +109,7 @@ struct EditorCanvasView: View {
                         Group {
                             switch panel {
                             case .keyboard(let text, let isNew):
-                                TextField("Nhập chữ...", text: $editingText)
+                                TextField(language.currentLanguage == .english ? "Enter text...":"Nhập chữ...", text: $editingText)
                                     .padding(8)
                                     .background(Color.white.opacity(0.8))
                                     .cornerRadius(8)

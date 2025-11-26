@@ -10,14 +10,15 @@ import SwiftUI
 struct DefaultPanel: View {
     let onAddText: () -> Void
     let onBackground: () -> Void
-    
+    @EnvironmentObject var language: LanguageManager
+
     var body: some View {
         HStack {
             Spacer()
             Button(action: onAddText) {
                 VStack {
                     Image("home_tabbartext")
-                    Text("Add Text")
+                    Text(language.localized("Add Text", "Thêm Chữ"))
                 }
                 .foregroundColor(.black.opacity(0.8))
             }
@@ -26,7 +27,7 @@ struct DefaultPanel: View {
             Button(action: onBackground) {
                 VStack {
                     Image("home_tabbarbg")
-                    Text("Background")
+                    Text(language.localized("Background", "Hình Nền"))
                 }
                 .foregroundColor(.black.opacity(0.8))
             }

@@ -7,8 +7,11 @@
 import Foundation
 import SwiftUI
 
-class AppUsage {
+class AppUsage: ObservableObject {
     static let shared = AppUsage()
-    @AppStorage("hasSeenIntro")  var hasSeenIntro: Bool = false
+
+    @AppStorage("hasSeenIntro") var hasSeenIntro: Bool = false
+    @AppStorage("isDarkMode") var isDarkMode: Bool = false
     
 }
+

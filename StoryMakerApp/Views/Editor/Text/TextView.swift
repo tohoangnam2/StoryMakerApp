@@ -12,6 +12,8 @@ struct TextView: View {
     @ObservedObject var overlayVM: OverlayTextViewModel
     
     var selectedEditText: OverlayTextEditEnum
+    @EnvironmentObject var language: LanguageManager
+
     
     static let solidColors: [String] = [
         "#000000",
@@ -70,9 +72,9 @@ struct TextView: View {
                 case .fontSize:
                     VStack{
                         VStack(spacing: 2) {
-                            CustomSliderRow(title: "Font size", value: overlay.fontSize, minValue: 15.0, maxValue: 80.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                            CustomSliderRow(title: "Line high", value: overlay.lineHeight, minValue: 15.0, maxValue: 80.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                            CustomSliderRow(title: "Letter Spacing", value: overlay.letterSpacing, minValue: 0, maxValue: 20.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: language.localized("Font Size", "Cỡ chữ"), value: overlay.fontSize, minValue: 15.0, maxValue: 80.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: language.localized("Line Height", "Chiều cao dòng"), value: overlay.lineHeight, minValue: 15.0, maxValue: 80.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                            CustomSliderRow(title: language.localized("Letter Spacing", "Khoảng cách chữ"), value: overlay.letterSpacing, minValue: 0, maxValue: 20.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         }
                         .padding()
                     }
@@ -111,7 +113,7 @@ struct TextView: View {
                     
                 case .colorSolid:
                     VStack{
-                        CustomSliderOpacity(title: "Opacity", valueOpacity:overlay.valueOpacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: language.localized("Opacity", "Độ mờ"), valueOpacity:overlay.valueOpacity, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal,showsIndicators: false) {
                                 HStack() {
@@ -154,7 +156,7 @@ struct TextView: View {
                     
                 case .gradient:
                     VStack {
-                        CustomSliderOpacity(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: language.localized("Opacity", "Độ mờ"), valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack {
@@ -217,8 +219,8 @@ struct TextView: View {
                     .padding(.leading, 8)
                 case .stroke:
                     VStack {
-                        CustomSliderRow(title: "Stroke Width", value: overlay.strokeWidth, minValue: 0, maxValue: 30.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        CustomSliderOpacity(title: "Opacity", valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: language.localized("Stroke Width", "Độ dày viền"), value: overlay.strokeWidth, minValue: 0, maxValue: 30.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: language.localized("Opacity", "Độ mờ"), valueOpacity: overlay.valueOpacity, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal) {
                                 HStack {
@@ -257,17 +259,17 @@ struct TextView: View {
                     .padding(.leading, 8)
                 case .align:
                     VStack{
-                        CustomAlign(title: "Align", selectedAlign: overlay.selectedAlign)
-                        CustomAlignCase(title: "Case", selectedAlignCase: overlay.selectedAlignCase)
-                        CustomSliderRow(title: "Cuver", value: overlay.cuver, minValue: 0, maxValue: 30.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomAlign(title: language.localized("Align", "Căn chữ"), selectedAlign: overlay.selectedAlign)
+                        CustomAlignCase(title:  language.localized("Case", "Kiểu chữ"), selectedAlignCase: overlay.selectedAlignCase)
+                        CustomSliderRow(title:  language.localized("Curve", "Độ cong"), value: overlay.cuver, minValue: 0, maxValue: 30.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                     }
                     .padding(.top, 12)
                     
                 case .background:
                     VStack{
-                        CustomSliderRow(title: "Padding", value: overlay.paddingBG, minValue: 0, maxValue: 100.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        CustomSliderRow(title: "Corner", value: overlay.cornerRadiusBG, minValue: 0, maxValue: 100.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        CustomSliderOpacity(title: "Opacity", valueOpacity: overlay.opacityBG, minValue: 0.1, maxValue: 1,  sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: language.localized("Padding", "Khoảng cách"), value: overlay.paddingBG, minValue: 0, maxValue: 100.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title:language.localized("Corner", "Bo góc"), value: overlay.cornerRadiusBG, minValue: 0, maxValue: 100.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: language.localized("Opacity", "Độ mờ"), valueOpacity: overlay.opacityBG, minValue: 0.1, maxValue: 1,  sliderColor: .gray,thumbColor: .red.opacity(0.6))
 
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal) {
@@ -309,8 +311,8 @@ struct TextView: View {
                     VStack{
                         CustomSliderRow(title: "X", value: overlay.offSetXSD, minValue: -5, maxValue: 5, sliderColor: .gray, thumbColor: .red.opacity(0.6))
                         CustomSliderRow(title: "Y", value: overlay.offSetYSD, minValue: -5, maxValue: 5, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        CustomSliderRow(title: "Blur", value: overlay.blurSD, minValue: 2.0, maxValue: 10.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
-                        CustomSliderOpacity(title: "Opacity", valueOpacity:overlay.opacitySD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
+                        CustomSliderRow(title: language.localized("Blur", "Làm mờ"), value: overlay.blurSD, minValue: 2.0, maxValue: 10.0, sliderColor: .gray, thumbColor: .red.opacity(0.6))
+                        CustomSliderOpacity(title: language.localized("Opacity", "Độ mờ"), valueOpacity:overlay.opacitySD, sliderColor: .gray,thumbColor: .red.opacity(0.6))
                         
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal) {

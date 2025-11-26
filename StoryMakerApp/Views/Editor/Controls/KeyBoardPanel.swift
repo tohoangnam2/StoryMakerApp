@@ -12,6 +12,8 @@ struct KeyboardPanel: View {
     @Binding var text: String
     let isNew : Bool
     let onDone: (String,Bool) -> Void
+    @EnvironmentObject var language: LanguageManager
+
     
     var body: some View {
         VStack{
