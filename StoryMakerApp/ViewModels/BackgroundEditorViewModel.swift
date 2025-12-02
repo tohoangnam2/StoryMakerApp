@@ -24,7 +24,8 @@ class BackgroundEditorViewModel: ObservableObject {
         //base change là cái này cũng change
         didSet {
             guard let newImage = baseImage else { return }
-            updatePreviewForNewBaseImage(newImage)
+            let nor = newImage.fixedOrientation()
+            updatePreviewForNewBaseImage(nor)
         }
     }
 
@@ -181,4 +182,18 @@ class BackgroundEditorViewModel: ObservableObject {
     
 
 
+}
+extension UIImage {
+    func fixedOrientation() -> UIImage {
+        if imageOrientation == .up {
+            return self
+        }
+
+        guard let cgImage = self.cgImage else { return self }
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
 }

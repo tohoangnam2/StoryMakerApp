@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct DefaultPanel: View {
+    
     let onAddText: () -> Void
     let onBackground: () -> Void
     @EnvironmentObject var language: LanguageManager

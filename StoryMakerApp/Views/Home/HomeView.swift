@@ -20,9 +20,8 @@ struct HomeView: View {
             NavigationView {
                 ZStack {
                     VStack {
-                        VStack {
                             //view tabbar
-                            VStack(spacing: 25){
+                            VStack(spacing: 18){
                                 HStack{
                                     NavigationLink(destination: SettingView()) {
                                         Image("home_ictabbar")
@@ -47,7 +46,7 @@ struct HomeView: View {
                                 }
                                 .padding(.horizontal,20)
                                 Text(language.currentLanguage == .english ? "Recent Project" : "Dự án gần đây")
-                                    .font(.system(size: 16, weight: .bold, design: .default))
+                                    .font(.system(size: 17, weight: .bold, design: .default))
                                     .frame(maxWidth: .infinity, alignment: .topLeading)
                                     .padding(.leading,25)
                             }
@@ -133,9 +132,6 @@ struct HomeView: View {
                                     }
                                 }
                             }
-                            
-                        }
-                        Spacer()
                     }
                 }
                 .overlay(
@@ -154,7 +150,7 @@ struct HomeView: View {
                                 .shadow(radius: 8)
                         }
                     }
-                        .padding(.bottom, 25),
+                        .padding(.bottom, 8),
                         alignment: .bottom
                 )
             }
@@ -178,25 +174,29 @@ struct HomeView: View {
 struct LoadingOverlay: View {
     var body: some View {
         ZStack {
-            Color.black.opacity(0.3)
+            /// Blur nền
+            Rectangle()
+                .fill(.ultraThinMaterial.opacity(0.8))
                 .ignoresSafeArea()
-                .blur(radius: 4)
+                .overlay(Color.black.opacity(0.1))
 
-            VStack(spacing: 14) {
+            VStack(spacing: 16) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .scaleEffect(1.6)
+                    .scaleEffect(1.3)
 
                 Text("Loading…")
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
-                    .font(.system(size: 16, weight: .medium))
             }
-            .padding(20)
-            .background(.black.opacity(0.35))
-            .cornerRadius(14)
-            .shadow(radius: 6)
+            .padding(.vertical, 25)
+            .padding(.horizontal, 35)
+            .background(.ultraThinMaterial.opacity(0.8))
+            .cornerRadius(22)
+            .shadow(color: .black.opacity(0.25), radius: 20)
+            .transition(.scale.combined(with: .opacity))
         }
-        .transition(.opacity.animation(.easeInOut(duration: 0.25)))
+        .animation(.spring(response: 0.35, dampingFraction: 0.85))
     }
 }
 

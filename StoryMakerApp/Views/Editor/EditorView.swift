@@ -25,13 +25,9 @@ struct EditorView: View {
     @State private var editEnum: BackGroundEditEditEnum = .filter
     //snapshort
     @State private var showPreview = false
-    @State private var takeSnapshot = false
     @State var snapshotImage: UIImage? = nil
-    @State private var triggerSnapshot = false
-    @StateObject private var exportingVM = ExportingViewModel()
-    @State var isExport = false
+    @ObservedObject  var exportingVM = ExportingViewModel()
     var completion: ((UIImage) -> Void)? = nil
-    @State private var isInitialized = false
     //go home
     @State private var showExport = false
     @State private var goHome = false
@@ -40,6 +36,8 @@ struct EditorView: View {
     var onDismiss: (() -> Void)?
     @State var panel : EditorPanelEnum = .default1
     @State var editingText : String = ""
+    @FocusState var isFocused: Bool
+    @State private var canvasViewRef: UIView? = nil
     
     @EnvironmentObject var language: LanguageManager
 
@@ -61,7 +59,10 @@ struct EditorView: View {
                         Button {
                             if vm.baseImage != nil {
                                 saveAndExitExport(project: project,overlayVM: overlayVM,vm: vm) {
+                                    // Mở HomePreview để hiển thị export progress
+                                    exportingVM.resetState()
                                     showPreview = true
+                                  
                                 }
                             }
                         } label: {
@@ -88,11 +89,11 @@ struct EditorView: View {
                                 panel: $panel,
                                 editingText: $editingText
                             )
+                            .captureView { view in
+                                canvasViewRef = view
+                            }
                             .onAppear {
                                 print("onapear")
-                                guard !isInitialized else { return }
-                                isInitialized = true
-
                                 if let existingProject = project {
                                     print("Khôi phục project:", existingProject.id)
                                     overlayVM.overlays = existingProject.textLayers
@@ -105,7 +106,6 @@ struct EditorView: View {
                                 }
                             }
                         }
-                        .modifier(SnapshotWrapper(isExport: isExport, snapshot: $snapshotImage, trigger: $triggerSnapshot))
                         
                         // view editor
                         switch panel {
@@ -121,6 +121,7 @@ struct EditorView: View {
                                         isShowBackgroundPicker = true
                                     }
                                 )
+                            
                             case .keyboard(let text, let isNew):
                                 KeyboardPanel(
                                     //gán cho giá trị đang hiện thị trực tiếp của textfield
@@ -139,6 +140,7 @@ struct EditorView: View {
                             
                             case .textDetail:
                                 TextDetailPanel(tool: $selectedEditText, overlayVM: overlayVM, panel: $panel)
+                            
                             default:
                                 EmptyView()
                         }
@@ -160,10 +162,9 @@ struct EditorView: View {
                         .animation(.easeInOut(duration: 0.2), value: panel)
                 }
             }
-            .onDisappear{
-                onDismiss?()
-            }
             .onDisappear {
+                onDismiss?()
+                
                 guard var current = project else {
                     print("bỏ qua lưu")
                     return
@@ -196,11 +197,11 @@ struct EditorView: View {
         }
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $showPreview) {
-            HomePreview(  exportingVM: exportingVM,
-                          snapshotImage: $snapshotImage,
-                          triggerSnapshot:$triggerSnapshot,
-                          project: $project,
-                          goHome:$goHome)
+            HomePreview(exportingVM: exportingVM,
+                       snapshotImage: $snapshotImage,
+                       project: $project,
+                       goHome: $goHome)
+                        .id(showPreview)
         }
         //back về rôt home
         .onChange(of: goHome) { newValue in
@@ -217,42 +218,57 @@ struct EditorView: View {
     }
     
     func saveAndExitExport(project: MainModel?,overlayVM: OverlayTextViewModel,vm: BackgroundEditorViewModel,completion: @escaping () -> Void) {
-        isExport = true
         resetEditState()
-        // bật trigger snapshot
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            triggerSnapshot = true
-        }
-        //đợi chụp xong rồi mới save
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            guard var currentProject = project else {
-                print("0 có project hiện tại")
-                completion()
-                return
-            }
-            // Cập nhật các thuộc tính chỉnh sửa
-            currentProject.textLayers = overlayVM.overlays
-            currentProject.frame      = frame
-            currentProject.blur       = vm.blur
-            currentProject.shadow     = vm.shadow
-            currentProject.opacity    = vm.opacity
-            currentProject.lightness  = vm.lightness
-            currentProject.saturation = vm.saturation
-            currentProject.selectedFilter = vm.selectedFilter.rawValue
-            currentProject.previewImage   = snapshotImage
-            // Lưu project vào file
-            ProjectStorage.saveProject(
-                currentProject,
-                previewImage: snapshotImage,
-                baseImage: vm.baseImage,
-            )
-            //  Cập nhật state cục bộ trong EditorView
-            self.project = currentProject
-            print(" Saved full project with snapshot & overlays")
-            ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
-            
+        
+        // Chụp snapshot từ view đang hiển thị
+        guard let viewToCapture = canvasViewRef else {
+            print(" Canvas view reference chưa sẵn sàng")
             completion()
+            return
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let renderer = UIGraphicsImageRenderer(bounds: viewToCapture.bounds)
+            self.snapshotImage = renderer.image { ctx in
+                viewToCapture.drawHierarchy(in: viewToCapture.bounds, afterScreenUpdates: true)
+            }
+            
+            self.saveProjectWithSnapshot(project: project, overlayVM: overlayVM, vm: vm, completion: completion)
+        }
+    }
+    
+    private func saveProjectWithSnapshot(project: MainModel?, overlayVM: OverlayTextViewModel, vm: BackgroundEditorViewModel, completion: @escaping () -> Void) {
+        
+        guard var currentProject = project else {
+            print("0 có project hiện tại")
+            completion()
+            return
+        }
+        
+        // Cập nhật các thuộc tính chỉnh sửa
+        currentProject.textLayers = overlayVM.overlays
+        currentProject.frame      = frame
+        currentProject.blur       = vm.blur
+        currentProject.shadow     = vm.shadow
+        currentProject.opacity    = vm.opacity
+        currentProject.lightness  = vm.lightness
+        currentProject.saturation = vm.saturation
+        currentProject.selectedFilter = vm.selectedFilter.rawValue
+        currentProject.previewImage   = snapshotImage
+        
+        // Lưu project vào file
+        ProjectStorage.saveProject(
+            currentProject,
+            previewImage: snapshotImage,
+            baseImage: vm.baseImage
+        )
+        
+        //  Cập nhật state cục bộ trong EditorView
+        self.project = currentProject
+        print(" Saved full project with snapshot & overlays")
+        ProjectStorage.debugPrintProjectJSON(id: currentProject.id)
+        
+        completion()
     }
 
     private func ensureProject() {
@@ -316,64 +332,31 @@ struct EditorView: View {
     }
 }
 
-//snapshoot view con
-struct SnapshotContainer<Content: View>: UIViewRepresentable {
-    let content: Content
-    @Binding var snapshot: UIImage?
-    @Binding var trigger: Bool
+// Helper để capture UIView reference từ SwiftUI View
+struct ViewCaptureModifier: UIViewRepresentable {
+    let onCapture: (UIView) -> Void
     
-    //render thành ảnh
     func makeUIView(context: Context) -> UIView {
-        let container = UIView()
-        let hosting = UIHostingController(rootView: content)
-        hosting.view.backgroundColor = .clear
-        hosting.view.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(hosting.view)
-        
-        NSLayoutConstraint.activate([
-            hosting.view.topAnchor.constraint(equalTo: container.topAnchor),
-            hosting.view.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            hosting.view.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            hosting.view.bottomAnchor.constraint(equalTo: container.bottomAnchor)
-        ])
-        
-        return container
+        let view = UIView(frame: .zero)
+        view.backgroundColor = .clear
+        return view
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        if trigger {
-            DispatchQueue.main.async {
-                let renderer = UIGraphicsImageRenderer(bounds: uiView.bounds)
-                let image = renderer.image { _ in
-                    //vẽ lại toàn bộ giao diện
-                    uiView.drawHierarchy(in: uiView.bounds, afterScreenUpdates: true)
-                }
-                snapshot = image
-                // tránh chup lai
-                trigger = false
+        DispatchQueue.main.async {
+            if let superview = uiView.superview?.superview {
+                onCapture(superview)
             }
         }
     }
 }
-struct SnapshotWrapper: ViewModifier {
-    let isExport: Bool
-    @Binding var snapshot: UIImage?
-    //kH hanh dong chup
-    @Binding var trigger: Bool
-    
-    func body(content: Content) -> some View {
-        Group {
-            if isExport {
-                SnapshotContainer(content: content,
-                                  snapshot: $snapshot,
-                                  trigger: $trigger)
-            } else {
-                //kothi hien thi bthg
-                content
-            }
-        }
+
+extension View {
+    func captureView(_ callback: @escaping (UIView) -> Void) -> some View {
+        background(ViewCaptureModifier(onCapture: callback))
     }
 }
+
 
 extension View {
     //cho phép trả về nheiefu view hay viewkhac nhau 

@@ -8,9 +8,9 @@ import SwiftUI
 
 @main
 struct StoryMakerAppApp: App {
+    
     @State var screen : ScreenEnum = .splash
     @ObservedObject var appUsage = AppUsage.shared
-    
     @StateObject var language = LanguageManager.shared
 
     var body: some Scene {
@@ -23,6 +23,7 @@ struct StoryMakerAppApp: App {
                     HomeView()
                 }
             }
+            
             .environmentObject(language)
             .preferredColorScheme(appUsage.isDarkMode ? .dark : .light)
         }

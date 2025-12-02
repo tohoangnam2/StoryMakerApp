@@ -15,7 +15,6 @@ struct BackGroundView: View {
     @State private var showImagePicker = false
     @State var backgroundType: BackGroundTypeEnum = .api
     let onPicked: (Frame?, UIImage?) -> Void // callback trả Frame hoặc UIImage
-    
     @State var isTransferring = false
     @EnvironmentObject var language: LanguageManager
 
@@ -52,6 +51,7 @@ struct BackGroundView: View {
                             //trả về ảnh check đk rồi truyền sang
                             let final = fullImage ?? UIImage(named: "placeholder")!
                             onPicked(frame, final)
+                            print(url)
                             dismiss()
                         }
                     }
@@ -99,31 +99,43 @@ struct BackGroundView: View {
                                 .padding(12)
                             }
                             .refreshable {
-                                vm.fetch()
+                                vm.refreshSelectedCategory()
                             }
                         }
                     }
-                    if vm.isLoadingFullImage {
-                        ZStack {
-                            Color.white.opacity(0.25)
-                                .edgesIgnoringSafeArea(.bottom)
-                                .transition(.opacity)
-                            ProgressView()
-                            Text("Loading…")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.white)
-                        }
-                        .padding(16)
-                        .zIndex(1)
-                    }
+                   
                 }
                 .onAppear {
                     if backgroundType == .api {
                         vm.fetch()
                     }
                 }
+                if vm.isLoadingFullImage || isTransferring {
+                    ZStack {
+                        Rectangle()
+                            .fill(.ultraThinMaterial.opacity(0.8))
+                            .ignoresSafeArea(.all)
+                            .overlay(Color.black.opacity(0.1))
+
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .scaleEffect(1.3)
+
+                            Text("Loading…")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.white)
+                        }
+                        .padding(.vertical, 25)
+                        .padding(.horizontal, 35)
+                        .background(.ultraThinMaterial.opacity(0.8))
+                        .cornerRadius(22)
+                        .shadow(color: .black.opacity(0.25), radius: 20)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+                    .animation(.spring(response: 0.35, dampingFraction: 0.85))
+                }
             }
-            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.all, edges: .bottom)
@@ -132,11 +144,12 @@ struct BackGroundView: View {
         }
         .onChange(of: pickedImage) { newImage in
             guard let img = newImage else { return }
+            let fixed = img.fixedOrientation()
             //  bật loading trước khi bắn callback
             isTransferring = true
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                onPicked(nil, img)
+                onPicked(nil, fixed)
                 // dismiss sau 0.15s để Editor có thời gian render ảnh
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     dismiss()
@@ -182,7 +195,6 @@ struct BackGroundView: View {
 
         }.resume()
     }
-
 }
 
 // Category tags

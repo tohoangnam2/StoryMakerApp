@@ -13,8 +13,6 @@ struct HomePreview: View {
     @ObservedObject var exportingVM: ExportingViewModel
     @Environment(\.dismiss) var dismiss
     @Binding  var snapshotImage: UIImage?
-    @Binding var triggerSnapshot : Bool
-    
     @Binding var project: MainModel?
     @Binding var goHome: Bool
     @EnvironmentObject var language: LanguageManager
@@ -30,6 +28,7 @@ struct HomePreview: View {
                         Spacer()
                         Text(language.localized("Preview", "Xem trước"))
                             .font(.system(size: 16, weight: .medium))
+                            .opacity(0)
                         Spacer()
                         Button(action: {
                             goHome = true
@@ -51,13 +50,13 @@ struct HomePreview: View {
                                 .scaledToFit()
                                 .clipped()
                                 .padding(.horizontal, 20)
-                                .scaleEffect(exportingVM.isDone ? 0.95 : 1.0, anchor: .center)
+                                .scaleEffect(0.95 , anchor: .center)
                                 .animation(.easeInOut(duration: 0.3), value: exportingVM.isDone)
                         }
                     }
                     
                     //view share
-                    if exportingVM.isDone {
+//                    if exportingVM.isDone {
                         VStack{
                             Text("Photo saved to gallery")
                                 .font(.system(size: 16, weight: .medium))
@@ -121,43 +120,39 @@ struct HomePreview: View {
                             }
                         }
                         .padding(.horizontal,55)
-                    }
+//                    }
                     //view export
-                    else {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 60)
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(height: 50)
-
-                            Button(action: {
-                                triggerSnapshot = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    if let image = snapshotImage {
-                                        // Nếu chưa có project thì tạo mới
-                                        var currentProject = project ?? MainModel(id: UUID())
-                                        currentProject.previewImage = image
-                                        exportingVM.startExporting(projectID: currentProject.id, image: image)
-                                        
-                                    } else {
-                                        print(" Snapshot chưa kịp tạo")
-                                    }
-                                }
-                            }) {
-                                HStack {
-                                    Text(language.localized("Export Photo", "Xuất Ảnh"))
-                                        .foregroundColor(.white)
-                                    Image("ic_right")
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 80)
-                    }
+//                    else {
+//                        ZStack {
+//                            RoundedRectangle(cornerRadius: 60)
+//                                .fill(
+//                                    LinearGradient(
+//                                        gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
+//                                        startPoint: .topLeading,
+//                                        endPoint: .bottomTrailing
+//                                    )
+//                                )
+//                                .frame(height: 50)
+//
+//                            Button(action: {
+//                                if let image = snapshotImage {
+//                                    // Nếu chưa có project thì tạo mới
+//                                    var currentProject = project ?? MainModel(id: UUID())
+//                                    currentProject.previewImage = image
+//                                    exportingVM.startExporting(projectID: currentProject.id, image: image)
+//                                } else {
+//                                    print(" Snapshot chưa có")
+//                                }
+//                            }) {
+//                                HStack {
+//                                    Text(language.localized("Export Photo", "Xuất Ảnh"))
+//                                        .foregroundColor(.white)
+//                                    Image("ic_right")
+//                                }
+//                            }
+//                        }
+//                        .padding(.horizontal, 80)
+//                    }
                 }
             }
             .fullScreenCover(isPresented: $exportingVM.isExporting) {
@@ -197,20 +192,20 @@ struct HomePreview: View {
             let pasteboardItems: [String: Any] = [
                 "com.instagram.sharedSticker.backgroundImage": imageData
             ]
-                   
-               // Set pasteboard options
+            
+            // Set pasteboard options
             let pasteboardOptions: [UIPasteboard.OptionsKey: Any] = [
                 .expirationDate: Date().addingTimeInterval(60)
             ]
-               // Attach the pasteboard items
-               UIPasteboard.general.setItems([pasteboardItems], options: pasteboardOptions)
-
+            // Attach the pasteboard items
+            UIPasteboard.general.setItems([pasteboardItems], options: pasteboardOptions)
+            
             UIApplication.shared.open(urlScheme, options: [:], completionHandler: nil)
-
-           } else {
-               // Handle error cases
-           }
+            
+        } else {
+            // Handle error cases
         }
+    }
 }
 
 

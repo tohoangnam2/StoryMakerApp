@@ -14,6 +14,9 @@ class ExportingViewModel: ObservableObject {
     private var documentController: UIDocumentInteractionController?
 
     func startExporting(projectID: UUID, image: UIImage) {
+        
+        resetState()
+        
         self.isExporting = true
         self.progress = 0.0
         self.isDone = false
@@ -21,11 +24,11 @@ class ExportingViewModel: ObservableObject {
         timer?.invalidate()
         
         // Timer chỉ chạy đến 0.99
-        timer = Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true) { [weak self] t in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.002, repeats: true) { [weak self] t in
             guard let self = self else { return }
             
-            if self.progress < 0.99 {
-                self.progress += 0.005
+            if self.progress < 0.9 {
+                self.progress += 0.002
             } else {
                 t.invalidate()
                 self.timer = nil
@@ -39,6 +42,14 @@ class ExportingViewModel: ObservableObject {
                   filename: "project_\(projectID).jpg"
               )
           }
+    }
+    func resetState() {
+        timer?.invalidate()
+        timer = nil
+        progress = 0
+        isDone = false
+        isExporting = false
+        exportedFileURL = nil
     }
 
     private func saveImageToProjectDirectory(projectID: UUID, image: UIImage, filename: String) {
@@ -61,12 +72,17 @@ class ExportingViewModel: ObservableObject {
                         PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: fileURL)
                     }) { _, _ in
                         DispatchQueue.main.async {
-                            withAnimation {
-                                self.progress = 1.0
+                            DispatchQueue.main.async {
+                                withAnimation(.linear(duration: 0.3)) {
+                                    self.progress = 1.0
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    self.isDone = true
+                                    self.isExporting = false
+                                    self.exportedFileURL = fileURL
+                                }
                             }
-                            self.isDone = true
-                            self.isExporting = false
-                            self.exportedFileURL = fileURL
+
                         }
                     }
                 } else {

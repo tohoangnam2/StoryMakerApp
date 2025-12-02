@@ -72,6 +72,7 @@ struct ExportingView: View {
                 Spacer()
                 .padding(.horizontal, 16)
             }
+            
         }
         .navigationBarBackButtonHidden(true)
     }

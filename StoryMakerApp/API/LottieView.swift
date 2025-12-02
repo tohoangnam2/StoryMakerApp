@@ -6,13 +6,37 @@
 //
 
 import SwiftUI
+import Lottie
 
-struct LottieView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct LottieView: UIViewRepresentable {
+    let filename: String
+    let loopMode: LottieLoopMode
+
+    init(filename: String, loopMode: LottieLoopMode = .playOnce) {
+        self.filename = filename
+        self.loopMode = loopMode
     }
-}
 
-#Preview {
-    LottieView()
+    func makeUIView(context: Context) -> some UIView {
+        let view = UIView(frame: .zero)
+
+        let animationView = LottieAnimationView(name: filename)
+        animationView.loopMode = loopMode
+        animationView.contentMode = .scaleAspectFit
+        animationView.play()
+
+        animationView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(animationView)
+
+        NSLayoutConstraint.activate([
+            animationView.topAnchor.constraint(equalTo: view.topAnchor),
+            animationView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            animationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            animationView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+
+        return view
+    }
+
+    func updateUIView(_ uiView: UIViewType, context: Context) {}
 }

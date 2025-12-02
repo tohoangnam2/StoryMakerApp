@@ -7,6 +7,8 @@
 
 import SwiftUI
 import MessageUI
+import StoreKit
+
 
 struct SettingView: View {
     @Environment(\.dismiss) var dismiss
@@ -38,6 +40,7 @@ struct SettingView: View {
                         }
                     }
                     .padding(.horizontal, 16)
+               
                     List {
                         // SECTION 1
                         Section {
@@ -72,7 +75,7 @@ struct SettingView: View {
                                          Text(language.currentLanguage == .english ? "Darks Theme" : "Chủ đề tối")
                                              .font(.system(size: 16, weight: .medium, design: .default))
                                      }
-                                 }
+                            }
                                  .toggleStyle(SwitchToggleStyle(tint: .green))
                         }
                         .padding()
@@ -82,13 +85,11 @@ struct SettingView: View {
                             ForEach(SettingEnum.allCases, id: \.self) { setting in
                                 Button(action: {
                                     handleSettingAction(setting)
-
                                 }, label: {
                                     HStack(spacing: 15){
                                         Image(setting.image)
                                         Text(language.currentLanguage == .english ? setting.title : setting.titleVN)
                                             .font(.system(size: 16, weight: .medium, design: .default))
-                                           
                                     }
                                     .padding()
                                 })                                
@@ -107,12 +108,25 @@ struct SettingView: View {
             MailView(subject: "Feedback for StoryMakerApp",
                      toEmail: "tohoangnam03@gmail.com")
         }
-
-
         .fullScreenCover(isPresented: $isShowPremium) {
             SubcriptionView()
         }
     }
+    func rateApp() {
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
+        }
+    }
+    func feedback() {
+        if MFMailComposeViewController.canSendMail() {
+            showMail = true
+        } else {
+            // Nếu máy user chưa đăng nhập email
+            let url = URL(string: "mailto:tohoangnam03@gmail.com")!
+            UIApplication.shared.open(url)
+        }
+    }
+    
     func handleSettingAction(_ setting: SettingEnum) {
         switch setting {
         case .policy:
@@ -120,19 +134,11 @@ struct SettingView: View {
         case .share:
             EmptyView()
         case .feedback:
-            if MFMailComposeViewController.canSendMail() {
-                showMail = true
-            } else {
-                // Nếu máy user chưa đăng nhập email
-                let url = URL(string: "mailto:tohoangnam03@gmail.com")!
-                UIApplication.shared.open(url)
-            }
+            feedback()
         case .rate:
-            EmptyView()
-
+            rateApp()
         case .other:
             EmptyView()
-
         case .version:
             break
         }

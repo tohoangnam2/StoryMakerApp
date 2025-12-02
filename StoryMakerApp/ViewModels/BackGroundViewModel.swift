@@ -12,6 +12,7 @@ class BackGroundViewModel: ObservableObject {
 
     @Published var model: BackGroundModel? = nil
     @Published var selectedCategory: Category? = nil
+    
     @Published var isLoadingFullImage = false
     //lưu ảnh fullsize theo url
     private var fullImageCache: [URL: UIImage] = [:]
@@ -43,6 +44,11 @@ class BackGroundViewModel: ObservableObject {
         }
         task.resume()
     }
+    func refreshSelectedCategory() {
+        objectWillChange.send()
+    }
+
+
     //trả về fram mà category đang chọn
     func framesForSelectedCategory() -> [Frame] {
         guard let selected = selectedCategory else { return [] }
@@ -52,6 +58,7 @@ class BackGroundViewModel: ObservableObject {
     func categoryName(for frame: Frame) -> String? {
           return model?.config.category.first(where: { $0.id == frame.category })?.name
     }
+    
 }
 
 
