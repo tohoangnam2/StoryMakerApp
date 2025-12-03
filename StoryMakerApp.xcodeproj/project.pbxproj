@@ -77,6 +77,7 @@
 		547AA2EA2EDD832700456661 /* splash.json in Resources */ = {isa = PBXBuildFile; fileRef = 547AA2E92EDD832700456661 /* splash.json */; };
 		547AA2EC2EDD8DED00456661 /* loading.json in Resources */ = {isa = PBXBuildFile; fileRef = 547AA2EB2EDD8DED00456661 /* loading.json */; };
 		547AA2EE2EDD910C00456661 /* loading_bar.json in Resources */ = {isa = PBXBuildFile; fileRef = 547AA2ED2EDD910C00456661 /* loading_bar.json */; };
+		547AA2F02EDEE82B00456661 /* ExportFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547AA2EF2EDEE82B00456661 /* ExportFlowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -151,6 +152,7 @@
 		547AA2E92EDD832700456661 /* splash.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = splash.json; sourceTree = "<group>"; };
 		547AA2EB2EDD8DED00456661 /* loading.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = loading.json; sourceTree = "<group>"; };
 		547AA2ED2EDD910C00456661 /* loading_bar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = loading_bar.json; sourceTree = "<group>"; };
+		547AA2EF2EDEE82B00456661 /* ExportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportFlowView.swift; sourceTree = "<group>"; };
 		BB94D9EE2E541CBD008F66EA /* StoryMakerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMakerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -282,6 +284,7 @@
 			children = (
 				544C176B2E8FBF1600999A9B /* ExportingView.swift */,
 				544C176C2E8FBF1600999A9B /* HomePreview.swift */,
+				547AA2EF2EDEE82B00456661 /* ExportFlowView.swift */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -551,6 +554,7 @@
 				54659D852ECDB3C000A89E47 /* TextDetailPanel.swift in Sources */,
 				544C17622E8FBF0600999A9B /* UIImage+LUT.swift in Sources */,
 				54659D922ED6B7C600A89E47 /* test2.swift in Sources */,
+				547AA2F02EDEE82B00456661 /* ExportFlowView.swift in Sources */,
 				546968B02E6E8C2E00BD2B77 /* EditorView.swift in Sources */,
 				546489AE2EB9AB7900818483 /* ExtensionTextView.swift in Sources */,
 				543F83B52EB21BE400354EDB /* FilterEditorCIView.swift in Sources */,

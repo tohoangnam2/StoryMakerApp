@@ -12,18 +12,18 @@ class ExportingViewModel: ObservableObject {
     @Published var exportedFileURL: URL? = nil
     private var timer: Timer?
     private var documentController: UIDocumentInteractionController?
-
-    func startExporting(projectID: UUID, image: UIImage) {
+    
+    func startExporting(image: UIImage, completion: (() -> Void)? = nil) {
         
         resetState()
         
         self.isExporting = true
         self.progress = 0.0
         self.isDone = false
-          
+        
         timer?.invalidate()
         
-        // Timer chỉ chạy đến 0.99
+        // Progress chạy đến 0.90 (90%)
         timer = Timer.scheduledTimer(withTimeInterval: 0.002, repeats: true) { [weak self] t in
             guard let self = self else { return }
             
@@ -34,15 +34,36 @@ class ExportingViewModel: ObservableObject {
                 self.timer = nil
             }
         }
-
-          DispatchQueue.global(qos: .background).async {
-              self.saveImageToProjectDirectory(
-                  projectID: projectID,
-                  image: image,
-                  filename: "project_\(projectID).jpg"
-              )
-          }
+        
+        // Bước 2: Save vào Photos
+        DispatchQueue.global(qos: .background).async {
+            
+            self.saveToPhotosOnly(
+                image,
+                onDenied: {
+                    // Không lưu được → vẫn hoàn thành export
+                    DispatchQueue.main.async {
+                        self.finishExport()
+                        completion?()
+                    }
+                },
+                onSaved: {
+                    DispatchQueue.main.async {
+                        self.finishExport()
+                        completion?()
+                    }
+                }
+            )
+        }
     }
+    private func finishExport() {
+        withAnimation(.linear(duration: 0.3)) {
+            self.progress = 1.0
+        }
+        self.isDone = true
+        self.isExporting = false
+    }
+    
     func resetState() {
         timer?.invalidate()
         timer = nil
@@ -51,53 +72,40 @@ class ExportingViewModel: ObservableObject {
         isExporting = false
         exportedFileURL = nil
     }
-
-    private func saveImageToProjectDirectory(projectID: UUID, image: UIImage, filename: String) {
-        guard let imageData = image.jpegData(compressionQuality: 0.9) else { return }
-
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let projectFolder = documentsURL.appendingPathComponent("project_\(projectID)")
-        try? FileManager.default.createDirectory(at: projectFolder, withIntermediateDirectories: true)
-
-        let fileURL = projectFolder.appendingPathComponent(filename)
-
-        do {
-            try imageData.write(to: fileURL)
-            print("Saved JPG to: \(fileURL)")
-
-            // Lưu vào Photos
-            PHPhotoLibrary.requestAuthorization { status in
-                if status == .authorized || status == .limited {
-                    PHPhotoLibrary.shared().performChanges({
-                        PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: fileURL)
-                    }) { _, _ in
-                        DispatchQueue.main.async {
-                            DispatchQueue.main.async {
-                                withAnimation(.linear(duration: 0.3)) {
-                                    self.progress = 1.0
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    self.isDone = true
-                                    self.isExporting = false
-                                    self.exportedFileURL = fileURL
-                                }
-                            }
-
-                        }
-                    }
-                } else {
-                    // User không cho phép → vẫn kết thúc nhưng không save Photos
-                    DispatchQueue.main.async {
-                        withAnimation { self.progress = 1.0 }
-                        self.isDone = true
-                        self.isExporting = false
-                        self.exportedFileURL = fileURL
+    func saveToPhotosOnly(
+        _ image: UIImage,
+        onDenied: @escaping () -> Void,
+        onSaved: @escaping () -> Void
+    ) {
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        
+        switch status {
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+                DispatchQueue.main.async {
+                    if newStatus == .authorized || newStatus == .limited {
+                        self.performSave(image, onSaved: onSaved)
+                    } else {
+                        onDenied()
                     }
                 }
             }
-
-        } catch {
-            print("Error: \(error)")
+            
+        case .authorized, .limited:
+            performSave(image, onSaved: onSaved)
+            
+        default:
+            onDenied()
+        }
+    }
+    
+    private func performSave(_ image: UIImage, onSaved: @escaping () -> Void) {
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }) { success, error in
+            DispatchQueue.main.async {
+                onSaved()
+            }
         }
     }
 }

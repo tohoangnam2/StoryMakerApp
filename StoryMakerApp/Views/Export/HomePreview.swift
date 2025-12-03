@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Photos
 
 struct HomePreview: View {
     
@@ -16,6 +17,9 @@ struct HomePreview: View {
     @Binding var project: MainModel?
     @Binding var goHome: Bool
     @EnvironmentObject var language: LanguageManager
+    @State private var showPermissionAlert = false
+    @State private var showSettingsAlert = false
+    @State private var message = ""
 
     var body: some View {
         NavigationView {
@@ -40,7 +44,15 @@ struct HomePreview: View {
                     }
                     .padding(.horizontal,10)
                     //main view
-                    if let project = project {
+                    if let snapshot = snapshotImage {
+                        Image(uiImage: snapshot)
+                            .resizable()
+                            .scaledToFit()
+                            .clipped()
+                            .padding(.horizontal, 20)
+                            .scaleEffect(0.95 , anchor: .center)
+                            .animation(.easeInOut(duration: 0.3), value: exportingVM.isDone)
+                    } else if let project = project {
                         let folderURL = ProjectStorage.projectFolder(for: project.id)
                         let previewURL = folderURL.appendingPathComponent("project_\(project.id).jpg")
 
@@ -56,7 +68,6 @@ struct HomePreview: View {
                     }
                     
                     //view share
-//                    if exportingVM.isDone {
                         VStack{
                             Text("Photo saved to gallery")
                                 .font(.system(size: 16, weight: .medium))
@@ -66,6 +77,41 @@ struct HomePreview: View {
                         }
                         HStack (spacing: 20){
                             //story
+                            VStack{
+                                Button(action: {
+                                    downloadImage()
+                                })
+                                {
+                                    ZStack {
+                                        Rectangle()
+                                            .fill(Color.preBg)
+                                            .frame(width:50,height: 50)
+                                            .cornerRadius(10)
+                                        Image(systemName: "square.and.arrow.down")
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                
+                                Text("DownLoad")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .alert("Permission Needed", isPresented: $showPermissionAlert) {
+                                Button("OK", role: .cancel) { }
+                            } message: {
+                                Text(message)
+                            }
+
+                            .alert("Photo Access Denied", isPresented: $showSettingsAlert) {
+                                Button("Open Settings") {
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                                Button("Cancel", role: .cancel) { }
+                            } message: {
+                                Text("Please enable photo access in Settings to save pictures.")
+                            }
+                            
                             VStack{
                                 Button(action: {
                                     shareToStory()
@@ -120,47 +166,30 @@ struct HomePreview: View {
                             }
                         }
                         .padding(.horizontal,55)
-//                    }
-                    //view export
-//                    else {
-//                        ZStack {
-//                            RoundedRectangle(cornerRadius: 60)
-//                                .fill(
-//                                    LinearGradient(
-//                                        gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
-//                                        startPoint: .topLeading,
-//                                        endPoint: .bottomTrailing
-//                                    )
-//                                )
-//                                .frame(height: 50)
-//
-//                            Button(action: {
-//                                if let image = snapshotImage {
-//                                    // Nếu chưa có project thì tạo mới
-//                                    var currentProject = project ?? MainModel(id: UUID())
-//                                    currentProject.previewImage = image
-//                                    exportingVM.startExporting(projectID: currentProject.id, image: image)
-//                                } else {
-//                                    print(" Snapshot chưa có")
-//                                }
-//                            }) {
-//                                HStack {
-//                                    Text(language.localized("Export Photo", "Xuất Ảnh"))
-//                                        .foregroundColor(.white)
-//                                    Image("ic_right")
-//                                }
-//                            }
-//                        }
-//                        .padding(.horizontal, 80)
-//                    }
                 }
             }
-            .fullScreenCover(isPresented: $exportingVM.isExporting) {
-                ExportingView(exportingVM: exportingVM)
-            }
+
         }
        
     }
+    
+    func downloadImage() {
+        guard let img = snapshotImage else { return }
+
+        exportingVM.saveToPhotosOnly(
+            img,
+            onDenied: {
+                showSettingsAlert = true
+            },
+            onSaved: {
+                message = "Saved to your Photos!"
+                showPermissionAlert = true
+            }
+        )
+    }
+
+
+
     func shareToStory() {
         
         guard let instagramURL = URL(string: "instagram-stories://share?source_application=a.StoryMakerApp"),

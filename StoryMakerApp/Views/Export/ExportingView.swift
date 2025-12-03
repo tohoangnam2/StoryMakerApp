@@ -5,16 +5,23 @@ import SwiftUI
 struct ExportingView: View {
     
     @ObservedObject var exportingVM: ExportingViewModel
+    
+    var projectID: UUID
+    var snapshot: UIImage
+    
+    var onDone: (() -> Void)? = nil
+    
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         NavigationView {
             ZStack(alignment: .topLeading) {
-                VStack() {
+                
+                VStack {
                     // Thanh navigationbar
                     HStack {
                         Button(action: {
-                            dismiss()
+                            dismiss()     // ⬅ Cancel vẫn cho phép thoát
                         }) {
                             Image("home_back")
                         }
@@ -22,6 +29,7 @@ struct ExportingView: View {
                     }
                     .padding(.bottom, 31)
 
+                    // Progress circle
                     ZStack {
                         Circle()
                             .stroke(Color("#F5F5F5"), lineWidth: 10)
@@ -42,38 +50,48 @@ struct ExportingView: View {
                             .animation(.easeInOut(duration: 0.3), value: exportingVM.progress)
 
                         
-                        // Hiển thị phần trăm
                         Text("\(Int(exportingVM.progress * 100))%")
                             .font(.system(size: 22, weight: .bold))
                     }
                     .padding(.bottom, 30)
 
                     Text("Processing...")
-                        .font(.system(size: 18, weight: .bold, design: .default))
+                        .font(.system(size: 18, weight: .bold))
                         .padding(.bottom, 15)
 
                     Button(action: {
-                        dismiss()
+                        dismiss()      // Cancel
                     }) {
-                        ZStack{
+                        ZStack {
                             RoundedRectangle(cornerRadius: 60)
                                 .fill(
-                                    LinearGradient(gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
-                                                   startPoint: .topLeading,
-                                                   endPoint: .bottomTrailing)
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.bgSplash2, Color.bgSplash1]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
                                 .frame(height: 50)
+                            
                             Text("Cancel")
                                 .foregroundColor(.white)
                         }
                         .padding(.horizontal, 80)
                     }
                 }
+                
                 Spacer()
-                .padding(.horizontal, 16)
+                    .padding(.horizontal, 16)
             }
             
+            .onAppear {
+                exportingVM.startExporting(image: snapshot) {
+                    onDone?()
+                }
+
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
 }
+
